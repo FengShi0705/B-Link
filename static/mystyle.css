@@ -1,0 +1,56 @@
+svg#Mainback {
+    position:fixed; top:0; bottom:0; left:0; right:0;
+}
+
+html, body { margin:0; padding:0; overflow:hidden }
+
+h1#title{
+  font-family:cursive;
+  color:#4776DA;
+  vertical_align:middle;
+}
+
+div.input {
+  float: left;
+}
+
+input[name="keywords"]{
+  width: 400px;
+  height: 30px;
+  font-size: 20px;
+  border-style:groove;
+  border-radius: 2px;
+  vertical-align:middle;
+}
+
+input[name="search"]{
+  width: 55px;
+  height: 40px;
+  background-image:url('/static/SearchButton.png');
+  background-size:100%;
+  vertical-align:middle;
+}
+
+div.header{
+   margin-left: 500px;
+   width:50%;
+}
+
+.edge {
+  stroke: #ccc;
+}
+
+.neighbor_track{
+  stroke: blue;
+  stroke-dasharray:5, 10;
+  fill: none;
+}
+
+svg rect#Backlayer{
+   fill:lime;
+   stroke:red;
+   stroke-width:5;
+   fill-opacity:0.1;
+   stroke-opacity:0.9;
+}
+
