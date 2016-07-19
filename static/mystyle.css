@@ -37,7 +37,13 @@ div.header{
 }
 
 .edge {
-  stroke: #ccc;
+  stroke: #aaa;
+}
+
+.gnode circle {
+  fill: red;
+  stroke: #fff;
+  stroke-width: 2px;
 }
 
 .neighbor_track{

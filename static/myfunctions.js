@@ -72,7 +72,6 @@ function force_v4(dataset){
                .on("end", dragended));
 
   gnodes.append("circle")
-         .style("fill","red")
          .attr("r",function(d){return scale_NodeRadius(d.N);});
 
   gnodes.append("text")
@@ -192,8 +191,42 @@ function circle_layout_neighbor(dataset){
    TITLECOLOR_CHANGE();
 };
 
+// wordrank highlight relevant words and corresponding paths
+function highlight_wordrank(dataset){
+    //not fade
+    d3.selectAll(".gnode").selectAll("circle").transition().style("opacity","1");
+    d3.selectAll(".gnode").selectAll("text").transition().style("opacity","1");
+    d3.selectAll(".edge").transition().style("opacity","1");
+
+    // generate a highlighted graph based on the top relevant words and corresponding paths
+    var hltG=new jsnx.Graph();;
+    for (var i = 0; i < Math.min(dataset.length, HltNodesNumber); i++){
+        hltG.addNode(dataset[i][0]);
+        hltG.addPath(dataset[i][1]);
+    };
+
+    //transparent nodes
+    var fadenodes=d3.selectAll(".gnode").filter(function(d){return !(hltG.hasNode(d.wid));});
+    fadenodes.selectAll("circle").transition().style("opacity","0.1");
+    fadenodes.selectAll("text").transition().style("opacity","0.1");
+
+
+    //transparent edges
+    var fadeedges=d3.selectAll(".edge").filter(function(d){return !(hltG.hasEdge(d.source.wid,d.target.wid)) ;});
+        fadeedges.transition().style("opacity","0.1");
+
+    //change title color
+    TITLECOLOR_CHANGE();
+
+};
+
 // Back to force layout
-function BacktoForce(){
+function RedoBack(){
+    //fade false
+    d3.selectAll(".gnode").selectAll("circle").transition().style("opacity","1");
+    d3.selectAll(".gnode").selectAll("text").transition().style("opacity","1");
+    d3.selectAll(".edge").transition().style("opacity","1");
+
     d3.selectAll("circle.neighbor_track").remove();
     SIMULATION.force("link").strength(function(d) {
         return 1 / Math.min(d.source.n, d.target.n);

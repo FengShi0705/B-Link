@@ -1,7 +1,7 @@
 from flask import Flask, render_template, make_response, request
 import json
 import networkx as nx
-from networkanalysis.Analysis import Retrievor
+from networkanalysis.Analysis import Retrievor,PF
 
 app=Flask(__name__)
 
@@ -48,4 +48,18 @@ def neighbor_level(node):
 
     response=json.dumps(response)
     return make_response(response)
+
+
+# WordRank
+# Get relevant word list and corresponding path list for a word
+@app.route('/wordrank/<int:node>')
+def wordrank(node):
+    response = my_localRtr.get_Rel_one(node,"Fw", len(nx.node_connected_component(my_localRtr.G, node)) )
+    nodesandpaths=[]
+    for n,p in response.iteritems():
+        path=p[1]
+        nodesandpaths.append([n,path])
+    response=json.dumps(nodesandpaths)
+    return make_response(response)
+
 

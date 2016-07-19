@@ -40,3 +40,4 @@ var tran = d3.transition()
              .duration(5000)
              .ease(d3.easeLinear);
 
+var HltNodesNumber=5;
