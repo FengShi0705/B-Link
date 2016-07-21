@@ -34,10 +34,11 @@ var maxlinkdistance=100;
 var minlinkdistance=20;
 var maxlinkwidth=5;
 var minlinkwidth=1;
-var maxNodeRadius=10;
+var maxNodeRadius=20;
 var minNodeRadius=5;
 var tran = d3.transition()
              .duration(5000)
              .ease(d3.easeLinear);
 
-var HltNodesNumber=5;
+var HltNodesNumber=20;
+var POSITIONFORCE_STRENGTH=0.8;

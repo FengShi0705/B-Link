@@ -67,19 +67,10 @@ class UndirectedG(object):
     # Based on probable path / relativeness measurement
     # Rel Form is OrderedDict(  [    ( target, [ length, [path from source to target] ] ) ,...] )
     # Checked OK
-    def get_Rel_one(self,ipt,tp,N,cut=6.0):
-        if N>= len( nx.node_connected_component(self.G, ipt) ):
-            N=len( nx.node_connected_component(self.G, ipt) )
+    def get_Rel_one(self,ipt,tp,N):
+        T2L,T2P=nx.single_source_dijkstra(self.G,ipt,Noff=N,weight=tp)
 
-        T2L,T2P=nx.single_source_dijkstra(self.G,ipt,cutoff=cut,weight=tp)
-        count=len(T2L.keys())
-
-        while count<N:
-            cut=cut+1.0
-            T2L,T2P=nx.single_source_dijkstra(self.G,ipt,cutoff=cut,weight=tp)
-            count=len(T2L.keys())
-
-        sorted_T=sorted(T2L.keys(),key=T2L.get)[:N]
+        sorted_T=sorted(T2L.keys(),key=T2L.get)
         Rel=[]
         for t in sorted_T:
             Rel.append((t,[T2L[t],T2P[t]]))

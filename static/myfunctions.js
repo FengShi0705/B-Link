@@ -60,6 +60,7 @@ function force_v4(dataset){
                     .append("text")
                     .attr("class","edgelabel")
                     .text(function(d){return d.Fw;})
+                    .style("opacity","0");
 
   var gnodes=SVG.selectAll(".gnode")
                .data(dataset.nodes)
@@ -71,12 +72,14 @@ function force_v4(dataset){
                .on("drag", dragged)
                .on("end", dragended));
 
-  gnodes.append("circle")
-         .attr("r",function(d){return scale_NodeRadius(d.N);});
 
   gnodes.append("text")
          .attr("dy",-10)
          .text(function(d){return d.label;})
+         .style("opacity","0");
+
+  gnodes.append("circle")
+         .attr("r",function(d){return scale_NodeRadius(d.N);});
 
   TICK = function(){
       edges.attr("x1", function(d) { return d.source.x; })
@@ -115,8 +118,10 @@ function circle_layout_neighbor(dataset){
    var level = dataset["disconnected"].length? Object.keys(dataset).length-1 : Object.keys(dataset).length-2 ;
    scale_Rnei=d3.scaleLinear().domain([1,level]).range([d3.min([w,h])/4,d3.min([w,h])/2-maxNodeRadius]);
 
+   // remove force
    SIMULATION.force("link").strength(0);
    SIMULATION.force("center",null);
+   SIMULATION.force("charge",null);
 
    function Get_CoordX(cx,i,n,R,l){
        var theta=2*Math.PI/level*(l-1)+2*Math.PI/n*i;
@@ -149,7 +154,7 @@ function circle_layout_neighbor(dataset){
        var coor_x=Get_CoordX(w/2,i,n,R,l);
        return coor_x;
    })
-   .strength(0.5);
+   .strength(POSITIONFORCE_STRENGTH);
 
    SIMULATION.force("yp",d3.forceY());
    SIMULATION.force("yp").y(function(d,i){
@@ -171,7 +176,7 @@ function circle_layout_neighbor(dataset){
        var coor_y=Get_CoordY(h/2,i,n,R,l);
        return coor_y;
    })
-   .strength(0.5);
+   .strength(POSITIONFORCE_STRENGTH);
 
    d3.selectAll(".neighbor_track").remove();
    neighbor_tracks=SVG.selectAll(".neighbor_track")
@@ -198,7 +203,7 @@ function highlight_wordrank(dataset){
     d3.selectAll(".gnode").selectAll("text").transition().style("opacity","1");
     d3.selectAll(".edge").transition().style("opacity","1");
 
-    // generate a highlighted graph based on the top relevant words and corresponding paths
+    // generate a highlighted graph based on how many nodes we want to highlight among the top relevant words and corresponding paths
     var hltG=new jsnx.Graph();;
     for (var i = 0; i < Math.min(dataset.length, HltNodesNumber); i++){
         hltG.addNode(dataset[i][0]);
@@ -222,16 +227,19 @@ function highlight_wordrank(dataset){
 
 // Back to force layout
 function RedoBack(){
-    //fade false
+    //resume color
     d3.selectAll(".gnode").selectAll("circle").transition().style("opacity","1");
     d3.selectAll(".gnode").selectAll("text").transition().style("opacity","1");
     d3.selectAll(".edge").transition().style("opacity","1");
-
+    // remove neighbor track
     d3.selectAll("circle.neighbor_track").remove();
+    //add force
     SIMULATION.force("link").strength(function(d) {
         return 1 / Math.min(d.source.n, d.target.n);
     });
     SIMULATION.force("center", d3.forceCenter(w / 2, h / 2));
+    SIMULATION.force("charge", d3.forceManyBody());
+    //remove force
     SIMULATION.force("xp",null);
     SIMULATION.force("yp",null);
     SIMULATION.alphaTarget(0.3).restart();
