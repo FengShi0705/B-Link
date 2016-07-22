@@ -15,14 +15,26 @@ Search_Button.on("mouseout",function(){
 
 Search_Button.on('click',function(){
   console.log("click search button");
-  d3.json('/gdata/'+get_inputtext(),function(error,data){
-    console.log(" finish Got data from server");
-    mydata=data;
-    force_v4(data);
-    console.log("finish build force")
-    node_right_click_on();
-    node_left_click_on();
-    console.log("finishe add event listeners")
+
+  d3.json('/texttowid/'+get_inputtext(),function(error,data){
+   ...if (data in Object.keys(NODES)){
+       move view port
+   }else{
+       寻找newnode
+
+       d3.json('/gdata/'+新的点,function(error,data){
+        console.log(" finish Got data from server");
+        mydata=data;
+        SHOW_UPDATE_FORCE(data);
+        console.log("finish build force")
+        node_right_click_on();
+        node_left_click_on();
+        console.log("finishe add event listeners")
+      });
+
+
+   };...
+
   });
 });
 

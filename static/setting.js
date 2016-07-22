@@ -26,8 +26,6 @@ var TITLECOLOR_CHANGE = function(){
 };
 
 
-
-
 var w=window.innerWidth || document.body.clientWidth;
 var h=window.innerHeight || document.body.clientHeight;
 var maxlinkdistance=100;
@@ -42,3 +40,17 @@ var tran = d3.transition()
 
 var HltNodesNumber=20;
 var POSITIONFORCE_STRENGTH=0.8;
+
+
+//add  main canvas
+SVG = d3.select("svg#Mainback")
+         .insert("svg",":first-child")
+         .attr("id","maincanvas");
+BACKLAYER = SVG.append("rect")
+               .attr("id","Backlayer")
+               .attr("width", w)
+               .attr("height", h);
+
+//nodes and edges
+NODES=[];
+EDGES=[];

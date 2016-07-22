@@ -4,9 +4,15 @@ function get_inputtext(){
   return d3.select('input[name="keywords"]').node().value;
 };
 
+//show or update force graph
+function SHOW_UPDATE_FORCE(dataset){
+    if(){}else{};
+
+};
+
 
 // show localgraph for search text using force SIMULATION
-function force_v4(dataset){
+function SHOW_UPDATE_FORCE(dataset){
   //scale
   scale_Fw2Distance = d3.scalePow().exponent(-2)
                    .domain([ d3.min(dataset.edges,function(d){return d.Fw}), d3.max(dataset.edges,function(d){return d.Fw})  ])
@@ -33,15 +39,9 @@ function force_v4(dataset){
             .distance(function(d){ return scale_Fw2Distance(d.Fw); });
 
   //remove svg, and create svg
-  d3.selectAll("#maincanvas").remove();
-  SVG = d3.select("svg#Mainback")
-          .insert("g",":first-child")
-          .attr("id","maincanvas");
 
-  BACKLAYER = SVG.append("rect")
-               .attr("id","Backlayer")
-               .attr("width", w)
-               .attr("height", h);
+
+
 
   //change title color
   TITLECOLOR_CHANGE();

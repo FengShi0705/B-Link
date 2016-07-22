@@ -8,7 +8,7 @@ app=Flask(__name__)
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG(nx.read_gpickle('../undirected(abcdeijm_test).gpickle'),'abcdeijm_test')
+myRtr=Retrievor.UndirectedG(nx.read_gpickle('data/undirected(fortest).gpickle'),'fortest')
 # local retrievor, use search result as its own graph
 my_localRtr=Retrievor.UndirectedG(nx.Graph(),'fortest')
 
@@ -28,6 +28,12 @@ def get_localgraph(text):
 @app.route('/')
 def index():
     return make_response(open('index.html').read())
+
+
+# get text return nodes number
+@app.route('/texttowid/<searchtext>')
+def texttowid(searchtext):
+    ...
 
 # Produce data of the localgraph for the search text
 @app.route('/gdata/<searchtext>')
