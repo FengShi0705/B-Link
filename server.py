@@ -9,20 +9,8 @@ app=Flask(__name__)
 # Initial Data
 # whole retrievor, use whole database as its own graph
 myRtr=Retrievor.UndirectedG(nx.read_gpickle('data/undirected(fortest).gpickle'),'fortest')
-# local retrievor, use search result as its own graph
-my_localRtr=Retrievor.UndirectedG(nx.Graph(),'fortest')
 
-# return local graph of input text
-def get_localgraph(text):
-    ipts=[word.strip() for word in text.split(';')]
-    myRtr.input_ids(ipts)
-    print "finish got input from mysql",strftime("%Y-%m-%d %H:%M:%S", gmtime())
-    myRtr.get_Rel('Fw',100)
-    print "finish got top 100 relevant words and corresonding paths for each inputs",strftime("%Y-%m-%d %H:%M:%S", gmtime())
-    my_localRtr.G = myRtr.G.subgraph(myRtr.RL_Allipts) # local
-    print "finish got local graph",strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
-    return my_localRtr.G
 
 # Main Page
 @app.route('/')
@@ -33,20 +21,30 @@ def index():
 # get text return nodes number
 @app.route('/texttowid/<searchtext>')
 def texttowid(searchtext):
-    ...
+    searchtext = searchtext.encode('utf-8')
+    ipts = [word.strip() for word in searchtext.split(';')]
+    wids=myRtr.input_ids(ipts)
+    response=json.dumps(wids)
+    return make_response(response)
 
-# Produce data of the localgraph for the search text
-@app.route('/gdata/<searchtext>')
-def gdata(searchtext):
-    searchtext=searchtext.encode('utf-8')
-    localgraph=get_localgraph(searchtext)
-    nodes=[{"wid":n, "label":localgraph.node[n]["label"],"N":localgraph.degree(n,weight="weight"), "n":localgraph.degree(n)} for n in localgraph.nodes()]
-    edges=[{"source":source, "target":target, "Fw":Fw} for (source,target,Fw) in localgraph.edges(data="Fw")]
 
-    dataset={"nodes":nodes, "edges":edges}
-    print "finish prepare dataset",strftime("%Y-%m-%d %H:%M:%S", gmtime())
+# receive queries, nodes currently existing in client, and N (the number of nodes to be explored around each queries)
+# explore around queries for most N relevent words
+# return all nodes to the client, and all edges for client graph, and queries
+@app.route('/gdata/<jsondata>')
+def gdata(jsondata):
+    info=json.loads(jsondata)
+    existing_nodes=info["existing_nodes"]
+    queries=info["queries"]
+    N=info["N"]
+    explorenodes=myRtr.get_Rel('Fw',N,queries)["RL_Allipts"]
+
+    localG = myRtr.G.subgraph(set(existing_nodes)|set(explorenodes))  # local
+    allnodes=[{"wid":n, "label":localG.node[n]["label"],"N":localG.degree(n,weight="weight"), "n":localG.degree(n)} for n in localG.nodes()]
+    alledges=[{"source":source, "target":target, "Fw":Fw} for (source,target,Fw) in localG.edges(data="Fw")]
+
+    dataset={"allnodes":allnodes, "alledges":alledges,"queries":queries}
     datajson=json.dumps(dataset)
-    print "send data to client",strftime("%Y-%m-%d %H:%M:%S", gmtime())
     return make_response(datajson)
 
 # get NeighborLevel for a node

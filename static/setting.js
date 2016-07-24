@@ -40,17 +40,60 @@ var tran = d3.transition()
 
 var HltNodesNumber=20;
 var POSITIONFORCE_STRENGTH=0.8;
+var N_SearchButton=3;
+var N_ExploreFunctionpanel=20;
 
 
 //add  main canvas
 SVG = d3.select("svg#Mainback")
-         .insert("svg",":first-child")
+         .insert("g",":first-child")
          .attr("id","maincanvas");
 BACKLAYER = SVG.append("rect")
                .attr("id","Backlayer")
                .attr("width", w)
                .attr("height", h);
 
-//nodes and edges
-NODES=[];
-EDGES=[];
+//set nodes and edges and simulation
+CLIENT_NODES=[];
+CLIENT_EDGES=[];
+//define SIMULATION
+SIMULATION = d3.forceSimulation()
+               .force("link",d3.forceLink().id(function id(d){return d.wid;}).links(CLIENT_EDGES)) //add spring
+               .force("charge", d3.forceManyBody().strength(-100)) //repel each other
+               .force("center", d3.forceCenter(w / 2, h / 2)) // force to center
+               .nodes(CLIENT_NODES);
+// tick on
+  TICK = function(){
+      SVG.selectAll(".edge").attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+      SVG.selectAll(".gnode").attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+      SVG.selectAll(".edgelabel").attr("x", function(d) { return (d.source.x+d.target.x)/2; })
+      .attr("y", function(d) { return (d.source.y+d.target.y)/2; });
+  };
+
+  SIMULATION.on("tick",TICK);
+
+// drag behavior
+
+  function dragstarted(d) {
+       if (!d3.event.active) SIMULATION.alphaTarget(0.3).restart();
+       d.fx = d.x;
+       d.fy = d.y;
+  };
+
+  function dragged(d) {
+       d.fx = d3.event.x;
+       d.fy = d3.event.y;
+  };
+
+  function dragended(d) {
+       if (!d3.event.active) SIMULATION.alphaTarget(0);
+       d.fx = null;
+       d.fy = null;
+  };
+
+

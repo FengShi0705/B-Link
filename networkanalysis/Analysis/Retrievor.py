@@ -14,18 +14,19 @@ class UndirectedG(object):
         assert type(self.G)==nx.classes.graph.Graph, 'Not undirected graph'
         self.cnx, self.cursor = PF.creatCursor(self.schema, 'R')
         print "----Connect mysql"
-        self.ipts=[]
 
 
 
-    # Get ids list of input words
+
+    # return ids list of input words
     # Inputs is a list of words
     def input_ids(self,ipts):
 
-        self.ipts=PF.find_id(ipts,self.cursor)
-        self.ipts=list(set(self.ipts))
-        for n in self.ipts:
+        ipwids=PF.find_id(ipts,self.cursor)
+        ipwids=list(set(ipwids))
+        for n in ipwids:
             print n, self.G.node[n]['label']
+        return ipwids
 
 
 
@@ -51,14 +52,14 @@ class UndirectedG(object):
     # get unioned neighbors of all inputs within l level
     # returned type is node
     # OK checked
-    def get_Neib(self,l):
-        self.NB_Eachipt={}
-        self.NB_Allipts=set()
-        for ipt in self.ipts:
-            self.NB_Eachipt[ipt]=self.get_Neib_one(ipt,l)
-            self.NB_Allipts.update(self.NB_Eachipt[ipt]['AllNb'])
+    def get_Neib(self,l,ipts):
+        NB_Eachipt={}
+        NB_Allipts=set()
+        for ipt in ipts:
+            NB_Eachipt[ipt]=self.get_Neib_one(ipt,l)
+            NB_Allipts.update(NB_Eachipt[ipt]['AllNb'])
 
-        return
+        return {"NB_Eachipt":NB_Eachipt,"NB_Allipts":NB_Allipts}
 
 
 
@@ -86,15 +87,15 @@ class UndirectedG(object):
     # RL_Eachipt Form is {ipt: OrderedDict }
     # RL_Allipts is all the union of N words for each input.
     # Checked OK
-    def get_Rel(self,tp,N):
-        self.RL_Eachipt={}
-        self.RL_Allipts=set()
+    def get_Rel(self,tp,N,ipts):
+        RL_Eachipt={}
+        RL_Allipts=set()
 
-        for ipt in self.ipts:
-            self.RL_Eachipt[ipt]=self.get_Rel_one(ipt,tp,N)
-            self.RL_Allipts.update(self.RL_Eachipt[ipt].keys())
+        for ipt in ipts:
+            RL_Eachipt[ipt]=self.get_Rel_one(ipt,tp,N)
+            RL_Allipts.update(RL_Eachipt[ipt].keys())
 
-        return
+        return {"RL_Eachipt":RL_Eachipt,"RL_Allipts":RL_Allipts}
 
 
 

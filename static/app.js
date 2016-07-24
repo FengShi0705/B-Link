@@ -15,26 +15,28 @@ Search_Button.on("mouseout",function(){
 
 Search_Button.on('click',function(){
   console.log("click search button");
-
   d3.json('/texttowid/'+get_inputtext(),function(error,data){
-   ...if (data in Object.keys(NODES)){
-       move view port
-   }else{
-       寻找newnode
+      //change view to all nodes
+      console.log("adjust view to the query nodes");
+      //get current nodes
+      var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+      //find new nodes
+      var newnodes = _.difference(data, currentnodes);
 
-       d3.json('/gdata/'+新的点,function(error,data){
-        console.log(" finish Got data from server");
-        mydata=data;
-        SHOW_UPDATE_FORCE(data);
-        console.log("finish build force")
-        node_right_click_on();
-        node_left_click_on();
-        console.log("finishe add event listeners")
-      });
-
-
-   };...
-
+      if(newnodes.length!=0){
+          var serverinfo ={existing_nodes:currentnodes,queries: newnodes, N:N_SearchButton};
+          console.log(serverinfo);
+          d3.json('/gdata/'+JSON.stringify(serverinfo),function(error,data){
+                console.log(" finish Got data from server");
+                mydata=data;
+                console.log(data);
+                SHOW_UPDATE_FORCE(data, false);
+                console.log("finish build force");
+                node_right_click_on();
+                node_left_click_on();
+                console.log("finishe add event listeners");
+          });
+      };
   });
 });
 

@@ -4,112 +4,108 @@ function get_inputtext(){
   return d3.select('input[name="keywords"]').node().value;
 };
 
-//show or update force graph
-function SHOW_UPDATE_FORCE(dataset){
-    if(){}else{};
-
+// Get an array which consists of the values of a paticular key of objects in another array
+function CURRENT_NODESSET(nodes,key){
+    var nodesset=[];
+    nodes.forEach(function(d){
+        nodesset.push(d[key]);
+    });
+    return nodesset;
 };
 
+// update force layout
+function SHOW_UPDATE_FORCE(dataset,query_exist_in_local){
 
-// show localgraph for search text using force SIMULATION
-function SHOW_UPDATE_FORCE(dataset){
+  // born postion and velocity of new nodes
+  if(query_exist_in_local){
+      var born = CLIENT_NODES.filter(function(obj){return obj["wid"]==dataset.queries[0];})[0];
+  }else if(CLIENT_NODES.length==0){
+      var born = {x:NaN,y:NaN,vx:NaN,vy:NaN};
+  }else{
+      var born = {x:w/2, y:h/2, vx:NaN, vy: NaN};
+  };
+
+  //update and add nodes
+  dataset.allnodes.forEach(function(d){
+      var cnode = CLIENT_NODES.filter(function(obj){return obj['wid']==d.wid;});
+
+      if(cnode.length==0){//add new nodes
+          d.x = born.x;
+          d.y = born.y;
+          d.vx = born.vx;
+          d.vy = born.vy;
+          CLIENT_NODES.push(d);
+      }else{ // update existing nodes degree
+          cnode=cnode[0];
+          cnode.n=d.n;
+          cnode.N=d.N;
+      };
+  });
+
+  //CLIENT_EDGES=dataset.edges;
+  CLIENT_EDGES=dataset.alledges;
+  // update simulation
+  SIMULATION.nodes(CLIENT_NODES);
+  SIMULATION.force("link").links(CLIENT_EDGES);
+
+
   //scale
   scale_Fw2Distance = d3.scalePow().exponent(-2)
-                   .domain([ d3.min(dataset.edges,function(d){return d.Fw}), d3.max(dataset.edges,function(d){return d.Fw})  ])
+                   .domain([ d3.min(CLIENT_EDGES,function(d){return d.Fw}), d3.max(CLIENT_EDGES,function(d){return d.Fw})  ])
                    .range([minlinkdistance,maxlinkdistance]);
 
   scale_Fw2Stokewidth = d3.scalePow().exponent(-2)
-                    .domain([ d3.min(dataset.edges,function(d){return d.Fw}), d3.max(dataset.edges,function(d){return d.Fw})  ])
+                    .domain([ d3.min(CLIENT_EDGES,function(d){return d.Fw}), d3.max(CLIENT_EDGES,function(d){return d.Fw})  ])
                     .range([maxlinkwidth,minlinkwidth]);
 
   scale_NodeRadius = d3.scalePow().exponent(3)
-                        .domain([ d3.min( dataset.nodes , function(d){return d.N}) , d3.max( dataset.nodes , function(d){return d.N}) ])
+                        .domain([ d3.min( CLIENT_NODES , function(d){return d.N}) , d3.max( CLIENT_NODES , function(d){return d.N}) ])
                         .range([minNodeRadius,maxNodeRadius]);
-
-  //define SIMULATION
-  SIMULATION = d3.forceSimulation()
-                     .force("link",d3.forceLink().id(function id(d){return d.wid;})) //add spring
-                     .force("charge", d3.forceManyBody())  //repel each other
-                     .force("center", d3.forceCenter(w / 2, h / 2)) // force to center
-                     .nodes(dataset.nodes);
-
-  //customize force
-  SIMULATION.force("link")
-            .links(dataset.edges)
-            .distance(function(d){ return scale_Fw2Distance(d.Fw); });
-
-  //remove svg, and create svg
-
-
-
 
   //change title color
   TITLECOLOR_CHANGE();
-
-
+  //update svg
   var edges=SVG.selectAll(".edge")
-               .data(dataset.edges)
-               .enter()
+               .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
+
+          edges.attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
+          edges.enter()
                .append("line")
                .attr("class","edge")
                .attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
+          edges.exit().remove();
 
   var edgelabels=SVG.selectAll(".edgelabel")
-                    .data(dataset.edges)
-                    .enter()
+                    .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
+
+          edgelabels.enter()
                     .append("text")
                     .attr("class","edgelabel")
-                    .text(function(d){return d.Fw;})
-                    .style("opacity","0");
+                    .text(function(d){return d.Fw;});
+          edgelabels.exit().remove();
 
   var gnodes=SVG.selectAll(".gnode")
-               .data(dataset.nodes)
-               .enter()
+               .data(SIMULATION.nodes(),function(d){return d.wid;});
+
+      gnodes.selectAll("circle").transition().attr("r",function(d){return scale_NodeRadius(d.N);});
+
+  var newgnodes=gnodes.enter()
                .append("g")
                .attr("class","gnode")
                .call(d3.drag()
                .on("start", dragstarted)
                .on("drag", dragged)
                .on("end", dragended));
-
-
-  gnodes.append("text")
+  newgnodes.append("text")
          .attr("dy",-10)
-         .text(function(d){return d.label;})
-         .style("opacity","0");
-
-  gnodes.append("circle")
+         .text(function(d){return d.label;});
+  newgnodes.append("circle").transition()
          .attr("r",function(d){return scale_NodeRadius(d.N);});
 
-  TICK = function(){
-      edges.attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
+  gnodes.exit().remove();
 
-      gnodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-
-      edgelabels.attr("x", function(d) { return (d.source.x+d.target.x)/2; })
-      .attr("y", function(d) { return (d.source.y+d.target.y)/2; });
-  };
-  SIMULATION.on("tick",TICK);
-
-  function dragstarted(d) {
-       if (!d3.event.active) SIMULATION.alphaTarget(0.3).restart();
-       d.fx = d.x;
-       d.fy = d.y;
-  };
-
-  function dragged(d) {
-       d.fx = d3.event.x;
-       d.fy = d3.event.y;
-  };
-
-  function dragended(d) {
-       if (!d3.event.active) SIMULATION.alphaTarget(0);
-       d.fx = null;
-       d.fy = null;
-  };
+  // restart simulation
+  SIMULATION .alphaTarget(0.3).restart();
 
 };
 
