@@ -42,7 +42,7 @@ function SHOW_UPDATE_FORCE(dataset,query_exist_in_local){
       };
   });
 
-  //CLIENT_EDGES=dataset.edges;
+
   CLIENT_EDGES=dataset.alledges;
   // update simulation
   SIMULATION.nodes(CLIENT_NODES);
@@ -61,6 +61,9 @@ function SHOW_UPDATE_FORCE(dataset,query_exist_in_local){
   scale_NodeRadius = d3.scalePow().exponent(3)
                         .domain([ d3.min( CLIENT_NODES , function(d){return d.N}) , d3.max( CLIENT_NODES , function(d){return d.N}) ])
                         .range([minNodeRadius,maxNodeRadius]);
+
+  //update link distance
+  SIMULATION.force("link").distance(function(d){return scale_Fw2Distance(d.Fw);});
 
   //change title color
   TITLECOLOR_CHANGE();
