@@ -1,7 +1,7 @@
 from flask import Flask, render_template, make_response, request
 import json
 import networkx as nx
-from networkanalysis.Analysis import Retrievor,PF
+from networkanalysis.Analysis import Retrievor
 from time import gmtime, strftime
 
 app=Flask(__name__)
