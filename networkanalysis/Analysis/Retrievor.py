@@ -2,6 +2,8 @@
 import networkx as nx
 from FengPrivate import PF
 import collections
+from sklearn.cluster import spectral_clustering
+from sklearn.manifold import spectral_embedding
 
 
 
@@ -96,6 +98,41 @@ class UndirectedG(object):
             RL_Allipts.update(RL_Eachipt[ipt].keys())
 
         return {"RL_Eachipt":RL_Eachipt,"RL_Allipts":RL_Allipts}
+
+
+
+    def normalized_cut_connected(self,nodes,k):
+        """
+        applying normalized cut clustering on the subgraph consisting of the input nodes
+
+        Paramters
+        ----------
+        nodes: a list of node to be clustered. The subgraph projected by the nodes should be connected.
+
+        k: the number of clusters to be generated
+
+        Return
+        ----------
+        clusters: array of sets. Each set is a cluster
+        """
+        G = self.G.subgraph(nodes)
+        assert nx.is_connected(G)==True, "graph is not connected"
+        aM = nx.adjacency_matrix(G,weight='weight')
+
+        labels = spectral_clustering(aM,n_clusters=k,eigen_solver='arpack')
+        dic_clusters={}
+        for i,n in enumerate(G.nodes()):
+            dic_clusters.setdefault(labels[i],list()).append(n)
+
+        clusters=dic_clusters.values()
+
+        return clusters
+
+
+
+
+
+
 
 
 
