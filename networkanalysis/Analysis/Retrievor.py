@@ -2,8 +2,11 @@
 import networkx as nx
 from FengPrivate import PF
 import collections
-from sklearn.cluster import spectral_clustering
-from sklearn.manifold import spectral_embedding
+from sklearn.utils.graph import graph_laplacian
+from sklearn.utils.arpack import eigsh
+import numpy as np
+import math
+from sklearn.cluster.k_means_ import k_means
 
 
 
@@ -101,9 +104,9 @@ class UndirectedG(object):
 
 
 
-    def normalized_cut_connected(self,nodes,k):
+    def cut_connectedgraph(self,nodes,k,algorithm='normalized'):
         """
-        applying normalized cut clustering on the subgraph consisting of the input nodes
+        applying clustering on the subgraph consisting of the input nodes
 
         Paramters
         ----------
@@ -111,18 +114,50 @@ class UndirectedG(object):
 
         k: the number of clusters to be generated
 
+        algorithm: {'normalized', 'modularity'}, default to 'normalized'
+
         Return
         ----------
-        clusters: array of sets. Each set is a cluster
+        clusters: array of lists. Each list contains the nodes of a cluster
         """
         G = self.G.subgraph(nodes)
         assert nx.is_connected(G)==True, "graph is not connected"
-        aM = nx.adjacency_matrix(G,weight='weight')
+        A = nx.adjacency_matrix(G, weight='weight')
 
-        labels = spectral_clustering(aM,n_clusters=k,eigen_solver='arpack')
+        if algorithm=="normalized":
+            Ls, dd = graph_laplacian(A, normed=True, return_diag=True)
+            eigenvalue_n, eigenvector_n = eigsh(Ls * (-1), k=k,
+                                                sigma=1.0, which='LM',
+                                                tol=0.0)
+            n_nodes=len(nodes)
+            eigenvector_n[:,-1] = np.full( n_nodes , 1.0/math.sqrt(n_nodes) ) # eigenvector for eigenvalue zero
+
+
+        elif algorithm=="modularity":
+            tr = np.sum(A)
+            d = np.sum(A,axis=1)
+            Q = ( A - (d*d.T)/tr ) /tr
+            eigenvalue_n, eigenvector_n = eigsh(Q, k=k,
+                                                sigma=1.0, which='LM',
+                                                tol=0.0)
+            for i,vl in enumerate(eigenvalue_n):
+                if vl > 1e-10:
+                    eigenvector_n = eigenvector_n[:,i:]
+                    break
+
+        else:
+            raise TypeError, "unrecognized algorithm: {}".format(algorithm)
+
+        # normalize row vector
+        for i, v in enumerate(eigenvector_n):
+            eigenvector_n[i] = v / float(np.linalg.norm(v))
+
+        _, labels, _ = k_means(eigenvector_n, k, random_state=None,
+                               n_init=10)
+
         dic_clusters={}
-        for i,n in enumerate(G.nodes()):
-            dic_clusters.setdefault(labels[i],list()).append(n)
+        for index,n in enumerate(G.nodes()):
+            dic_clusters.setdefault(labels[index],list()).append(n)
 
         clusters=dic_clusters.values()
 
