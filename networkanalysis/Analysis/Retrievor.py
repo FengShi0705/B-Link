@@ -7,6 +7,7 @@ from sklearn.utils.arpack import eigsh
 import numpy as np
 import math
 from sklearn.cluster.k_means_ import k_means
+import itertools
 
 
 
@@ -162,6 +163,71 @@ class UndirectedG(object):
         clusters=dic_clusters.values()
 
         return clusters
+
+    def mcl_cluster(self,nodes,r):
+        """
+        Applying Markov clustering on the input nodes
+
+        :param nodes: a list of node to be clustered.
+
+        :param r: inflation factor
+
+        :return M: the convergent matrix
+
+        :return clusters: array of lists. Each list contains the nodes of a cluster
+        """
+        def normalize_matrix(adjacency):
+            Tri = adjacency.sum(axis=1)
+            M=adjacency/Tri
+            return M
+        def get_cluster(mx,nodes):
+            queue=set(nodes)
+            diag=np.array(mx).diagonal()
+            clusters={}
+            for i,d in enumerate(diag):
+                if d>=1e-5:
+                    if nodes[i] in queue:
+                        queue.remove(nodes[i])
+                        clusters.setdefault(nodes[i], set()).add(nodes[i])
+                        for j, jd in enumerate(np.array(mx)[i]):
+                            if jd >= 1e-5:
+                                clusters[nodes[i]].add(nodes[j])
+                                if nodes[j] in queue: queue.remove(nodes[j])
+                        for j,jd in enumerate(np.array(mx)[:,i]):
+                            if jd >= 1e-5:
+                                clusters[nodes[i]].add(nodes[j])
+                                if nodes[j] in queue: queue.remove(nodes[j])
+                    else:
+                        continue
+
+            if len(queue)!=0:
+                raise TypeError, "mcl_cluster miss nodes"
+            for s1,s2 in itertools.combinations(clusters.keys(),2):
+                if clusters[s1] & clusters[s2]:
+                    raise TypeError, "mcl_cluster overlapping cluster"
+
+            clusters=[list(cl) for cl in clusters.values()]
+            return  clusters
+
+
+        G=self.G.subgraph(nodes)
+        A = nx.adjacency_matrix(G, weight='weight').todense()
+        np.fill_diagonal(A, np.sum(A, axis=1) + 1.0)
+        M=normalize_matrix(A)
+
+        while True:
+            nM=np.linalg.matrix_power(M,2)
+            nM=np.power(nM,r)
+            nM=normalize_matrix(nM)
+            er = np.linalg.norm(nM-M)
+            M=nM
+            if er<=1e-5:
+                break
+
+        clusters=get_cluster(M,G.nodes())
+
+        return M,clusters
+
 
 
 
