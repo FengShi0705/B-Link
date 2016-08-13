@@ -189,14 +189,10 @@ class UndirectedG(object):
                     if nodes[i] in queue:
                         queue.remove(nodes[i])
                         clusters.setdefault(nodes[i], set()).add(nodes[i])
-                        for j, jd in enumerate(np.array(mx)[i]):
-                            if jd >= 1e-5:
-                                clusters[nodes[i]].add(nodes[j])
-                                if nodes[j] in queue: queue.remove(nodes[j])
                         for j,jd in enumerate(np.array(mx)[:,i]):
-                            if jd >= 1e-5:
+                            if jd >= 1e-5 and j!=i:
                                 clusters[nodes[i]].add(nodes[j])
-                                if nodes[j] in queue: queue.remove(nodes[j])
+                                queue.remove(nodes[j])
                     else:
                         continue
 
