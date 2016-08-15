@@ -105,7 +105,7 @@ class UndirectedG(object):
 
 
 
-    def cut_connectedgraph(self,nodes,k,algorithm='normalized'):
+    def cut_connectedgraph(self,nodes,k,weight='weight',algorithm='normalized'):
         """
         applying clustering on the subgraph consisting of the input nodes
 
@@ -123,7 +123,7 @@ class UndirectedG(object):
         """
         G = self.G.subgraph(nodes)
         assert nx.is_connected(G)==True, "graph is not connected"
-        A = nx.adjacency_matrix(G, weight='weight')
+        A = nx.adjacency_matrix(G, weight=weight)
 
         if algorithm=="normalized":
             Ls, dd = graph_laplacian(A, normed=True, return_diag=True)
@@ -164,7 +164,7 @@ class UndirectedG(object):
 
         return clusters
 
-    def mcl_cluster(self,nodes,r):
+    def mcl_cluster(self,nodes,r,weight='weight'):
         """
         Applying Markov clustering on the input nodes
 
@@ -207,7 +207,7 @@ class UndirectedG(object):
 
 
         G=self.G.subgraph(nodes)
-        A = nx.adjacency_matrix(G, weight='weight').todense()
+        A = nx.adjacency_matrix(G, weight=weight).todense()
         np.fill_diagonal(A, np.sum(A, axis=1) + 1.0)
         M=normalize_matrix(A)
 
@@ -223,6 +223,44 @@ class UndirectedG(object):
         clusters=get_cluster(M,G.nodes())
 
         return M,clusters
+
+
+
+    def Bterms_Bpaths(self,cluster1,cluster2,tp,N=20):
+        """
+        Find the B-terms and B-paths between cluster1 and cluster2
+
+        :param cluster1: list of nodes in cluster1
+
+        :param cluster2: list of nodes in cluster2
+
+        :param N: the number of B paths to be returned
+
+        :return:
+        """
+        cset1=set(cluster1)
+        cset2=set(cluster2)
+        B_paths={}
+        for start in cluster1:
+            for end in cluster2:
+                length,path = nx.single_source_dijkstra(self.G,start,target=end,weight=tp)
+                repath=path[::-1]
+                for i,n in enumerate(path):
+                    if n in cset1 and path[i+1] not in cset1:
+                        j1 = i
+                        break
+                for i,n in enumerate(repath):
+                    if n in cset2 and repath[i+1] not in cset2:
+                        j2 = len(path)-1-i
+                B_paths.setdefault(path[j1],{}).setdefault(path[j2],{})
+                B_paths[path[j1]][path[j2]]['path']=path[j1:j2+1]
+                B_paths[path[j1]][path[j2]]['length']=length
+
+
+
+
+
+
 
 
 
