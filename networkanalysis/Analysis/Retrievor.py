@@ -75,16 +75,47 @@ class UndirectedG(object):
     # Based on probable path / relativeness measurement
     # Rel Form is OrderedDict(  [    ( target, [ length, [path from source to target] ] ) ,...] )
     # Checked OK
-    def get_Rel_one(self,ipt,tp,N):
-        T2L,T2P=nx.single_source_dijkstra(self.G,ipt,Noff=N,weight=tp)
+    def get_Rel_one(self,ipt,tp):
+        """
+        Generator of the most relevant words and paths for the input, ordered by relevance
+        :param ipt: source
+        :param tp: the property of edge to be used as distance
+        :return: (length, relevant path)
+        """
+        push = heappush
+        pop = heappop
+        dist = {}  # dictionary of final distances
+        seen = {ipt: 0}
+        c = itertools.count()
+        fringe = []  # use heapq with (distance,label) tuples
+        push(fringe, (0, next(c), ipt))
+        paths={ipt:[ipt]}
+        while fringe:
+            (d,_,v)=pop(fringe)
+            if v in dist:
+                continue # already searched this node
 
-        sorted_T=sorted(T2L.keys(),key=T2L.get)
-        Rel=[]
-        for t in sorted_T:
-            Rel.append((t,[T2L[t],T2P[t]]))
-        Rel=collections.OrderedDict(Rel)
+            dist[v]=d
+            yield (d, paths[v])
 
-        return Rel
+            for u in self.G.adj[v].keys():
+                cost = self.G[u][v][tp]
+                if cost is None:
+                    continue
+                vu_dist = dist[v] + cost
+                if u in dist:
+                    if vu_dist < dist[u]:
+                        raise ValueError('Contradictory paths found:',
+                                         'negative weights?')
+                elif u not in seen or vu_dist < seen[u]:
+                    seen[u] = vu_dist
+                    push(fringe, (vu_dist, next(c), u))
+                    paths[u] = paths[v] + [u]
+
+
+
+
+
 
 
 

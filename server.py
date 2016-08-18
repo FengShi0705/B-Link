@@ -1,20 +1,29 @@
-from flask import Flask, render_template, make_response, request
+from flask import Flask, render_template, make_response, request,session,redirect
 import json
 import networkx as nx
 from networkanalysis.Analysis import Retrievor
 from time import gmtime, strftime
 
 app=Flask(__name__)
-
+app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d\xb3+\xbe>\xd2'
 # Initial Data
 # whole retrievor, use whole database as its own graph
 myRtr=Retrievor.UndirectedG(nx.read_gpickle('data/undirected(fortest).gpickle'),'fortest')
+email_addresses=[]
 
+# sign up
+@app.route('/signup')
+def signup():
+    return make_response(open('signup.html').read())
 
 
 # Main Page
 @app.route('/')
 def index():
+    email = request.args.get('email', '')
+    session['email'] = email
+    email_addresses.append(email)
+    print session['email'],email_addresses
     return make_response(open('index.html').read())
 
 
