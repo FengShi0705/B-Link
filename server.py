@@ -10,21 +10,41 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 # whole retrievor, use whole database as its own graph
 myRtr=Retrievor.UndirectedG(nx.read_gpickle('data/undirected(fortest).gpickle'),'fortest')
 email_addresses=[]
+globals_state = {}
 
 # sign up
 @app.route('/signup')
 def signup():
-    return make_response(open('signup.html').read())
+    email = request.args.get('email','')
+    session['email']=email
+    email_addresses.append(email)
+    return redirect('/')
+
+#generator
+@app.route('/gt/<Js>')
+def gt(Js):
+    Js=json.loads(Js)
+    if Js['start']:
+        globals_state[session['email']]=myRtr.get_Rel_one(Js['ipt'],'Fw')
+        result= globals_state[session['email']].next()
+        return make_response(json.dumps(result))
+    else:
+        result = globals_state[session['email']].next()
+        return make_response(json.dumps(result))
+
+
+
+
 
 
 # Main Page
 @app.route('/')
 def index():
-    email = request.args.get('email', '')
-    session['email'] = email
-    email_addresses.append(email)
-    print session['email'],email_addresses
-    return make_response(open('index.html').read())
+    if 'email' in session:
+        print session['email'],email_addresses
+        return make_response(open('index.html').read())
+    else:
+        return make_response(open('signup.html').read())
 
 
 # get text return nodes number
