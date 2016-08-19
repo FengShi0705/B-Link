@@ -21,6 +21,7 @@ class UndirectedG(object):
         assert type(self.G)==nx.classes.graph.Graph, 'Not undirected graph'
         self.cnx, self.cursor = PF.creatCursor(self.schema, 'R')
         print "----Connect mysql"
+        self.user_generators={}
 
 
 
@@ -71,16 +72,17 @@ class UndirectedG(object):
 
 
 
-    # Top N-1 words for one input, totally N words
-    # Based on probable path / relativeness measurement
-    # Rel Form is OrderedDict(  [    ( target, [ length, [path from source to target] ] ) ,...] )
-    # Checked OK
-    def get_Rel_one(self,ipt,tp):
+
+    def get_Rel_one(self,ipt,tp,minhops):
         """
-        Generator of the most relevant words and paths for the input, ordered by relevance
+        Generator of the most relevant words and their corresponding paths for an input.
+        The word is sorted by the distance of its shortest path from input, and is filtered by minhops of its shortest path.
+        The corresponding path of the word is its shortest path.
+
         :param ipt: source
         :param tp: the property of edge to be used as distance
-        :return: (length, relevant path)
+        :param minhops: the minimum hops that the word's shortest path should contain
+        :return: (length, word's shortest path)
         """
         push = heappush
         pop = heappop
@@ -96,7 +98,8 @@ class UndirectedG(object):
                 continue # already searched this node
 
             dist[v]=d
-            yield (d, paths[v])
+            if len(paths[v])>=minhops+1:
+                yield (d, paths[v])
 
             for u in self.G.adj[v].keys():
                 cost = self.G[u][v][tp]
@@ -120,20 +123,41 @@ class UndirectedG(object):
 
 
 
-    # get top N-1 words for each input
-    # Based on probable path / relativeness measurement
-    # RL_Eachipt Form is {ipt: OrderedDict }
-    # RL_Allipts is all the union of N words for each input.
-    # Checked OK
-    def get_Rel(self,tp,N,ipts):
-        RL_Eachipt={}
-        RL_Allipts=set()
+    def get_Rel(self,tp,N,ipts,user,start=True,minhops=1):
+        """
+        if there are more than one input, find the first N words and paths for each input
+
+        if there is only one input, find the first N words if start=True, while find the next N words if start=False
+
+        :param tp: property of the edge to be distance
+        :param N: number of words to get
+        :param ipts: input words
+        :param user: user's email
+        :param start: Ture: find the first N words. False: find the next N words
+        :param minhops: the minimum number of hops that the paths should contain
+        :return: {'allnodes': set(), 'allpaths': [[],[]...]}
+        """
+        results={}
+        results['allnodes'] = set()
+        results['allpaths'] = []
+        if start == False:
+            assert len(ipts)==1, 'there are more than one input, and we cannot get the next N words for all inputs.'
 
         for ipt in ipts:
-            RL_Eachipt[ipt]=self.get_Rel_one(ipt,tp,N)
-            RL_Allipts.update(RL_Eachipt[ipt].keys())
+            if start==True:
+                self.user_generators[user] = (ipt,self.get_Rel_one(ipt, tp, minhops))
 
-        return {"RL_Eachipt":RL_Eachipt,"RL_Allipts":RL_Allipts}
+            assert self.user_generators[user][0] == ipt, 'no user generator'
+            for i in xrange(N):
+                try:
+                    length,path = self.user_generators[user][1].next()
+                except:
+                    break
+                else:
+                    results['allnodes'].update(set(path))
+                    results['allpaths'].append(path)
+
+        return results
 
 
 

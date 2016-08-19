@@ -4,44 +4,29 @@ import networkx as nx
 from networkanalysis.Analysis import Retrievor
 from time import gmtime, strftime
 
-app=Flask(__name__)
+app = Flask(__name__)
 app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d\xb3+\xbe>\xd2'
+
 # Initial Data
 # whole retrievor, use whole database as its own graph
 myRtr=Retrievor.UndirectedG(nx.read_gpickle('data/undirected(fortest).gpickle'),'fortest')
-email_addresses=[]
-globals_state = {}
 
 # sign up
 @app.route('/signup')
 def signup():
-    email = request.args.get('email','')
-    session['email']=email
-    email_addresses.append(email)
+    user = request.args.get('email','')
+    session['user'] = user
+    fusers = open('allusers.txt', mode='a')
+    fusers.write(user+'\n')
+    fusers.close()
     return redirect('/')
-
-#generator
-@app.route('/gt/<Js>')
-def gt(Js):
-    Js=json.loads(Js)
-    if Js['start']:
-        globals_state[session['email']]=myRtr.get_Rel_one(Js['ipt'],'Fw')
-        result= globals_state[session['email']].next()
-        return make_response(json.dumps(result))
-    else:
-        result = globals_state[session['email']].next()
-        return make_response(json.dumps(result))
-
-
-
-
 
 
 # Main Page
 @app.route('/')
 def index():
-    if 'email' in session:
-        print session['email'],email_addresses
+    if 'user' in session:
+        print session['user']
         return make_response(open('index.html').read())
     else:
         return make_response(open('signup.html').read())
@@ -101,4 +86,4 @@ def wordrank(node):
     response=json.dumps(nodesandpaths)
     return make_response(response)
 
-
+app.run(host="0.0.0.0",threaded=True)
