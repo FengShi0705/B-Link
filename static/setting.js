@@ -41,6 +41,7 @@ var tran = d3.transition()
 var HltNodesNumber=20;
 var POSITIONFORCE_STRENGTH=0.8;
 var N_SearchButton=3;
+var Type_distance = 'Fw';
 var N_ExploreFunctionpanel=20;
 
 

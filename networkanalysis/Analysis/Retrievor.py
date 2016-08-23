@@ -22,6 +22,7 @@ class UndirectedG(object):
         self.cnx, self.cursor = PF.creatCursor(self.schema, 'R')
         print "----Connect mysql"
         self.user_generators={}
+        self.gencode={'get_Rel_one':self.get_Rel_one}
 
 
 
@@ -104,7 +105,7 @@ class UndirectedG(object):
                 continue # already searched this node
 
             dist[v]=d
-            if len(paths[v])>=minhops+1:
+            if len(paths[v])>=minhops:
                 yield (d, paths[v])
 
             for u in G.adj[v].keys():
@@ -124,37 +125,20 @@ class UndirectedG(object):
 
 
 
-
-
-
-
-
-    def get_Rel(self,tp,N,ipt,user,start=True,minhops=1,localnodes=None):
-        """
-        find the relevant words and paths for an input word
-        find the first N words if start=True, while find the next or previous N words if start=False
-
-        :param tp: property of the edge to be distance
-        :param N: number of words to get. if N is positive, get the next N nodes, otherwise, get the previous N nodes
-        :param ipt: input word
-        :param user: user's email
-        :param start: Ture: find the first N words. False: find the next or previous N words
-        :param minhops: the minimum number of hops that the paths should contain
-        :param localnodes: if none, find the relevent words in whole graph. Else, find the relevant words in localgraph.
-        :return: 'allnodes': set(), 'allpaths': [[],[]...], 'AddNew': boolean. set 'allnodes' is the union set of the nodes in all the 'allpaths',
-                             'AddNew' indicates whether there is new nodes to add.
-        """
-        results = {}
-        results['allnodes'] = set()
-        results['allpaths'] = []
-
-
-
-
-
     def my_Gen(self,N,user,parameters,generator,start=True):
-        results={}
+        """
+        Transform a generator to a function can go forward and backward
 
+        :param N: Number of words/paths to be retrieved. If N is positive, Next N words. If N is negetive, previous N words.
+        :param user: user's email
+        :param parameters: parameters for the generator
+        :param generator: the function of the generator
+        :param start: If true, find the first N words/paths. Otherwise, find the next or previous N words/paths
+        :return: nodes, paths. nodes is the union set of all nodes in the paths.
+        """
+
+        results={}
+        generator=self.gencode[generator]
 
         if start==True:
             self.user_generators[user] = {}
@@ -171,8 +155,8 @@ class UndirectedG(object):
 
         n_records = len(self.user_generators[user]['records'])
 
-        if self.user_generators[user]['position'] > n_records:
-            for i in xrange(self.user_generators[user]['position'] - n_records +N+1):
+        if self.user_generators[user]['position'] >= n_records:
+            for i in xrange(self.user_generators[user]['position'] - n_records +1):
                 try:
                     length, path = self.user_generators[user]['generator'].next()
                 except:
@@ -183,16 +167,10 @@ class UndirectedG(object):
 
         if self.user_generators[user]['max'] is not None and self.user_generators[user]['position']>=self.user_generators[user]['max']:
             self.user_generators[user]['position'] -= N
-
-        if self.user_generators[user]['position']==0:
+        elif self.user_generators[user]['position']==0:
             self.user_generators[user]['position'] -= N
 
-
-        if N>=0:
-            results['allpaths'] = self.user_generators[user]['records'][startposition:startposition+N]
-        else:
-            results['allpaths'] = self.user_generators[user]['records'][startposition+N:startposition]
-
+        results['allpaths'] = self.user_generators[user]['records'][min(startposition,startposition+N):max(startposition,startposition+N)]
         results['allnodes'] = set()
         for path in results['allpaths']:
             results['allnodes'].update(path)

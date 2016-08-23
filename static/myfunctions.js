@@ -1,3 +1,11 @@
+//assert like python
+function assert(condition, message) {
+    if (!condition) {
+        throw message || "Assertion failed";
+    }
+}
+
+
 
 // get the text in inputbox
 function get_inputtext(){
@@ -14,16 +22,17 @@ function CURRENT_NODESSET(nodes,key){
 };
 
 // update force layout
-function SHOW_UPDATE_FORCE(dataset,query_exist_in_local){
+function SHOW_UPDATE_FORCE(dataset,born){
 
   // born postion and velocity of new nodes
+  /*born = bornplace
   if(query_exist_in_local){
-      var born = CLIENT_NODES.filter(function(obj){return obj["wid"]==dataset.queries[0];})[0];
+      var born = CLIENT_NODES.filter(function(obj){return obj["wid"]==dataset.query;})[0];
   }else if(CLIENT_NODES.length==0){
       var born = {x:NaN,y:NaN,vx:NaN,vy:NaN};
   }else{
       var born = {x:w/2, y:h/2, vx:NaN, vy: NaN};
-  };
+  };*/
 
   //update and add nodes
   dataset.allnodes.forEach(function(d){
@@ -196,17 +205,17 @@ function circle_layout_neighbor(dataset){
 };
 
 // wordrank highlight relevant words and corresponding paths
-function highlight_wordrank(dataset){
+function highlight_nodespaths(dataset){
     //not fade
-    d3.selectAll(".gnode").selectAll("circle").transition().style("opacity","1");
+    d3.selectAll(".gnode").selectAll("circle").style("opacity","1");
     d3.selectAll(".gnode").selectAll("text").transition().style("opacity","1");
     d3.selectAll(".edge").transition().style("opacity","1");
 
     // generate a highlighted graph based on how many nodes we want to highlight among the top relevant words and corresponding paths
-    var hltG=new jsnx.Graph();;
-    for (var i = 0; i < Math.min(dataset.length, HltNodesNumber); i++){
-        hltG.addNode(dataset[i][0]);
-        hltG.addPath(dataset[i][1]);
+    var hltG=new jsnx.Graph();
+    for (var i = 0; i < dataset.paths.length; i++){
+        hltG.addNode(dataset.paths[i][0]);
+        hltG.addPath(dataset.paths[i]);
     };
 
     //transparent nodes
