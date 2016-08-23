@@ -51,23 +51,6 @@ Search_Button.on('click',function(){
           });
       };
 
-
-
-
-      /*if(newnodes.length!=0){
-          var serverinfo ={existing_nodes:currentnodes,queries: newnodes, N:N_SearchButton};
-
-          d3.json('/gdata/'+JSON.stringify(serverinfo),function(error,data){
-                console.log(" finish Got data from server");
-                mydata=data;
-                console.log(data);
-                SHOW_UPDATE_FORCE(data, false);
-                console.log("finish build force");
-                node_right_click_on();
-                node_left_click_on();
-                console.log("finishe add event listeners");
-          });
-      };*/
   });
 });
 

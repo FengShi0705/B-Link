@@ -99,7 +99,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
   var gnodes=SVG.selectAll(".gnode")
                .data(SIMULATION.nodes(),function(d){return d.wid;});
 
-      gnodes.selectAll("circle").transition().attr("r",function(d){return scale_NodeRadius(d.N);});
+      gnodes.selectAll("circle").transition('Radius').attr("r",function(d){return scale_NodeRadius(d.N);});
 
   var newgnodes=gnodes.enter()
                .append("g")
@@ -111,7 +111,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
   newgnodes.append("text")
          .attr("dy",-10)
          .text(function(d){return d.label;});
-  newgnodes.append("circle").transition()
+  newgnodes.append("circle").transition('Radius')
          .attr("r",function(d){return scale_NodeRadius(d.N);});
 
   gnodes.exit().remove();
@@ -207,9 +207,9 @@ function circle_layout_neighbor(dataset){
 // wordrank highlight relevant words and corresponding paths
 function highlight_nodespaths(dataset){
     //not fade
-    d3.selectAll(".gnode").selectAll("circle").style("opacity","1");
-    d3.selectAll(".gnode").selectAll("text").transition().style("opacity","1");
-    d3.selectAll(".edge").transition().style("opacity","1");
+    d3.selectAll(".gnode").selectAll("circle").style('fill','red').transition('highlightopacity').style("opacity","1");
+    d3.selectAll(".gnode").selectAll("text").transition('highlightopacity').style("opacity","1");
+    d3.selectAll(".edge").transition('highlightopacity').style("opacity","1");
 
     // generate a highlighted graph based on how many nodes we want to highlight among the top relevant words and corresponding paths
     var hltG=new jsnx.Graph();
@@ -220,13 +220,16 @@ function highlight_nodespaths(dataset){
 
     //transparent nodes
     var fadenodes=d3.selectAll(".gnode").filter(function(d){return !(hltG.hasNode(d.wid));});
-    fadenodes.selectAll("circle").transition().style("opacity","0.1");
-    fadenodes.selectAll("text").transition().style("opacity","0.1");
+    fadenodes.selectAll("circle").transition('highlightopacity').style("opacity","0.1");
+    fadenodes.selectAll("text").transition('highlightopacity').style("opacity","0.1");
 
 
     //transparent edges
     var fadeedges=d3.selectAll(".edge").filter(function(d){return !(hltG.hasEdge(d.source.wid,d.target.wid)) ;});
-        fadeedges.transition().style("opacity","0.1");
+        fadeedges.transition('highlightopacity').style("opacity","0.1");
+
+    //highlight queries
+    d3.selectAll(".gnode").selectAll("circle").filter(function(d){return _.contains(dataset.nodes,d.wid);}).transition('highlightcolor').style('fill','blue');
 
     //change title color
     TITLECOLOR_CHANGE();
