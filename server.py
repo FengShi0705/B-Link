@@ -45,13 +45,13 @@ def texttowid(searchtext):
 # receive queries, nodes currently existing in client, and N (the number of nodes to be explored around each queries)
 # explore around queries for most N relevent words
 # return all nodes to the client, and all edges for client graph, and queries
-@app.route('/gdata/<jsondata>')
-def gdata(jsondata):
-    info=json.loads(jsondata)
+@app.route('/explore/<info>')
+def explore(info):
+    info=json.loads(info)
     existing_nodes=info["existing_nodes"]
     queries=info["queries"]
     N=info["N"]
-    explorenodes=myRtr.get_Rel('Fw',N,queries)["RL_Allipts"]
+    explorenodes=myRtr.get_Rel(info['tp'],info['N'],info['ipts'],info['user'],)
 
     localG = myRtr.G.subgraph(set(existing_nodes)|set(explorenodes))  # local
     allnodes=[{"wid":n, "label":localG.node[n]["label"],"N":localG.degree(n,weight="weight"), "n":localG.degree(n)} for n in localG.nodes()]

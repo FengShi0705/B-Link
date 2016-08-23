@@ -73,7 +73,7 @@ class UndirectedG(object):
 
 
 
-    def get_Rel_one(self,ipt,tp,minhops):
+    def get_Rel_one(self,ipt,tp,minhops,localnodes=None):
         """
         Generator of the most relevant words and their corresponding paths for an input.
         The word is sorted by the distance of its shortest path from input, and is filtered by minhops of its shortest path.
@@ -82,8 +82,14 @@ class UndirectedG(object):
         :param ipt: source
         :param tp: the property of edge to be used as distance
         :param minhops: the minimum hops that the word's shortest path should contain
+        :param localnodes: if none, find the relevent words in whole graph. Else, find the relevant words in localgraph.
         :return: (length, word's shortest path)
         """
+        if localnodes==None:
+            G = self.G
+        else:
+            G = self.G.subgraph(localnodes)
+
         push = heappush
         pop = heappop
         dist = {}  # dictionary of final distances
@@ -101,8 +107,8 @@ class UndirectedG(object):
             if len(paths[v])>=minhops+1:
                 yield (d, paths[v])
 
-            for u in self.G.adj[v].keys():
-                cost = self.G[u][v][tp]
+            for u in G.adj[v].keys():
+                cost = G[u][v][tp]
                 if cost is None:
                     continue
                 vu_dist = dist[v] + cost
@@ -123,41 +129,95 @@ class UndirectedG(object):
 
 
 
-    def get_Rel(self,tp,N,ipts,user,start=True,minhops=1):
+    def get_Rel(self,tp,N,ipt,user,start=True,minhops=1,localnodes=None):
         """
-        if there are more than one input, find the first N words and paths for each input
-
-        if there is only one input, find the first N words if start=True, while find the next N words if start=False
+        find the relevant words and paths for an input word
+        find the first N words if start=True, while find the next or previous N words if start=False
 
         :param tp: property of the edge to be distance
-        :param N: number of words to get
-        :param ipts: input words
+        :param N: number of words to get. if N is positive, get the next N nodes, otherwise, get the previous N nodes
+        :param ipt: input word
         :param user: user's email
-        :param start: Ture: find the first N words. False: find the next N words
+        :param start: Ture: find the first N words. False: find the next or previous N words
         :param minhops: the minimum number of hops that the paths should contain
-        :return: {'allnodes': set(), 'allpaths': [[],[]...]}
+        :param localnodes: if none, find the relevent words in whole graph. Else, find the relevant words in localgraph.
+        :return: 'allnodes': set(), 'allpaths': [[],[]...], 'AddNew': boolean. set 'allnodes' is the union set of the nodes in all the 'allpaths',
+                             'AddNew' indicates whether there is new nodes to add.
         """
-        results={}
+        results = {}
         results['allnodes'] = set()
         results['allpaths'] = []
-        if start == False:
-            assert len(ipts)==1, 'there are more than one input, and we cannot get the next N words for all inputs.'
 
-        for ipt in ipts:
-            if start==True:
-                self.user_generators[user] = (ipt,self.get_Rel_one(ipt, tp, minhops))
 
-            assert self.user_generators[user][0] == ipt, 'no user generator'
-            for i in xrange(N):
+
+
+
+    def my_Gen(self,N,user,parameters,generator,start=True):
+        results={}
+
+
+        if start==True:
+            self.user_generators[user] = {}
+            self.user_generators[user]['generator'] = generator(**parameters)
+            self.user_generators[user]['records'] = []
+            self.user_generators[user]['position'] = 0
+            self.user_generators[user]['max'] = None
+
+        if self.user_generators[user]['position'] + N < 0:
+            raise ValueError("position should not be negative")
+        else:
+            startposition = self.user_generators[user]['position']
+            self.user_generators[user]['position'] += N
+
+        n_records = len(self.user_generators[user]['records'])
+
+        if self.user_generators[user]['position'] > n_records:
+            for i in xrange(self.user_generators[user]['position'] - n_records +N+1):
                 try:
-                    length,path = self.user_generators[user][1].next()
+                    length, path = self.user_generators[user]['generator'].next()
                 except:
+                    self.user_generators[user]['max'] = len(self.user_generators[user]['records'])
                     break
                 else:
-                    results['allnodes'].update(set(path))
-                    results['allpaths'].append(path)
+                    self.user_generators[user]['records'].append(path)
 
-        return results
+        if self.user_generators[user]['max'] is not None and self.user_generators[user]['position']>=self.user_generators[user]['max']:
+            self.user_generators[user]['position'] -= N
+
+        if self.user_generators[user]['position']==0:
+            self.user_generators[user]['position'] -= N
+
+
+        if N>=0:
+            results['allpaths'] = self.user_generators[user]['records'][startposition:startposition+N]
+        else:
+            results['allpaths'] = self.user_generators[user]['records'][startposition+N:startposition]
+
+        results['allnodes'] = set()
+        for path in results['allpaths']:
+            results['allnodes'].update(path)
+
+        return results['allnodes'],results['allpaths']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

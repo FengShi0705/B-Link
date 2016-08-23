@@ -8,6 +8,13 @@ import math
 from heapq import heappush, heappop
 
 
+class tri(object):
+    def print_parameters(self,parameters,function):
+        function(**parameters)
+
+    def lala(self,a,b):
+        print a,b
+
 def original_cluster(k):
     G = nx.read_gpickle('data/undirected(fortest).gpickle')
     A = nx.adjacency_matrix(G,nodelist=G.nodes()[:-1],weight='weight')
