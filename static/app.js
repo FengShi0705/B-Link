@@ -32,6 +32,7 @@ Search_Button.on('click',function(){
               assert(data.AddNew==false, 'why need to add new nodes when exploring local graph?');
               var highlights={'nodes':[query],'paths':data.paths};
               highlight_nodespaths(highlights);
+              ZoomToNodes([query]);
           });
       }else{//not existing, explore whole
           var subparameters = {'ipt':query,'tp':Type_distance,'minhops':1,'localnodes':null};
@@ -40,14 +41,11 @@ Search_Button.on('click',function(){
           console.log(info);
           d3.json('/explore/'+JSON.stringify(info),function(error,data){
               assert(data.AddNew==true, 'why not add new nodes when queries not in local graph?');
-              if(currentnodes.length==0){
-                  var bornplace = {x:NaN,y:NaN,vx:NaN,vy:NaN}
-              }else{
-                  var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};
-              };
+              var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};
               SHOW_UPDATE_FORCE(data,bornplace);
               var highlights={'nodes':[query],'paths':data.paths};
               highlight_nodespaths(highlights);
+              ZoomToNodes([query]);
           });
       };
 

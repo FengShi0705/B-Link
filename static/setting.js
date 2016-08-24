@@ -52,10 +52,16 @@ var EdgeColor = '#aaa';
 SVG = d3.select("svg#Mainback")
          .insert("g",":first-child")
          .attr("id","maincanvas");
-BACKLAYER = SVG.append("rect")
+
+BACKLAYER_Zoom = d3.zoom()
+                   .scaleExtent([1/10,4])
+                   .on("zoom",zoomed);
+BACKLAYER = d3.select("svg#Mainback")
+              .insert("rect",":first-child")
                .attr("id","Backlayer")
                .attr("width", w)
-               .attr("height", h);
+               .attr("height", h)
+               .call(BACKLAYER_Zoom);
 
 //set nodes and edges and simulation
 CLIENT_NODES=[];
@@ -99,5 +105,7 @@ SIMULATION = d3.forceSimulation()
        d.fx = null;
        d.fy = null;
   };
-
+  function zoomed() {
+  SVG.attr("transform", d3.event.transform);
+}
 

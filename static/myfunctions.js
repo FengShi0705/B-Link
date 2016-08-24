@@ -234,6 +234,34 @@ function highlight_nodespaths(dataset){
     TITLECOLOR_CHANGE();
 };
 
+function ZoomToNodes(nodes){
+    var obj_nodes = d3.selectAll('.gnode').filter(function(d){return _.contains(nodes,d.wid);});
+    obj_nodes = obj_nodes.data();
+    if(obj_nodes.length == 1){
+        var k=4;
+        var x=obj_nodes[0].x
+        var y=obj_nodes[0].y
+    }else{
+        var max_x=d3.max(obj_nodes,function(d){return d.x});
+        var max_y=d3.max(obj_nodes,function(d){return d.y});
+        var min_x=d3.min(obj_nodes,function(d){return d.x});
+        var min_y=d3.min(obj_nodes,function(d){return d.y});
+        var x = (max_x+min_x)/2;
+        var y = (max_y+min_y)/2;
+        var kx = w/(max_x-min_x+4*maxNodeRadius);
+        var ky = h/(max_y-min_y+4*maxNodeRadius);
+        var k = Math.min(kx,ky);
+        console.log(k);
+    };
+    function transform(){
+        return d3.zoomIdentity
+                 .translate(w/2,h/2)
+                 .scale(k)
+                 .translate(-x,-y);
+    };
+    BACKLAYER.transition('zoom').duration(3000).call(BACKLAYER_Zoom.transform, transform);
+};
+
 // Back to force layout
 function RedoBack(){
     //resume color
