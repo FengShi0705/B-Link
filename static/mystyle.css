@@ -41,7 +41,7 @@ div.header{
 }
 
 .gnode circle {
-  fill: red;
+  fill: #3498DB;
   stroke: #fff;
   stroke-width: 2px;
 }

@@ -96,7 +96,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                     .text(function(d){return d.Fw;});
           edgelabels.exit().remove();
 
-  var gnodes=SVG.selectAll(".gnode")
+  var gnodes = SVG.selectAll(".gnode")
                .data(SIMULATION.nodes(),function(d){return d.wid;});
 
       gnodes.selectAll("circle").transition('Radius').attr("r",function(d){return scale_NodeRadius(d.N);});
@@ -206,34 +206,32 @@ function circle_layout_neighbor(dataset){
 
 // wordrank highlight relevant words and corresponding paths
 function highlight_nodespaths(dataset){
-    //not fade
-    d3.selectAll(".gnode").selectAll("circle").style('fill','red').transition('highlightopacity').style("opacity","1");
-    d3.selectAll(".gnode").selectAll("text").transition('highlightopacity').style("opacity","1");
-    d3.selectAll(".edge").transition('highlightopacity').style("opacity","1");
-
     // generate a highlighted graph based on how many nodes we want to highlight among the top relevant words and corresponding paths
     var hltG=new jsnx.Graph();
     for (var i = 0; i < dataset.paths.length; i++){
         hltG.addNode(dataset.paths[i][0]);
         hltG.addPath(dataset.paths[i]);
     };
-
-    //transparent nodes
-    var fadenodes=d3.selectAll(".gnode").filter(function(d){return !(hltG.hasNode(d.wid));});
-    fadenodes.selectAll("circle").transition('highlightopacity').style("opacity","0.1");
-    fadenodes.selectAll("text").transition('highlightopacity').style("opacity","0.1");
-
-
-    //transparent edges
-    var fadeedges=d3.selectAll(".edge").filter(function(d){return !(hltG.hasEdge(d.source.wid,d.target.wid)) ;});
-        fadeedges.transition('highlightopacity').style("opacity","0.1");
-
-    //highlight queries
-    d3.selectAll(".gnode").selectAll("circle").filter(function(d){return _.contains(dataset.nodes,d.wid);}).transition('highlightcolor').style('fill','blue');
-
+    // all nodes color
+    d3.selectAll(".gnode").selectAll("circle").each(function(d){
+        if( _.contains(dataset.nodes, d.wid) ){
+            d3.select(this).transition('color').style('fill',HltQueryColor);
+        }else if( hltG.hasNode(d.wid) ){
+            d3.select(this).transition('color').style('fill',HltPathColor);
+        }else{
+            d3.select(this).transition('color').style('fill',NodeColor);
+        };
+    });
+    //all edges color
+    d3.selectAll(".edge").transition('color').style('stroke',function(d){
+        if( hltG.hasEdge(d.source.wid,d.target.wid) ){
+            return HltPathColor;
+        }else{
+            return EdgeColor;
+        };
+    });
     //change title color
     TITLECOLOR_CHANGE();
-
 };
 
 // Back to force layout

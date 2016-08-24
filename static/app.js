@@ -33,7 +33,7 @@ Search_Button.on('click',function(){
               var highlights={'nodes':[query],'paths':data.paths};
               highlight_nodespaths(highlights);
           });
-      }else{
+      }else{//not existing, explore whole
           var subparameters = {'ipt':query,'tp':Type_distance,'minhops':1,'localnodes':null};
           var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
           var info={'explorelocal':false,'localnodes':currentnodes,'parameters':parameters};

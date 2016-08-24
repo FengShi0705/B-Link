@@ -43,7 +43,10 @@ var POSITIONFORCE_STRENGTH=0.8;
 var N_SearchButton=3;
 var Type_distance = 'Fw';
 var N_ExploreFunctionpanel=20;
-
+var HltQueryColor = '#FF0000'
+var HltPathColor = '#FF6800';
+var NodeColor = '#3498DB';
+var EdgeColor = '#aaa';
 
 //add  main canvas
 SVG = d3.select("svg#Mainback")

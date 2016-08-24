@@ -105,7 +105,7 @@ class UndirectedG(object):
                 continue # already searched this node
 
             dist[v]=d
-            if len(paths[v])>=minhops:
+            if len(paths[v])>=minhops+1 or len(paths[v])==1:
                 yield (d, paths[v])
 
             for u in G.adj[v].keys():
