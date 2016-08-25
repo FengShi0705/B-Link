@@ -1,3 +1,11 @@
+//assert like python
+function assert(condition, message) {
+    if (!condition) {
+        throw message || "Assertion failed";
+    }
+}
+
+
 
 // get the text in inputbox
 function get_inputtext(){
@@ -14,16 +22,17 @@ function CURRENT_NODESSET(nodes,key){
 };
 
 // update force layout
-function SHOW_UPDATE_FORCE(dataset,query_exist_in_local){
+function SHOW_UPDATE_FORCE(dataset,born){
 
   // born postion and velocity of new nodes
+  /*born = bornplace
   if(query_exist_in_local){
-      var born = CLIENT_NODES.filter(function(obj){return obj["wid"]==dataset.queries[0];})[0];
+      var born = CLIENT_NODES.filter(function(obj){return obj["wid"]==dataset.query;})[0];
   }else if(CLIENT_NODES.length==0){
       var born = {x:NaN,y:NaN,vx:NaN,vy:NaN};
   }else{
       var born = {x:w/2, y:h/2, vx:NaN, vy: NaN};
-  };
+  };*/
 
   //update and add nodes
   dataset.allnodes.forEach(function(d){
@@ -87,10 +96,10 @@ function SHOW_UPDATE_FORCE(dataset,query_exist_in_local){
                     .text(function(d){return d.Fw;});
           edgelabels.exit().remove();
 
-  var gnodes=SVG.selectAll(".gnode")
+  var gnodes = SVG.selectAll(".gnode")
                .data(SIMULATION.nodes(),function(d){return d.wid;});
 
-      gnodes.selectAll("circle").transition().attr("r",function(d){return scale_NodeRadius(d.N);});
+      gnodes.selectAll("circle").transition('Radius').attr("r",function(d){return scale_NodeRadius(d.N);});
 
   var newgnodes=gnodes.enter()
                .append("g")
@@ -102,7 +111,7 @@ function SHOW_UPDATE_FORCE(dataset,query_exist_in_local){
   newgnodes.append("text")
          .attr("dy",-10)
          .text(function(d){return d.label;});
-  newgnodes.append("circle").transition()
+  newgnodes.append("circle").transition('Radius')
          .attr("r",function(d){return scale_NodeRadius(d.N);});
 
   gnodes.exit().remove();
@@ -196,32 +205,61 @@ function circle_layout_neighbor(dataset){
 };
 
 // wordrank highlight relevant words and corresponding paths
-function highlight_wordrank(dataset){
-    //not fade
-    d3.selectAll(".gnode").selectAll("circle").transition().style("opacity","1");
-    d3.selectAll(".gnode").selectAll("text").transition().style("opacity","1");
-    d3.selectAll(".edge").transition().style("opacity","1");
-
+function highlight_nodespaths(dataset){
     // generate a highlighted graph based on how many nodes we want to highlight among the top relevant words and corresponding paths
-    var hltG=new jsnx.Graph();;
-    for (var i = 0; i < Math.min(dataset.length, HltNodesNumber); i++){
-        hltG.addNode(dataset[i][0]);
-        hltG.addPath(dataset[i][1]);
+    var hltG=new jsnx.Graph();
+    for (var i = 0; i < dataset.paths.length; i++){
+        hltG.addNode(dataset.paths[i][0]);
+        hltG.addPath(dataset.paths[i]);
     };
-
-    //transparent nodes
-    var fadenodes=d3.selectAll(".gnode").filter(function(d){return !(hltG.hasNode(d.wid));});
-    fadenodes.selectAll("circle").transition().style("opacity","0.1");
-    fadenodes.selectAll("text").transition().style("opacity","0.1");
-
-
-    //transparent edges
-    var fadeedges=d3.selectAll(".edge").filter(function(d){return !(hltG.hasEdge(d.source.wid,d.target.wid)) ;});
-        fadeedges.transition().style("opacity","0.1");
-
+    // all nodes color
+    d3.selectAll(".gnode").selectAll("circle").each(function(d){
+        if( _.contains(dataset.nodes, d.wid) ){
+            d3.select(this).transition('color').style('fill',HltQueryColor);
+        }else if( hltG.hasNode(d.wid) ){
+            d3.select(this).transition('color').style('fill',HltPathColor);
+        }else{
+            d3.select(this).transition('color').style('fill',NodeColor);
+        };
+    });
+    //all edges color
+    d3.selectAll(".edge").transition('color').style('stroke',function(d){
+        if( hltG.hasEdge(d.source.wid,d.target.wid) ){
+            return HltPathColor;
+        }else{
+            return EdgeColor;
+        };
+    });
     //change title color
     TITLECOLOR_CHANGE();
+};
 
+function ZoomToNodes(nodes){
+    var obj_nodes = d3.selectAll('.gnode').filter(function(d){return _.contains(nodes,d.wid);});
+    obj_nodes = obj_nodes.data();
+    if(obj_nodes.length == 1){
+        var k=4;
+        var x=obj_nodes[0].x
+        var y=obj_nodes[0].y
+    }else{
+        var max_x=d3.max(obj_nodes,function(d){return d.x});
+        var max_y=d3.max(obj_nodes,function(d){return d.y});
+        var min_x=d3.min(obj_nodes,function(d){return d.x});
+        var min_y=d3.min(obj_nodes,function(d){return d.y});
+        var x = (max_x+min_x)/2;
+        var y = (max_y+min_y)/2;
+        var kx = w/(max_x-min_x+4*maxNodeRadius);
+        var ky = h/(max_y-min_y+4*maxNodeRadius);
+        var k = Math.min(kx,ky);
+        console.log(k);
+    };
+    function transform(){
+        return d3.zoomIdentity
+                 .translate(w/2,h/2)
+                 .scale(k)
+                 .translate(-x,-y);
+    };
+    BACKLAYER.transition('zoom').duration(3000).call(BACKLAYER_Zoom.transform, transform);
 };
 
 // Back to force layout
