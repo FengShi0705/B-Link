@@ -204,41 +204,42 @@ function circle_layout_neighbor(dataset){
    TITLECOLOR_CHANGE();
 };
 
-// wordrank highlight relevant words and corresponding paths
+// highlight dataset.paths and all the nodes on the paths, except dataset.nodes which are highlighted in a different style.
 function highlight_nodespaths(dataset){
-    // generate a highlighted graph based on how many nodes we want to highlight among the top relevant words and corresponding paths
+    // generate a highlighted graph based on dataset.paths
     var hltG=new jsnx.Graph();
     for (var i = 0; i < dataset.paths.length; i++){
-        hltG.addNode(dataset.paths[i][0]);
+        hltG.addNode(dataset.paths[i][0]);//in case a path only have one node
         hltG.addPath(dataset.paths[i]);
     };
     // all nodes color
     d3.selectAll(".gnode").selectAll("circle").each(function(d){
         if( _.contains(dataset.nodes, d.wid) ){
-            d3.select(this).transition('color').style('fill',HltQueryColor);
+            d3.select(this).attr('class','hltA');
         }else if( hltG.hasNode(d.wid) ){
-            d3.select(this).transition('color').style('fill',HltPathColor);
+            d3.select(this).attr('class','hltP');
         }else{
-            d3.select(this).transition('color').style('fill',NodeColor);
+            d3.select(this).attr('class','');
         };
     });
     //all edges color
-    d3.selectAll(".edge").transition('color').style('stroke',function(d){
+    d3.selectAll(".edge").each(function(d){
         if( hltG.hasEdge(d.source.wid,d.target.wid) ){
-            return HltPathColor;
+            d3.select(this).attr('class','edge hltE');
         }else{
-            return EdgeColor;
+            d3.select(this).attr('class','edge');
         };
     });
     //change title color
     TITLECOLOR_CHANGE();
 };
 
+// zooming to multiple nodes so that the nodes fill up the screen.
 function ZoomToNodes(nodes){
     var obj_nodes = d3.selectAll('.gnode').filter(function(d){return _.contains(nodes,d.wid);});
     obj_nodes = obj_nodes.data();
     if(obj_nodes.length == 1){
-        var k=4;
+        var k = 1;
         var x=obj_nodes[0].x
         var y=obj_nodes[0].y
     }else{
