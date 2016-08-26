@@ -117,7 +117,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
   gnodes.exit().remove();
 
   // restart simulation
-  SIMULATION .alphaTarget(0.3).restart();
+  SIMULATION .alphaTarget(0.5).restart();
 
 };
 
