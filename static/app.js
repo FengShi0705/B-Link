@@ -26,13 +26,10 @@ d3.select("input[name='keywords']").on('keydown',function(){
 function Handle_Search_Button(){
   console.log("click search button");
   d3.json('/texttowid/'+get_inputtext(),function(error,data){
-      //change view to all nodes
-      console.log("adjust view to the query node");
       //get current local nodes
       var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
       //get query
       var query = data
-
       if(_.contains(currentnodes,query)){//existings, explore local
           var subparameters = {'ipt':query,'tp':Type_distance,'minhops':1,'localnodes':currentnodes};
           var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
@@ -53,6 +50,7 @@ function Handle_Search_Button(){
               assert(data.AddNew==true, 'why not add new nodes when queries not in local graph?');
               var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};
               SHOW_UPDATE_FORCE(data,bornplace);
+              node_left_click_on();
               var highlights={'nodes':[query],'paths':data.paths};
               highlight_nodespaths(highlights);
               ZoomToNodes([query]);
@@ -78,11 +76,17 @@ function node_right_click_on(){
 // node left click behavior
 function node_left_click_on(){
    d3.select("#maincanvas").selectAll('.gnode').on('click',function(d){
-      d3.json('/wordrank/'+d.wid,function(error,data){
-          console.log(JSON.stringify(data));
-          highlight_wordrank(data);
-          Backlayer_clickon();
+      var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+      var clicked = d.wid;
+      var subparameters = {'ipt':d.wid,'tp':Type_distance,'minhops':1,'localnodes':currentnodes};
+      var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
+      var info={'explorelocal':true,'localnodes':null,'parameters':parameters};
+      d3.json('/explore/'+JSON.stringify(info),function(error,data){
+          var highlights = {'nodes':[clicked],'paths':data.paths};
+          highlight_nodespaths(highlights);
       });
+      //update inputbox
+      d3.select('input[name="keywords"]').node().value = d.label;
    });
 };
 

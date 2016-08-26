@@ -78,7 +78,7 @@ SIMULATION = d3.forceSimulation()
       if( SIMULATION.alpha()>=0.49 ){
           SIMULATION.alphaTarget(0);
       };
-      console.log(SIMULATION.alpha());
+
       SVG.selectAll(".edge").attr("x1", function(d) { return d.source.x; })
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })

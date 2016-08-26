@@ -111,12 +111,3 @@ svg rect#Backlayer{
   -webkit-transform: rotate(180deg);
   background:blue;
 }
-
-input[name="search"]{
-  top:10px;
-  left:10px;
-  width:300px;
-  height:20px;
-  border:5px;
-  border-style:groove;
-}

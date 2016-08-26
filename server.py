@@ -42,9 +42,7 @@ def texttowid(searchtext):
     return make_response(response)
 
 
-# receive queries, nodes currently existing in client, and N (the number of nodes to be explored around each queries)
-# explore around queries for most N relevent words
-# return all nodes to the client, and all edges for client graph, and queries
+# query generator in the server
 @app.route('/explore/<info>')
 def explore(info):
     info=json.loads(info)
