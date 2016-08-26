@@ -1,6 +1,6 @@
 # this module is for the existing relevant information retrieval.
 import networkx as nx
-from FengPrivate import PF
+from Private import PF
 import collections
 from sklearn.utils.graph import graph_laplacian
 from sklearn.utils.arpack import eigsh
