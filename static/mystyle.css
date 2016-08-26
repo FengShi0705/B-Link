@@ -39,11 +39,25 @@ div.header{
 .edge {
   stroke: #aaa;
 }
+.edge.hltE {
+  stroke: #FF6800;
+}
 
 .gnode circle {
   fill: #3498DB;
   stroke: #fff;
   stroke-width: 2px;
+}
+
+.gnode circle.hltP{
+   fill: #FF6800;
+   stroke: #fff;
+   stroke-width: 2px;
+}
+.gnode circle.hltA{
+   fill: #fff;
+   stroke: #FF6800;
+   stroke-width: 5px;
 }
 
 .neighbor_track{

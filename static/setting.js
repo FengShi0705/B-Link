@@ -43,7 +43,6 @@ var POSITIONFORCE_STRENGTH=0.8;
 var N_SearchButton=3;
 var Type_distance = 'Fw';
 var N_ExploreFunctionpanel=20;
-var HltQueryColor = '#FF0000'
 var HltPathColor = '#FF6800';
 var NodeColor = '#3498DB';
 var EdgeColor = '#aaa';
@@ -54,7 +53,7 @@ SVG = d3.select("svg#Mainback")
          .attr("id","maincanvas");
 
 BACKLAYER_Zoom = d3.zoom()
-                   .scaleExtent([1/10,4])
+                   .scaleExtent([1/4,4])
                    .on("zoom",zoomed);
 BACKLAYER = d3.select("svg#Mainback")
               .insert("rect",":first-child")

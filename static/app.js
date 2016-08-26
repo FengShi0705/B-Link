@@ -12,8 +12,18 @@ Search_Button.on("mouseout",function(){
   .style({"background-image": "url('/static/SearchButton.png')"})
 });
 
+//Search button click
+Search_Button.on('click', Handle_Search_Button);
 
-Search_Button.on('click',function(){
+//input box enter
+d3.select("input[name='keywords']").on('keydown',function(){
+  if (d3.event.keyCode==13){
+      Handle_Search_Button();
+  };
+});
+
+//Search button handler
+function Handle_Search_Button(){
   console.log("click search button");
   d3.json('/texttowid/'+get_inputtext(),function(error,data){
       //change view to all nodes
@@ -48,9 +58,8 @@ Search_Button.on('click',function(){
               ZoomToNodes([query]);
           });
       };
-
   });
-});
+};
 
 // node click behavior
 function node_right_click_on(){
