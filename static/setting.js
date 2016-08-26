@@ -114,3 +114,8 @@ SIMULATION = d3.forceSimulation()
   SVG.attr("transform", d3.event.transform);
 }
 
+// hide the left side info panel 
+  function hideLeftPanel() {
+	var elem = document.getElementById("left-panel");
+        elem.classList.toggle("hide");
+  };
