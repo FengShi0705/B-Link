@@ -47,6 +47,8 @@ var HltPathColor = '#FF6800';
 var NodeColor = '#3498DB';
 var EdgeColor = '#aaa';
 
+//add svg
+d3.select('body').append('svg').attr('id',"Mainback").attr('width',w) .attr('height',h);
 //add  main canvas
 SVG = d3.select("svg#Mainback")
          .insert("g",":first-child")
@@ -73,6 +75,10 @@ SIMULATION = d3.forceSimulation()
                .nodes(CLIENT_NODES);
 // tick on
   TICK = function(){
+      if( SIMULATION.alpha()>=0.49 ){
+          SIMULATION.alphaTarget(0);
+      };
+      console.log(SIMULATION.alpha());
       SVG.selectAll(".edge").attr("x1", function(d) { return d.source.x; })
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })
