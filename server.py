@@ -41,6 +41,32 @@ def texttowid(searchtext):
     response=json.dumps(wids[0])
     return make_response(response)
 
+# search button, add one node
+@app.route('/searchbutton/<info>')
+def search(info):
+    info = json.loads(info)
+    localG = myRtr.G.subgraph(set(info['currentnodes']+[info['query']]))
+    allnodes = [
+        {"wid": n, "label": localG.node[n]["label"], "N": localG.degree(n, weight="weight"), "n": localG.degree(n)} for
+        n in localG.nodes()]
+    alledges = [{"source": source, "target": target, "Fw": Fw} for (source, target, Fw) in localG.edges(data="Fw")]
+    sorted_paths = sorted(localG.edges(nbunch=[info['query']],data='Fw'), key=lambda x:x[2])
+    add_paths = [path[:-1] for path in sorted_paths]
+    try:
+        bornnode = sorted_paths[0][1]
+    except:
+        bornnode = None
+
+    dataset = {"allnodes": allnodes, "alledges": alledges, "paths": add_paths,'bornnode':bornnode}
+    response = json.dumps(dataset)
+    return response
+
+
+
+
+
+
+
 
 # query generator in the server
 @app.route('/explore/<info>')
@@ -88,4 +114,4 @@ def wordrank(node):
     response=json.dumps(nodesandpaths)
     return make_response(response)
 
-#app.run(host="0.0.0.0",threaded=True)
+app.run(threaded=True)
