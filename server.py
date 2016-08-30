@@ -69,8 +69,8 @@ def search(info):
 
 
 # query generator in the server
-@app.route('/explore/<info>')
-def explore(info):
+@app.route('/generator/<info>')
+def generator(info):
     info=json.loads(info)
     info['parameters']['user'] =  session['user']
     if info['explorelocal']==True:

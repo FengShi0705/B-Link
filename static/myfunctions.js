@@ -212,12 +212,20 @@ function highlight_nodespaths(dataset){
         hltG.addNode(dataset.paths[i][0]);//in case a path only have one node
         hltG.addPath(dataset.paths[i]);
     };
+    var hltG1=new jsnx.Graph();
+    for (var i = 0; i < dataset.paths1.length; i++){
+        hltG1.addNode(dataset.paths1[i][0]);//in case a path only have one node
+        hltG1.addPath(dataset.paths1[i]);
+    };
+
     // all nodes color
     d3.selectAll(".gnode").selectAll("circle").each(function(d){
         if( _.contains(dataset.nodes, d.wid) ){
             d3.select(this).attr('class','hltA');
         }else if( hltG.hasNode(d.wid) ){
             d3.select(this).attr('class','hltP');
+        }else if( hltG1.hasNode(d.wid) ){
+            d3.select(this).attr('class','hltP1');
         }else{
             d3.select(this).attr('class','');
         };
@@ -226,6 +234,8 @@ function highlight_nodespaths(dataset){
     d3.selectAll(".edge").each(function(d){
         if( hltG.hasEdge(d.source.wid,d.target.wid) ){
             d3.select(this).attr('class','edge hltE');
+        }else if( hltG1.hasEdge(d.source.wid,d.target.wid) ){
+            d3.select(this).attr('class','edge hltE1');
         }else{
             d3.select(this).attr('class','edge');
         };
@@ -285,42 +295,85 @@ function RedoBack(){
     TITLECOLOR_CHANGE();
 };
 
+//get the value of minhops
+function get_minhops(){
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+};
+
 //Explore button handler
 function Handle_Explore_Button(){
-  console.log("click search button");
-  d3.json('/texttowid/'+get_inputtext(),function(error,data){
-      //get current local nodes
-      var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-      //get query
-      var query = data
-      if(_.contains(currentnodes,query)){//existings, explore local
-          var subparameters = {'ipt':query,'tp':Type_distance,'minhops':1,'localnodes':currentnodes};
-          var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
-          var info={'explorelocal':true,'localnodes':null,'parameters':parameters};
-          console.log(info);
-          d3.json('/explore/'+JSON.stringify(info),function(error,data){
-              assert(data.AddNew==false, 'why need to add new nodes when exploring local graph?');
-              var highlights={'nodes':[query],'paths':data.paths};
-              highlight_nodespaths(highlights);
-              ZoomToNodes([query]);
-          });
-      }else{//not existing, explore whole
-          var subparameters = {'ipt':query,'tp':Type_distance,'minhops':1,'localnodes':null};
-          var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
-          var info={'explorelocal':false,'localnodes':currentnodes,'parameters':parameters};
-          console.log(info);
-          d3.json('/explore/'+JSON.stringify(info),function(error,data){
-              assert(data.AddNew==true, 'why not add new nodes when queries not in local graph?');
-              var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};
-              SHOW_UPDATE_FORCE(data,bornplace);
-              node_left_click_on();
-              var highlights={'nodes':[query],'paths':data.paths};
-              highlight_nodespaths(highlights);
-              ZoomToNodes([query]);
-          });
-      };
-  });
+    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+    var query = d3.select('circle.hltA').data()[0].wid;
+    var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':null};
+    var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
+    var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
+    Explore_Nearby(info,query);
 };
+
+//Explore next handler
+function Handle_ExploreNext_Button(){
+    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+    var query = d3.select('circle.hltA').data()[0].wid;
+    var parameters = {'N':N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
+    var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
+    Explore_Nearby(info,query);
+};
+
+//Explore previous handler
+function Handle_Exploreprevious_Button(){
+    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+    var query = d3.select('circle.hltA').data()[0].wid;
+    var parameters = {'N':-N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
+    var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
+    Explore_Nearby(info,query);
+};
+
+//Nearby button handler
+function Handle_Nearby_Button(){
+    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+    var query = d3.select('circle.hltA').data()[0].wid;
+    var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
+    var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
+    var info = {'explorelocal':true,'localnodes':null,'parameters':parameters};
+    Explore_Nearby(info,query);
+};
+
+//Nearby next handler
+function Handle_NearbyNext_Button(){
+    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+    var query = d3.select('circle.hltA').data()[0].wid;
+    var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
+    var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
+    var info = {'explorelocal':true; 'localnodes':null,'parameters':parameters};
+    Explore_Nearby(info,query);
+};
+
+//Nearby previous handler
+function Handle_NearbyPrevious_Button(){
+    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+    var query = d3.select('circle.hltA').data()[0].wid;
+    var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
+    var parameters = {'N':-N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
+    var info = {'explorelocal':true; 'localnodes':null,'parameters':parameters};
+    Explore_Nearby(info,query);
+};
+
+function Explore_Nearby(info,query){
+    d3.json('/generator/'+JSON.stringify(info),function(error,data){
+        if(data.AddNew==true){
+            var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==query;})[0];
+            var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
+            SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
+            node_left_click_on();
+        };
+        var highlights={'nodes':[query],'paths':[data.paths[0]],'paths1':data.paths.slice(1,data.paths.length)}; //highlight nodes and paths
+        highlight_nodespaths(highlights);
+        ZoomToNodes([query]); // zoom to the node
+        !!!!!!!!!//update the information panel here
+    });
+};
+
+
 
 // Handle search button
 function Handle_Search_Button(){
