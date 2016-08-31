@@ -296,18 +296,27 @@ function RedoBack(){
 };
 
 //get the value of minhops
-function get_minhops(){
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-};
+//function get_minhops(){
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//};
 
 //Explore button handler
 function Handle_Explore_Button(){
-    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-    var query = d3.select('circle.hltA').data()[0].wid;
-    var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':null};
-    var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
-    var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
-    Explore_Nearby(info,query);
+    d3.json('/texttowid/'+get_inputtext(),function(error,data){
+        var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+        var query = data;
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':null};
+        var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
+        var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
+        if( _.contains(currentnodes,query) ){
+            Explore_Nearby(info,query,query);
+        }else{
+            var info1 = {'currentnodes':currentnodes,'query':query};
+            d3.json('/findnear/'+JSON.stringify(info1),function(error,data){
+                Explore_Nearby(info,query,data);
+            });
+        };
+    });
 };
 
 //Explore next handler
@@ -316,7 +325,7 @@ function Handle_ExploreNext_Button(){
     var query = d3.select('circle.hltA').data()[0].wid;
     var parameters = {'N':N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
     var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
-    Explore_Nearby(info,query);
+    Explore_Nearby(info,query,query);
 };
 
 //Explore previous handler
@@ -325,7 +334,7 @@ function Handle_Exploreprevious_Button(){
     var query = d3.select('circle.hltA').data()[0].wid;
     var parameters = {'N':-N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
     var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
-    Explore_Nearby(info,query);
+    Explore_Nearby(info,query,query);
 };
 
 //Nearby button handler
@@ -335,7 +344,7 @@ function Handle_Nearby_Button(){
     var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
     var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
     var info = {'explorelocal':true,'localnodes':null,'parameters':parameters};
-    Explore_Nearby(info,query);
+    Explore_Nearby(info,query,query);
 };
 
 //Nearby next handler
@@ -344,8 +353,8 @@ function Handle_NearbyNext_Button(){
     var query = d3.select('circle.hltA').data()[0].wid;
     var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
     var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
-    var info = {'explorelocal':true; 'localnodes':null,'parameters':parameters};
-    Explore_Nearby(info,query);
+    var info = {'explorelocal':true, 'localnodes':null,'parameters':parameters};
+    Explore_Nearby(info,query,query);
 };
 
 //Nearby previous handler
@@ -354,22 +363,26 @@ function Handle_NearbyPrevious_Button(){
     var query = d3.select('circle.hltA').data()[0].wid;
     var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
     var parameters = {'N':-N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
-    var info = {'explorelocal':true; 'localnodes':null,'parameters':parameters};
-    Explore_Nearby(info,query);
+    var info = {'explorelocal':true, 'localnodes':null,'parameters':parameters};
+    Explore_Nearby(info,query,query);
 };
 
-function Explore_Nearby(info,query){
+function Explore_Nearby(info,query,born){
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
         if(data.AddNew==true){
-            var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==query;})[0];
-            var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
+            if(born){
+                var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==born;})[0];
+                var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
+            }else{
+                var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};
+            };
             SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
             node_left_click_on();
         };
         var highlights={'nodes':[query],'paths':[data.paths[0]],'paths1':data.paths.slice(1,data.paths.length)}; //highlight nodes and paths
         highlight_nodespaths(highlights);
         ZoomToNodes([query]); // zoom to the node
-        !!!!!!!!!//update the information panel here
+        //!!!!!!!!!//update the information panel here
     });
 };
 
@@ -381,7 +394,7 @@ function Handle_Search_Button(){
         var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
         var query = data;
         if(_.contains(currentnodes,query)){
-            var highlights = {'nodes':[query],'paths':[]};
+            var highlights = {'nodes':[query],'paths':[],'paths1':[]};
             highlight_nodespaths(highlights);
             ZoomToNodes([query]);
         }else{
@@ -393,7 +406,7 @@ function Handle_Search_Button(){
                 }else{var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};};
                 SHOW_UPDATE_FORCE(data,bornplace);
                 node_left_click_on();
-                var highlights={'nodes':[query],'paths':data.paths};
+                var highlights={'nodes':[query],'paths':data.paths,'paths1':[]};
                 highlight_nodespaths(highlights);
                 ZoomToNodes([query]);
             });

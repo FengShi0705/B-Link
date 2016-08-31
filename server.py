@@ -59,7 +59,22 @@ def search(info):
 
     dataset = {"allnodes": allnodes, "alledges": alledges, "paths": add_paths,'bornnode':bornnode}
     response = json.dumps(dataset)
-    return response
+    return make_response(response)
+
+# find the nearest node of the current nodes to the query node
+@app.route('/findnear/<info>')
+def findnear(info):
+    info = json.loads(info)
+    query = info['query']
+    localG = myRtr.G.subgraph(set(info['currentnodes'] + [query]))
+    sorted_neighbors = sorted([(n,localG[query][n]['Fw']) for n in localG.neighbors(query)] , key=lambda x:x[1])
+    try:
+        bornnode = sorted_neighbors[0][0]
+    except:
+        bornnode = None
+
+    response = json.dumps(bornnode)
+    return make_response(response)
 
 
 
