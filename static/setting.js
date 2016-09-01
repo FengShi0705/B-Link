@@ -48,21 +48,25 @@ var NodeColor = '#3498DB';
 var EdgeColor = '#aaa';
 
 //add svg
-d3.select('body').append('svg').attr('id',"Mainback").attr('width',w) .attr('height',h);
+SVG = d3.select('body').append('svg').attr('id',"Mainback").attr('width',w) .attr('height',h);
+function SVG_change_size(){
+    w=window.innerWidth || document.body.clientWidth;
+    h=window.innerHeight || document.body.clientHeight;
+    SVG.attr('width',w) .attr('height',h);
+    BACKLAYER.attr("width", w).attr("height", h);
+};
 //add  main canvas
-SVG = d3.select("svg#Mainback")
-         .insert("g",":first-child")
-         .attr("id","maincanvas");
+GRAPH = SVG.append("g")
+           .attr("id","MainGraph");
 
 BACKLAYER_Zoom = d3.zoom()
                    .scaleExtent([1/4,4])
                    .on("zoom",zoomed);
-BACKLAYER = d3.select("svg#Mainback")
-              .insert("rect",":first-child")
-               .attr("id","Backlayer")
-               .attr("width", w)
-               .attr("height", h)
-               .call(BACKLAYER_Zoom);
+BACKLAYER = SVG.insert("rect",":first-child")
+                  .attr("id","Backlayer")
+                  .attr("width", w)
+                  .attr("height", h)
+                  .call(BACKLAYER_Zoom);
 
 //set nodes and edges and simulation
 CLIENT_NODES=[];
@@ -79,14 +83,14 @@ SIMULATION = d3.forceSimulation()
           SIMULATION.alphaTarget(0);
       };
 
-      SVG.selectAll(".edge").attr("x1", function(d) { return d.source.x; })
+      GRAPH.selectAll(".edge").attr("x1", function(d) { return d.source.x; })
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })
       .attr("y2", function(d) { return d.target.y; });
 
-      SVG.selectAll(".gnode").attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+      GRAPH.selectAll(".gnode").attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-      SVG.selectAll(".edgelabel").attr("x", function(d) { return (d.source.x+d.target.x)/2; })
+      GRAPH.selectAll(".edgelabel").attr("x", function(d) { return (d.source.x+d.target.x)/2; })
       .attr("y", function(d) { return (d.source.y+d.target.y)/2; });
   };
 
@@ -111,7 +115,7 @@ SIMULATION = d3.forceSimulation()
        d.fy = null;
   };
   function zoomed() {
-  SVG.attr("transform", d3.event.transform);
+  GRAPH.attr("transform", d3.event.transform);
 }
 
 // hide the left side info panel 

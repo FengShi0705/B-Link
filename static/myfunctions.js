@@ -77,7 +77,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
   //change title color
   TITLECOLOR_CHANGE();
   //update svg
-  var edges=SVG.selectAll(".edge")
+  var edges=GRAPH.selectAll(".edge")
                .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
           edges.attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
@@ -87,7 +87,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                .attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
           edges.exit().remove();
 
-  var edgelabels=SVG.selectAll(".edgelabel")
+  var edgelabels=GRAPH.selectAll(".edgelabel")
                     .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
           edgelabels.enter()
@@ -96,7 +96,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                     .text(function(d){return d.Fw;});
           edgelabels.exit().remove();
 
-  var gnodes = SVG.selectAll(".gnode")
+  var gnodes = GRAPH.selectAll(".gnode")
                .data(SIMULATION.nodes(),function(d){return d.wid;});
 
       gnodes.selectAll("circle").transition('Radius').attr("r",function(d){return scale_NodeRadius(d.N);});
@@ -187,7 +187,7 @@ function circle_layout_neighbor(dataset){
    .strength(POSITIONFORCE_STRENGTH);
 
    d3.selectAll(".neighbor_track").remove();
-   neighbor_tracks=SVG.selectAll(".neighbor_track")
+   neighbor_tracks=GRAPH.selectAll(".neighbor_track")
                       .data(_.range(1,level+1))
                       .enter()
                       .append("circle")
@@ -204,7 +204,7 @@ function circle_layout_neighbor(dataset){
    TITLECOLOR_CHANGE();
 };
 
-// highlight dataset.paths and all the nodes on the paths, except dataset.nodes which are highlighted in a different style.
+// highlight dataset.paths and dataset.paths1 in different style, and dataset.nodes which are highlighted in a different style as well.
 function highlight_nodespaths(dataset){
     // generate a highlighted graph based on dataset.paths
     var hltG=new jsnx.Graph();
@@ -295,10 +295,7 @@ function RedoBack(){
     TITLECOLOR_CHANGE();
 };
 
-//get the value of minhops
-//function get_minhops(){
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//};
+
 
 //Explore button handler
 function Handle_Explore_Button(){
@@ -319,26 +316,47 @@ function Handle_Explore_Button(){
     });
 };
 
-//Explore next handler
+//Explore next handler OK
 function Handle_ExploreNext_Button(){
     var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
     var query = d3.select('circle.hltA').data()[0].wid;
-    var parameters = {'N':N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
-    var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
+    if( explore_LocalorGlobal()){//explore Global
+        var parameters = {'N':N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
+        var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
+    }else{ //explore Local
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
+        var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
+        var info = {'explorelocal':true, 'localnodes':null,'parameters':parameters};
+    };
     Explore_Nearby(info,query,query);
 };
 
-//Explore previous handler
+//Explore previous handler OK
 function Handle_Exploreprevious_Button(){
     var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
     var query = d3.select('circle.hltA').data()[0].wid;
-    var parameters = {'N':-N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
-    var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
+    if (explore_LocalorGlobal()) {//explore Global
+        var parameters = {'N':-N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
+        var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
+    } else { //explore Local
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
+        var parameters = {'N':-N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
+        var info = {'explorelocal':true, 'localnodes':null,'parameters':parameters};
+    };
     Explore_Nearby(info,query,query);
 };
 
-//Nearby button handler
-function Handle_Nearby_Button(){
+
+//get the value of minhops
+function get_minhops(){
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+};
+// check swith
+function explore_LocalorGlobal(){}
+// hop handler
+function Explore_hops(){}
+//Switch handler
+function Explore_LG_switch(){
     var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
     var query = d3.select('circle.hltA').data()[0].wid;
     var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
@@ -347,26 +365,7 @@ function Handle_Nearby_Button(){
     Explore_Nearby(info,query,query);
 };
 
-//Nearby next handler
-function Handle_NearbyNext_Button(){
-    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-    var query = d3.select('circle.hltA').data()[0].wid;
-    var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
-    var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
-    var info = {'explorelocal':true, 'localnodes':null,'parameters':parameters};
-    Explore_Nearby(info,query,query);
-};
-
-//Nearby previous handler
-function Handle_NearbyPrevious_Button(){
-    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-    var query = d3.select('circle.hltA').data()[0].wid;
-    var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
-    var parameters = {'N':-N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
-    var info = {'explorelocal':true, 'localnodes':null,'parameters':parameters};
-    Explore_Nearby(info,query,query);
-};
-
+//------------------------------Explore either global or local graph, born is the wid of the node as the bornplace.
 function Explore_Nearby(info,query,born){
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
         if(data.AddNew==true){
@@ -406,7 +405,7 @@ function Handle_Search_Button(){
                 }else{var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};};
                 SHOW_UPDATE_FORCE(data,bornplace);
                 node_left_click_on();
-                var highlights={'nodes':[query],'paths':data.paths,'paths1':[]};
+                var highlights = {'nodes':[query],'paths':data.paths,'paths1':[]};
                 highlight_nodespaths(highlights);
                 ZoomToNodes([query]);
             });

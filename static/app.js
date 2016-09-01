@@ -25,7 +25,7 @@ d3.select("input[name='keywords']").on('keydown',function(){
 
 // node click behavior
 function node_right_click_on(){
-   d3.select("#maincanvas").selectAll('.gnode').on('contextmenu',function(d){
+      GRAPH.selectAll('.gnode').on('contextmenu',function(d){
       d3.event.preventDefault();
       console.log("click node");
       console.log(d.label);
@@ -39,9 +39,15 @@ function node_right_click_on(){
 
 // node left click behavior
 function node_left_click_on(){
-   d3.select("#maincanvas").selectAll('.gnode').on('click',function(d){
+      GRAPH.selectAll('.gnode').on('mouseover',function(){
+          console.log('mouseover');
+          d3.select('input[name="keywords"]').node().blur();
+      });
+
+      GRAPH.selectAll('.gnode').on('click',function(d){
       // highlight the clicked node
-      var highlights = {'nodes':[d.wid],'paths':[]};
+      console.log('leftclick')
+      var highlights = {'nodes':[d.wid],'paths':[],'paths1':[]};
       highlight_nodespaths(highlights);
       //update inputbox
       d3.select('input[name="keywords"]').node().value = d.label;
