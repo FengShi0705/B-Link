@@ -302,15 +302,15 @@ function Handle_Explore_Button(){
     d3.json('/texttowid/'+get_inputtext(),function(error,data){
         var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
         var query = data;
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':null};
-        var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
-        var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
+        set to globle
+        set to hops 1
+
         if( _.contains(currentnodes,query) ){
-            Explore_Nearby(info,query,query);
+            Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
         }else{
             var info1 = {'currentnodes':currentnodes,'query':query};
             d3.json('/findnear/'+JSON.stringify(info1),function(error,data){
-                Explore_Nearby(info,query,data);
+                Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,data);
             });
         };
     });
@@ -318,58 +318,57 @@ function Handle_Explore_Button(){
 
 //Explore next handler OK
 function Handle_ExploreNext_Button(){
-    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
     var query = d3.select('circle.hltA').data()[0].wid;
-    if( explore_LocalorGlobal()){//explore Global
-        var parameters = {'N':N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
-        var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
-    }else{ //explore Local
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
-        var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
-        var info = {'explorelocal':true, 'localnodes':null,'parameters':parameters};
-    };
-    Explore_Nearby(info,query,query);
+    Explore_Nearby(check_explore_LG(),false,N_SearchButton,query,query);
 };
 
 //Explore previous handler OK
 function Handle_Exploreprevious_Button(){
-    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
     var query = d3.select('circle.hltA').data()[0].wid;
-    if (explore_LocalorGlobal()) {//explore Global
-        var parameters = {'N':-N_SearchButton,'parameters':null,'generator':'get_Rel_one','start':false};
-        var info = {'explorelocal':false,'parameters':parameters,'localnodes':currentnodes};
-    } else { //explore Local
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
-        var parameters = {'N':-N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':false};
-        var info = {'explorelocal':true, 'localnodes':null,'parameters':parameters};
-    };
-    Explore_Nearby(info,query,query);
+    Explore_Nearby(check_explore_LG(),false,-N_SearchButton,query,query);
 };
 
 
 //get the value of minhops
 function get_minhops(){
+return number
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 };
 // check swith
-function explore_LocalorGlobal(){}
-// hop handler
-function Explore_hops(){}
+function check_explore_LG(){
+return 'local' or 'globel'};
+
+// Hop handler
+function ExploreHops(){
+    var query = d3.select('circle.hltA').data()[0].wid;
+    Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
+};
 //Switch handler
 function Explore_LG_switch(){
-    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
     var query = d3.select('circle.hltA').data()[0].wid;
-    var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
-    var parameters = {'N':N_SearchButton,'parameters':subparameters,'generator':'get_Rel_one','start':true};
-    var info = {'explorelocal':true,'localnodes':null,'parameters':parameters};
-    Explore_Nearby(info,query,query);
+    Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
 };
 
-//------------------------------Explore either global or local graph, born is the wid of the node as the bornplace.
-function Explore_Nearby(info,query,born){
+// Explore either global or local graph
+// Start or Previous or Next
+// Query is the queried node to be highlighted
+// born is the wid of the node as the bornplace.
+function Explore_Nearby(LorG,start,N,query,born){
+    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+    if ( LorG=="local" ){
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
+        var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
+        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
+    }else{
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':null};
+        var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
+        var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
+    };
+
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
         if(data.AddNew==true){
             if(born){
+                assert( _.contains(currentnodes,born), 'current nodes do not include born node');
                 var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==born;})[0];
                 var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
             }else{
@@ -383,6 +382,7 @@ function Explore_Nearby(info,query,born){
         ZoomToNodes([query]); // zoom to the node
         //!!!!!!!!!//update the information panel here
     });
+
 };
 
 
