@@ -129,6 +129,9 @@ div.header{
 .edge.hltE {
   stroke: #FF6800;
 }
+.edge.hltE1 {
+  stroke: #ff0000;
+}
 
 .gnode circle {
   fill: #3498DB;
@@ -138,6 +141,11 @@ div.header{
 
 .gnode circle.hltP{
    fill: #FF6800;
+   stroke: #fff;
+   stroke-width: 2px;
+}
+.gnode circle.hltP1{
+   fill: #ff0000;
    stroke: #fff;
    stroke-width: 2px;
 }
@@ -320,3 +328,4 @@ p.list{
     display:flex;
     justify-content:space-between;
 }
+

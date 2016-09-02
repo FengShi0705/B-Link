@@ -77,7 +77,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
   //change title color
   TITLECOLOR_CHANGE();
   //update svg
-  var edges=SVG.selectAll(".edge")
+  var edges=GRAPH.selectAll(".edge")
                .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
           edges.attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
@@ -87,7 +87,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                .attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
           edges.exit().remove();
 
-  var edgelabels=SVG.selectAll(".edgelabel")
+  var edgelabels=GRAPH.selectAll(".edgelabel")
                     .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
           edgelabels.enter()
@@ -96,7 +96,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                     .text(function(d){return d.Fw;});
           edgelabels.exit().remove();
 
-  var gnodes = SVG.selectAll(".gnode")
+  var gnodes = GRAPH.selectAll(".gnode")
                .data(SIMULATION.nodes(),function(d){return d.wid;});
 
       gnodes.selectAll("circle").transition('Radius').attr("r",function(d){return scale_NodeRadius(d.N);});
@@ -187,7 +187,7 @@ function circle_layout_neighbor(dataset){
    .strength(POSITIONFORCE_STRENGTH);
 
    d3.selectAll(".neighbor_track").remove();
-   neighbor_tracks=SVG.selectAll(".neighbor_track")
+   neighbor_tracks=GRAPH.selectAll(".neighbor_track")
                       .data(_.range(1,level+1))
                       .enter()
                       .append("circle")
@@ -204,7 +204,7 @@ function circle_layout_neighbor(dataset){
    TITLECOLOR_CHANGE();
 };
 
-// highlight dataset.paths and all the nodes on the paths, except dataset.nodes which are highlighted in a different style.
+// highlight dataset.paths and dataset.paths1 in different style, and dataset.nodes which are highlighted in a different style as well.
 function highlight_nodespaths(dataset){
     // generate a highlighted graph based on dataset.paths
     var hltG=new jsnx.Graph();
@@ -212,12 +212,20 @@ function highlight_nodespaths(dataset){
         hltG.addNode(dataset.paths[i][0]);//in case a path only have one node
         hltG.addPath(dataset.paths[i]);
     };
+    var hltG1=new jsnx.Graph();
+    for (var i = 0; i < dataset.paths1.length; i++){
+        hltG1.addNode(dataset.paths1[i][0]);//in case a path only have one node
+        hltG1.addPath(dataset.paths1[i]);
+    };
+
     // all nodes color
     d3.selectAll(".gnode").selectAll("circle").each(function(d){
         if( _.contains(dataset.nodes, d.wid) ){
             d3.select(this).attr('class','hltA');
         }else if( hltG.hasNode(d.wid) ){
             d3.select(this).attr('class','hltP');
+        }else if( hltG1.hasNode(d.wid) ){
+            d3.select(this).attr('class','hltP1');
         }else{
             d3.select(this).attr('class','');
         };
@@ -226,6 +234,8 @@ function highlight_nodespaths(dataset){
     d3.selectAll(".edge").each(function(d){
         if( hltG.hasEdge(d.source.wid,d.target.wid) ){
             d3.select(this).attr('class','edge hltE');
+        }else if( hltG1.hasEdge(d.source.wid,d.target.wid) ){
+            d3.select(this).attr('class','edge hltE1');
         }else{
             d3.select(this).attr('class','edge');
         };
@@ -283,4 +293,122 @@ function RedoBack(){
     SIMULATION.alphaTarget(0.3).restart();
     //change title color
     TITLECOLOR_CHANGE();
+};
+
+
+
+//Explore button handler
+function Handle_Explore_Button(){
+    d3.json('/texttowid/'+get_inputtext(),function(error,data){
+        var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+        var query = data;
+        set to globle
+        set to hops 1
+
+        if( _.contains(currentnodes,query) ){
+            Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
+        }else{
+            var info1 = {'currentnodes':currentnodes,'query':query};
+            d3.json('/findnear/'+JSON.stringify(info1),function(error,data){
+                Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,data);
+            });
+        };
+    });
+};
+
+//Explore next handler OK
+function Handle_ExploreNext_Button(){
+    var query = d3.select('circle.hltA').data()[0].wid;
+    Explore_Nearby(check_explore_LG(),false,N_SearchButton,query,query);
+};
+
+//Explore previous handler OK
+function Handle_Exploreprevious_Button(){
+    var query = d3.select('circle.hltA').data()[0].wid;
+    Explore_Nearby(check_explore_LG(),false,-N_SearchButton,query,query);
+};
+
+
+//get the value of minhops
+function get_minhops(){
+return number
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+};
+// check swith
+function check_explore_LG(){
+return 'local' or 'globel'};
+
+// Hop handler
+function ExploreHops(){
+    var query = d3.select('circle.hltA').data()[0].wid;
+    Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
+};
+//Switch handler
+function Explore_LG_switch(){
+    var query = d3.select('circle.hltA').data()[0].wid;
+    Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
+};
+
+// Explore either global or local graph
+// Start or Previous or Next
+// Query is the queried node to be highlighted
+// born is the wid of the node as the bornplace.
+function Explore_Nearby(LorG,start,N,query,born){
+    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+    if ( LorG=="local" ){
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
+        var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
+        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
+    }else{
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':null};
+        var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
+        var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
+    };
+
+    d3.json('/generator/'+JSON.stringify(info),function(error,data){
+        if(data.AddNew==true){
+            if(born){
+                assert( _.contains(currentnodes,born), 'current nodes do not include born node');
+                var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==born;})[0];
+                var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
+            }else{
+                var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};
+            };
+            SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
+            node_left_click_on();
+        };
+        var highlights={'nodes':[query],'paths':[data.paths[0]],'paths1':data.paths.slice(1,data.paths.length)}; //highlight nodes and paths
+        highlight_nodespaths(highlights);
+        ZoomToNodes([query]); // zoom to the node
+        //!!!!!!!!!//update the information panel here
+    });
+
+};
+
+
+
+// Handle search button
+function Handle_Search_Button(){
+    d3.json('/texttowid/'+get_inputtext(),function(error,data){
+        var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+        var query = data;
+        if(_.contains(currentnodes,query)){
+            var highlights = {'nodes':[query],'paths':[],'paths1':[]};
+            highlight_nodespaths(highlights);
+            ZoomToNodes([query]);
+        }else{
+            var info={'currentnodes':currentnodes,'query':query};
+            d3.json('/searchbutton/'+JSON.stringify(info),function(error,data){
+                if(data.bornnode){
+                    var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==data.bornnode;})[0];
+                    var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
+                }else{var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};};
+                SHOW_UPDATE_FORCE(data,bornplace);
+                node_left_click_on();
+                var highlights = {'nodes':[query],'paths':data.paths,'paths1':[]};
+                highlight_nodespaths(highlights);
+                ZoomToNodes([query]);
+            });
+        };
+    });
 };

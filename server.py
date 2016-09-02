@@ -41,12 +41,51 @@ def texttowid(searchtext):
     response=json.dumps(wids[0])
     return make_response(response)
 
+# search button, add one node
+@app.route('/searchbutton/<info>')
+def search(info):
+    info = json.loads(info)
+    localG = myRtr.G.subgraph(set(info['currentnodes']+[info['query']]))
+    allnodes = [
+        {"wid": n, "label": localG.node[n]["label"], "N": localG.degree(n, weight="weight"), "n": localG.degree(n)} for
+        n in localG.nodes()]
+    alledges = [{"source": source, "target": target, "Fw": Fw} for (source, target, Fw) in localG.edges(data="Fw")]
+    sorted_paths = sorted(localG.edges(nbunch=[info['query']],data='Fw'), key=lambda x:x[2])
+    add_paths = [path[:-1] for path in sorted_paths]
+    try:
+        bornnode = sorted_paths[0][1]
+    except:
+        bornnode = None
 
-# receive queries, nodes currently existing in client, and N (the number of nodes to be explored around each queries)
-# explore around queries for most N relevent words
-# return all nodes to the client, and all edges for client graph, and queries
-@app.route('/explore/<info>')
-def explore(info):
+    dataset = {"allnodes": allnodes, "alledges": alledges, "paths": add_paths,'bornnode':bornnode}
+    response = json.dumps(dataset)
+    return make_response(response)
+
+# find the nearest node of the current nodes to the query node
+@app.route('/findnear/<info>')
+def findnear(info):
+    info = json.loads(info)
+    query = info['query']
+    localG = myRtr.G.subgraph(set(info['currentnodes'] + [query]))
+    sorted_neighbors = sorted([(n,localG[query][n]['Fw']) for n in localG.neighbors(query)] , key=lambda x:x[1])
+    try:
+        bornnode = sorted_neighbors[0][0]
+    except:
+        bornnode = None
+
+    response = json.dumps(bornnode)
+    return make_response(response)
+
+
+
+
+
+
+
+
+# query generator in the server
+@app.route('/generator/<info>')
+def generator(info):
     info=json.loads(info)
     info['parameters']['user'] =  session['user']
     if info['explorelocal']==True:
@@ -90,4 +129,4 @@ def wordrank(node):
     response=json.dumps(nodesandpaths)
     return make_response(response)
 
-#app.run(host="0.0.0.0",threaded=True)
+app.run(threaded=True)
