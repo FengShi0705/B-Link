@@ -10,19 +10,60 @@
   </head>
 
   <body onresize="SVG_change_size()">
-      <div class="input">
-                 <input type="text" name="keywords" value="">
-                 <input type="button" name="search" value="">
+      <div class="func-nav">
+          <button type="button" onclick="findpoint()" name="b-findpoint" id="b-findpoint"></button>
+          <p class="t-func-nav">P O I N T</p>
+          <button type="button" onclick="findline()" name="b-findline" id="b-findline"></button>
+          <p class="t-func-nav">L I N E</p>
+          <button type="button" onclick="cluster()" name="b-cluster" id="b-cluster"></button>
+          <p class="t-func-nav">CLUSTER</p>
       </div>
+
+      <form class="input">
+          <input type="text" id="keywords" name="keywords" placeholder="Search..." autocomplete="on" onkeyup="checkTextField(this)">
+          <input type="button" name="search" value="">
+          <input type="reset" name="clear" value="">
+      </form>
+
       <div class="header">
-          <h1 id="title">
-              Data-Drive Creativity
-          </h1>
+          Data-Drive Creativity
       </div>
 
       <div id="left-panel">
-        <a href="#" onclick="hideLeftPanel();" class="controller"> << </a>
-        <h1 style="text-align:center; color:red">control panel</h1>
+          <p class="p-text">Min Hop:
+               <select class="minhop">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+              </select>
+          </p>
+
+          <div id="t-global">Global</div>
+          <label class="switch">
+                <input type="checkbox" name="switch-1" id="switch-check" onclick="checkswitch()" >
+                <div class="slider round"></div>
+          </label>
+          <div id="t-local">Local</div>
+          <div class="blockline"></div>
+
+          <div id="info-display">
+              <p class="list" >1</p>
+              <p class="list" >2</p>
+              <p class="list" >3</p>
+              <p class="list" >4</p>
+              <p class="list" >5</p>
+              <p class="list" >6</p>
+              <p class="list" >7</p>
+              <p class="list" >8</p>
+              <p class="list" >9</p>
+              <p class="list" >10</p>
+          </div>
+          <div id="page-button">
+              <button type="button" onclick="pageup()" name="b-up" class="button">PREVIOUS</button>
+              <button type="button" onclick="pagedown()" name="b-down" class="button">NEXT</button>
+          </div>
       </div>
 
 

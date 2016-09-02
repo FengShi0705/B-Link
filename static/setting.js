@@ -115,11 +115,50 @@ SIMULATION = d3.forceSimulation()
        d.fy = null;
   };
   function zoomed() {
+
+  SVG.attr("transform", d3.event.transform);
+};
+
+
+// CSS - function-navigation panel
+  function findpoint(){
+    document.getElementById("left-panel").style.visibility = "visible";
+
+  };
+
   GRAPH.attr("transform", d3.event.transform);
 }
 
-// hide the left side info panel 
-  function hideLeftPanel() {
-	var elem = document.getElementById("left-panel");
-        elem.classList.toggle("hide");
+
+// CSS - search-box control
+  function checkTextField(field) {
+    if (field.value != '') {
+        d3.select('input[name="clear"]').style("visibility","visible");
+    }
+    else{
+        d3.select('input[name="clear"]').style("visibility","hidden");
+    }
   };
+
+var clear_button=d3.select('input[name="clear"]');
+    clear_button.on('click', function(){
+        document.getElementById("left-panel").style.visibility = "hidden";
+        document.getElementById("keywords").style.value = "";
+    });
+
+// CSS - Global-local switch control
+    function checkswitch(){
+        var switchcheck = document.getElementById("switch-check").checked;
+        if (switchcheck == true) {
+            document.getElementById("t-local").style.color = "#2196F3";
+            d3.select("#t-local").style("font-weight", "bold");
+            document.getElementById("t-global").style.color = "black";
+            d3.select("#t-global").style("font-weight","normal");
+            }
+        else {
+            document.getElementById("t-local").style.color = "black";
+            d3.select("#t-local").style("font-weight", "normal");
+            document.getElementById("t-global").style.color = "#2196F3";
+            d3.select("#t-global").style("font-weight","bold");
+        }};
+

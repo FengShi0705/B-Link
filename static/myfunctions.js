@@ -389,6 +389,7 @@ function Explore_Nearby(LorG,start,N,query,born){
 
 // Handle search button
 function Handle_Search_Button(){
+    document.getElementById("left-panel").style.visibility = "hidden";
     d3.json('/texttowid/'+get_inputtext(),function(error,data){
         var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
         var query = data;
