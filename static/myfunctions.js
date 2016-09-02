@@ -302,8 +302,8 @@ function Handle_Explore_Button(){
     d3.json('/texttowid/'+get_inputtext(),function(error,data){
         var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
         var query = data;
-        set to globle
-        set to hops 1
+        ////////////////set to globle
+        //////////////set to hops 1
 
         if( _.contains(currentnodes,query) ){
             Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
@@ -331,12 +331,13 @@ function Handle_Exploreprevious_Button(){
 
 //get the value of minhops
 function get_minhops(){
-return number
+//////return number
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 };
 // check swith
 function check_explore_LG(){
-return 'local' or 'globel'};
+//////////////return 'local' or 'globel'
+};
 
 // Hop handler
 function ExploreHops(){

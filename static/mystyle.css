@@ -64,7 +64,7 @@ p.t-func-nav{
   cursor:pointer;
 }
 
-form.input {
+div.input {
   position:fixed;
   left:75px;
   top:10px;
@@ -89,6 +89,7 @@ input[name="search"]{
   top:5px;
   border:2px;
   background-image:url('/static/search icon.png');
+  background-color:white;
   background-size:100%;
   cursor: pointer;
 }

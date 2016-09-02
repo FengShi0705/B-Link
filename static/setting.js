@@ -116,7 +116,7 @@ SIMULATION = d3.forceSimulation()
   };
   function zoomed() {
 
-  SVG.attr("transform", d3.event.transform);
+  GRAPH.attr("transform", d3.event.transform);
 };
 
 
@@ -126,8 +126,7 @@ SIMULATION = d3.forceSimulation()
 
   };
 
-  GRAPH.attr("transform", d3.event.transform);
-}
+
 
 
 // CSS - search-box control
@@ -143,7 +142,7 @@ SIMULATION = d3.forceSimulation()
 var clear_button=d3.select('input[name="clear"]');
     clear_button.on('click', function(){
         document.getElementById("left-panel").style.visibility = "hidden";
-        document.getElementById("keywords").style.value = "";
+        document.getElementById("keywords").value = "";
     });
 
 // CSS - Global-local switch control
