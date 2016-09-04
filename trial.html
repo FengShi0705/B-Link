@@ -1,102 +1,11 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-
-.link {
-  stroke: #000;
-  stroke-width: 1.5px;
-}
-
-.node {
-  fill: #000;
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-
-.node.a { fill: #1f77b4; }
-.node.b { fill: #ff7f0e; }
-.node.c { fill: #2ca02c; }
-
-</style>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+  </head>
 <body>
-<script src="https://d3js.org/d3.v4.min.js"></script>
- <script type="text/javascript" src="static/underscore.js"></script>
-<script>
+   <article id="main"></article>
+</body>
+</html>
 
-var width = 960,
-    height = 500;
-
-
-
-var nodes = [],
-    links = [];
-
-var force = d3.forceSimulation()
-              .nodes(nodes)
-              .force("link",d3.forceLink().distance(120))
-              .force("charge", d3.forceManyBody().strength(-100))
-              .force("center", d3.forceCenter(width / 2, height / 2));
-
-    force.force("link")
-         .links(links);
-
-    force.on("tick", tick);
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-
-
-// 1. Add three nodes and three links.
-setTimeout(function() {
-  var a = {id: "a"}, b = {id: "b"}, c = {id: "c"};
-  nodes.push(a, b, c);
-  links.push({source: a, target: b}, {source: a, target: c}, {source: b, target: c});
-
-  start();
-}, 0);
-
-// 2. Remove node B and associated links.
-setTimeout(function() {
-  nodes.splice(1, 1); // remove b
-  links.shift(); // remove a-b
-  links.pop(); // remove b-c
-
-  start();
-}, 3000);
-
-// Add node B back.
-setTimeout(function() {
-  var a = nodes[0], b = {id: "b"}, c = nodes[1];
-  nodes.push(b);
-  links.push({source: a, target: b}, {source: b, target: c});
-  start();
-}, 6000);
-
-function start() {
-  force.nodes(nodes);
-  force.force("link").links(links);
-  link = svg.selectAll(".link").data(force.force("link").links(), function(d) { return d.source.id + "-" + d.target.id; });
-  link.enter().insert("line", ".node").attr("class", "link");
-  link.exit().remove();
-
-  node = svg.selectAll(".node").data(force.nodes(), function(d) { return d.id;});
-  node.enter().append("circle").attr("class", function(d) { return "node " + d.id; }).attr("r", 8);
-  node.exit().remove();
-
-  force.alphaTarget(0.0001).restart();
-
-}
-
-function tick() {
-  svg.selectAll(".node").attr("cx", function(d) { return d.x; })
-      .attr("cy", function(d) { return d.y; })
-
-  svg.selectAll(".link").attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
-}
-
-</script>

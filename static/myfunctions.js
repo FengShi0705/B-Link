@@ -82,7 +82,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
 
           edges.attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
           edges.enter()
-               .append("line")
+               .insert("line",":first-child")
                .attr("class","edge")
                .attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
           edges.exit().remove();
@@ -99,7 +99,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
   var gnodes = GRAPH.selectAll(".gnode")
                .data(SIMULATION.nodes(),function(d){return d.wid;});
 
-      gnodes.selectAll("circle").transition('Radius').attr("r",function(d){return scale_NodeRadius(d.N);});
+      gnodes.select("circle").transition('Radius').attr("r",function(d){return scale_NodeRadius(d.N);});
 
   var newgnodes=gnodes.enter()
                .append("g")
@@ -108,11 +108,12 @@ function SHOW_UPDATE_FORCE(dataset,born){
                .on("start", dragstarted)
                .on("drag", dragged)
                .on("end", dragended));
+
+  newgnodes.append("circle").transition('Radius')
+         .attr("r",function(d){return scale_NodeRadius(d.N);});
   newgnodes.append("text")
          .attr("dy",-10)
          .text(function(d){return d.label;});
-  newgnodes.append("circle").transition('Radius')
-         .attr("r",function(d){return scale_NodeRadius(d.N);});
 
   gnodes.exit().remove();
 
@@ -302,8 +303,8 @@ function Handle_Explore_Button(){
     d3.json('/texttowid/'+get_inputtext(),function(error,data){
         var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
         var query = data;
-        ////////////////set to globle
-        //////////////set to hops 1
+        d3.select('label.switch input[name="switch-1"]').node().checked = false; //set to globle
+        d3.select('select.minhop').node().value=1; // set hops to 1
 
         if( _.contains(currentnodes,query) ){
             Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
@@ -331,12 +332,15 @@ function Handle_Exploreprevious_Button(){
 
 //get the value of minhops
 function get_minhops(){
-//////return number
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    return parseInt(d3.select('select.minhop').node().value);
 };
 // check swith
 function check_explore_LG(){
-//////////////return 'local' or 'globel'
+    if( d3.select('label.switch input[name="switch-1"]').node().checked==true ){
+        return 'local';
+    }else{
+        return 'global';
+    };
 };
 
 // Hop handler
@@ -378,10 +382,18 @@ function Explore_Nearby(LorG,start,N,query,born){
             SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
             node_left_click_on();
         };
-        var highlights={'nodes':[query],'paths':[data.paths[0]],'paths1':data.paths.slice(1,data.paths.length)}; //highlight nodes and paths
+        var highlights={'nodes':[query],'paths':[data.paths.ids[0]],'paths1':data.paths.ids.slice(1,data.paths.ids.length)}; //highlight nodes and paths
         highlight_nodespaths(highlights);
         ZoomToNodes([query]); // zoom to the node
-        //!!!!!!!!!//update the information panel here
+        //update the information panel here
+        var inforow = d3.select('div#left-panel div#info-display').selectAll('div.row').data(data.paths.labels);
+        inforow.select('p.list').text(function(d,i){return parseInt(i)+data.position;});
+        inforow.select('div.content').text(function(d){return d.join(' > ');});
+        var newrows=inforow.enter().append('div').attr('class','row')
+        newrows.append('p').attr('class','list').text(function(d,i){return parseInt(i)+data.position;});
+        newrows.append('div').attr('class','content').text(function(d){return d.join(' > ');});
+        inforow.exit().remove();
+        console.log(data.position);
     });
 
 };

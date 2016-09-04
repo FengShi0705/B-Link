@@ -31,7 +31,7 @@
 
       <div id="left-panel">
           <p class="p-text">Min Hop:
-               <select class="minhop">
+               <select class="minhop" onchange="change_exploreMinhop()">
                   <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
@@ -49,16 +49,6 @@
           <div class="blockline"></div>
 
           <div id="info-display">
-              <p class="list" >1</p>
-              <p class="list" >2</p>
-              <p class="list" >3</p>
-              <p class="list" >4</p>
-              <p class="list" >5</p>
-              <p class="list" >6</p>
-              <p class="list" >7</p>
-              <p class="list" >8</p>
-              <p class="list" >9</p>
-              <p class="list" >10</p>
           </div>
           <div id="page-button">
               <button type="button" onclick="pageup()" name="b-up" class="button">PREVIOUS</button>

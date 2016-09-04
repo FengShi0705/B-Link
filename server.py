@@ -91,15 +91,15 @@ def generator(info):
     if info['explorelocal']==True:
         info['localnodes'] = info['parameters']['parameters']['localnodes']
 
-    explorenodes,explorepaths = myRtr.my_Gen(**info['parameters'])
+    explorenodes,explorepaths, position= myRtr.my_Gen(**info['parameters'])
 
     if set(explorenodes).issubset(info['localnodes']):
-        response = json.dumps({'AddNew':False,'paths':explorepaths})
+        response = json.dumps({'AddNew':False,'paths':explorepaths,"position":position})
     else:
         localG = myRtr.G.subgraph(set(info['localnodes']) | set(explorenodes))  # local
         allnodes = [{"wid":n, "label":localG.node[n]["label"],"N":localG.degree(n,weight="weight"), "n":localG.degree(n)} for n in localG.nodes()]
         alledges=[{"source":source, "target":target, "Fw":Fw} for (source,target,Fw) in localG.edges(data="Fw")]
-        dataset={'AddNew':True,"allnodes":allnodes, "alledges":alledges,"paths":explorepaths}
+        dataset={'AddNew':True,"allnodes":allnodes, "alledges":alledges,"paths":explorepaths,"position":position}
         response=json.dumps(dataset)
 
     return make_response(response)
