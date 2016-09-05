@@ -208,14 +208,12 @@ function circle_layout_neighbor(dataset){
 // highlight dataset.paths and dataset.paths1 in different style, and dataset.nodes which are highlighted in a different style as well.
 function highlight_nodespaths(dataset){
     // generate a highlighted graph based on dataset.paths
-    var hltG=new jsnx.Graph();
+    var hltG = new jsnx.Graph();
     for (var i = 0; i < dataset.paths.length; i++){
-        hltG.addNode(dataset.paths[i][0]);//in case a path only have one node
         hltG.addPath(dataset.paths[i]);
     };
     var hltG1=new jsnx.Graph();
     for (var i = 0; i < dataset.paths1.length; i++){
-        hltG1.addNode(dataset.paths1[i][0]);//in case a path only have one node
         hltG1.addPath(dataset.paths1[i]);
     };
 
@@ -297,61 +295,17 @@ function RedoBack(){
 };
 
 
-
-//Explore button handler
-function Handle_Explore_Button(){
-    d3.json('/texttowid/'+get_inputtext(),function(error,data){
-        var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-        var query = data;
-        d3.select('label.switch input[name="switch-1"]').node().checked = false; //set to globle
-        d3.select('select.minhop').node().value=1; // set hops to 1
-
-        if( _.contains(currentnodes,query) ){
-            Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
-        }else{
-            var info1 = {'currentnodes':currentnodes,'query':query};
-            d3.json('/findnear/'+JSON.stringify(info1),function(error,data){
-                Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,data);
-            });
-        };
-    });
-};
-
-//Explore next handler OK
-function Handle_ExploreNext_Button(){
-    var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),false,N_SearchButton,query,query);
-};
-
-//Explore previous handler OK
-function Handle_Exploreprevious_Button(){
-    var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),false,-N_SearchButton,query,query);
-};
-
-
 //get the value of minhops
 function get_minhops(){
     return parseInt(d3.select('select.minhop').node().value);
 };
-// check swith
+// check swith is either local or global
 function check_explore_LG(){
     if( d3.select('label.switch input[name="switch-1"]').node().checked==true ){
         return 'local';
     }else{
         return 'global';
     };
-};
-
-// Hop handler
-function ExploreHops(){
-    var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
-};
-//Switch handler
-function Explore_LG_switch(){
-    var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
 };
 
 // Explore either global or local graph
@@ -382,47 +336,50 @@ function Explore_Nearby(LorG,start,N,query,born){
             SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
             node_left_click_on();
         };
-        var highlights={'nodes':[query],'paths':[data.paths.ids[0]],'paths1':data.paths.ids.slice(1,data.paths.ids.length)}; //highlight nodes and paths
+        var hlpath1 = [];
+        data.paths.slice(1, data.paths.length).forEach(function(d){ hlpath1.push(d.ids); });
+        var highlights={'nodes':[query],'paths':[data.paths[0].ids],'paths1':hlpath1}; //highlight nodes and paths
         highlight_nodespaths(highlights);
         ZoomToNodes([query]); // zoom to the node
         //update the information panel here
-        var inforow = d3.select('div#left-panel div#info-display').selectAll('div.row').data(data.paths.labels);
-        inforow.select('p.list').text(function(d,i){return parseInt(i)+data.position;});
-        inforow.select('div.content').text(function(d){return d.join(' > ');});
-        var newrows=inforow.enter().append('div').attr('class','row')
-        newrows.append('p').attr('class','list').text(function(d,i){return parseInt(i)+data.position;});
-        newrows.append('div').attr('class','content').text(function(d){return d.join(' > ');});
-        inforow.exit().remove();
-        console.log(data.position);
+        update_informationPanel(data.paths,data.position);
     });
 
 };
 
+// paths are the information to be updated on the information panel
+// position is the position of the current paths
+function update_informationPanel(paths,position){
+    d3.select('div#left-panel div#info-display').selectAll('div.row').remove();
+    var inforow = d3.select('div#left-panel div#info-display')
+                    .selectAll('div.row')
+                    .data(paths)
+                    .enter()
+                    .append('div')
+                    .attr('class','row');
+    inforow.append('p').attr('class','list')
+                       .text(function(d,i){
+                           if(i==0){d3.select(this).style('background-color','#F2F3F4'); };
+                           return parseInt(i)+position;
+                       });
+    inforow.append('div').attr('class','content')
+                         .text(function(d){
+                             if(i==0){ d3.select(this).style('background-color','#F2F3F4'); };
+                             return d.labels.join(' > ');
+                         });
 
-
-// Handle search button
-function Handle_Search_Button(){
-    document.getElementById("left-panel").style.visibility = "hidden";
-    d3.json('/texttowid/'+get_inputtext(),function(error,data){
-        var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-        var query = data;
-        if(_.contains(currentnodes,query)){
-            var highlights = {'nodes':[query],'paths':[],'paths1':[]};
-            highlight_nodespaths(highlights);
-            ZoomToNodes([query]);
-        }else{
-            var info={'currentnodes':currentnodes,'query':query};
-            d3.json('/searchbutton/'+JSON.stringify(info),function(error,data){
-                if(data.bornnode){
-                    var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==data.bornnode;})[0];
-                    var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
-                }else{var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};};
-                SHOW_UPDATE_FORCE(data,bornplace);
-                node_left_click_on();
-                var highlights = {'nodes':[query],'paths':data.paths,'paths1':[]};
-                highlight_nodespaths(highlights);
-                ZoomToNodes([query]);
-            });
-        };
+    //information clickable
+    d3.select('div#left-panel div#info-display').selectAll('div.row').on('click',function(d,i){
+        d3.selectAll('div.row').style('background-color','white');
+        d3.select(this).style('background-color','#F2F3F4');
+        var hltP1=[];
+        paths.forEach(function(p,pi){
+            if(pi!=i){
+                hltP1.push(p.ids);
+            };
+        });
+        var highlights={'nodes':[d.ids[0]],'paths':[d.ids],'paths1':hltP1};
+        highlight_nodespaths(highlights);
+        ZoomToNodes(d.ids);
     });
 };

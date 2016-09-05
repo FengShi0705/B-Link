@@ -105,7 +105,7 @@ class UndirectedG(object):
                 continue # already searched this node
 
             dist[v]=d
-            if len(paths[v])>=minhops+1 or len(paths[v])==1:
+            if len(paths[v])>=minhops+1:
                 yield (d, paths[v])
 
             for u in G.adj[v].keys():
@@ -172,13 +172,13 @@ class UndirectedG(object):
 
         results['allpaths'] = self.user_generators[user]['records'][min(startposition,startposition+N):max(startposition,startposition+N)]
         results['allnodes'] = set()
-        labelpaths = []
+        finalpaths = []
         for path in results['allpaths']:
             results['allnodes'].update(path)
             lapath = [self.G.node[n]['label'] for n in path]
-            labelpaths.append(lapath)
+            finalpaths.append({'ids':path,'labels':lapath})
 
-        return results['allnodes'],{'ids':results['allpaths'],'labels':labelpaths},min(startposition,startposition+N)+1
+        return results['allnodes'],finalpaths,min(startposition,startposition+N)+1
 
 
 

@@ -11,6 +11,53 @@ d3.select("input[name='keywords']").on('keydown',function(){
   };
 });
 
+// Handle search button
+function Handle_Search_Button(){
+    document.getElementById("left-panel").style.visibility = "hidden";
+    d3.json('/texttowid/'+get_inputtext(),function(error,data){
+        var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+        var query = data;
+        if(_.contains(currentnodes,query)){
+            var highlights = {'nodes':[query],'paths':[],'paths1':[]};
+            highlight_nodespaths(highlights);
+            ZoomToNodes([query]);
+        }else{
+            var info={'currentnodes':currentnodes,'query':query};
+            d3.json('/searchbutton/'+JSON.stringify(info),function(error,data){
+                if(data.bornnode){
+                    var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==data.bornnode;})[0];
+                    var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
+                }else{var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};};
+                SHOW_UPDATE_FORCE(data,bornplace);
+                node_left_click_on();
+                var highlights = {'nodes':[query],'paths':data.paths,'paths1':[]};
+                highlight_nodespaths(highlights);
+                ZoomToNodes([query]);
+            });
+        };
+    });
+};
+
+//Explore show results
+function Explore_showRessult(){
+    d3.json('/texttowid/'+get_inputtext(),function(error,data){
+        var query = data;
+        Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
+    });
+};
+
+//Explore next handler OK
+function Explore_Next(){
+    var query = d3.select('circle.hltA').data()[0].wid;
+    Explore_Nearby(check_explore_LG(),false,N_SearchButton,query,query);
+};
+
+//Explore previous handler OK
+function Explore_Previous(){
+    var query = d3.select('circle.hltA').data()[0].wid;
+    Explore_Nearby(check_explore_LG(),false,-N_SearchButton,query,query);
+};
+
 
 // node click behavior
 function node_right_click_on(){
