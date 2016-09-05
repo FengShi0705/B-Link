@@ -172,10 +172,13 @@ class UndirectedG(object):
 
         results['allpaths'] = self.user_generators[user]['records'][min(startposition,startposition+N):max(startposition,startposition+N)]
         results['allnodes'] = set()
+        labelpaths = []
         for path in results['allpaths']:
             results['allnodes'].update(path)
+            lapath = [self.G.node[n]['label'] for n in path]
+            labelpaths.append(lapath)
 
-        return results['allnodes'],results['allpaths']
+        return results['allnodes'],{'ids':results['allpaths'],'labels':labelpaths},min(startposition,startposition+N)+1
 
 
 

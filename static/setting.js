@@ -116,18 +116,24 @@ SIMULATION = d3.forceSimulation()
   };
   function zoomed() {
 
-  SVG.attr("transform", d3.event.transform);
+  GRAPH.attr("transform", d3.event.transform);
 };
 
 
 // CSS - function-navigation panel
   function findpoint(){
     document.getElementById("left-panel").style.visibility = "visible";
-
+    Handle_Explore_Button();
   };
 
-  GRAPH.attr("transform", d3.event.transform);
-}
+// explore next page
+   function pagedown(){
+       Handle_ExploreNext_Button();
+   };
+// explore previous page
+   function pageup(){
+       Handle_Exploreprevious_Button();
+   };
 
 
 // CSS - search-box control
@@ -143,7 +149,8 @@ SIMULATION = d3.forceSimulation()
 var clear_button=d3.select('input[name="clear"]');
     clear_button.on('click', function(){
         document.getElementById("left-panel").style.visibility = "hidden";
-        document.getElementById("keywords").style.value = "";
+        document.getElementById("keywords").value = "";
+        this.style.visibility = "hidden";
     });
 
 // CSS - Global-local switch control
@@ -160,5 +167,15 @@ var clear_button=d3.select('input[name="clear"]');
             d3.select("#t-local").style("font-weight", "normal");
             document.getElementById("t-global").style.color = "#2196F3";
             d3.select("#t-global").style("font-weight","bold");
-        }};
+        };
+
+        Explore_LG_switch();
+
+    };
+
+// selet explore minhops
+function change_exploreMinhop(){
+    ExploreHops();
+};
+
 
