@@ -124,6 +124,81 @@ class UndirectedG(object):
 
 
 
+    def get_pathsBetween_twonodes(self,source,target,tp,minhops,localnodes=None):
+
+        if localnodes == None:
+            G = self.G
+        else:
+            G = self.G.subgraph(localnodes)
+
+        dist = [{},{}] #dictionary of paths from start(and end) to middle nodes keyed by middle nodes
+        fringe = [[],[]] #heap of (distance, path) tuples for extracting next node to expand
+
+        wholeQ=[]
+        push = heappush
+        pop = heappop
+
+        push(fringe[0],(0,[source]))
+
+        push(fringe[1],(0,[target]))
+
+        while fringe[0] or wholeQ:
+            if wholeQ:
+                (outd,outp) = pop(wholeQ)
+                if len(outp) >= minhops+1:
+                    yield (outd,outp)
+
+            if fringe[0]:
+                #forward
+                (d,p)= pop(fringe[0])
+
+                end = p[-1]
+                if end in dist[1]:
+                    end_Bs=set()
+                    for (re_d, re_p) in dist[1][end]:
+                        if len(re_p)>1:
+                            end_Bs.add(re_p[-2])
+                        if len(set(p)&set(re_p))==1:
+                            re_p = re_p[::-1]
+                            bi_d = d + re_d
+                            bi_p = p + re_p[1:]
+                            push(wholeQ, (bi_d, bi_p))
+                    if end!=target: #continue explore
+                        for nei in G.adj[end].keys():
+                            if nei not in p and nei not in end_Bs:
+                                up_d = d + G[nei][end][tp]
+                                up_p = p + [nei]
+                                push(fringe[0], (up_d, up_p))
+                else:
+                    dist[0].setdefault(end, list()).append((d, p))
+                    for nei in G.adj[end].keys():
+                        if nei not in p:
+                            up_d = d + G[nei][end][tp]
+                            up_p = p + [nei]
+                            push(fringe[0], (up_d, up_p))
+
+
+
+                #backward
+                if fringe[1]:
+                    (d, p) = pop(fringe[1])
+                    end=p[-1]
+
+
+                    if end in dist[0]:
+                        continue
+                    else:
+                        dist[1].setdefault(end, list()).append((d, p))
+                        for nei in G.adj[end].keys():
+                            if nei not in p:
+                                up_d = d + G[nei][end][tp]
+                                up_p = p + [nei]
+                                push(fringe[1], (up_d, up_p))
+
+        raise ValueError('no more such paths between %s and %s.' %(source,target))
+
+
+
 
     def my_Gen(self,N,user,parameters,generator,start=True):
         """
@@ -358,6 +433,77 @@ class UndirectedG(object):
                     up_d = d + self.G[nei][end][tp]
                     up_p = p + [nei]
                     push(fringe, (up_d, up_p))
+
+    def get_pathsBetween_twoClusters(self, cluster1, cluster2, tp, localnodes=None):
+
+        if localnodes == None:
+            G = self.G
+        else:
+            G = self.G.subgraph(localnodes)
+
+        dist = [{}, {}]  # dictionary of paths from cluster to nodes keyed by nodes
+        fringe = [[], []]  # heap of (distance, path) tuples for extracting next node to expand
+        wholeQ = []
+        push = heappush
+        pop = heappop
+
+        cset1=set(cluster1)
+        cset2=set(cluster2)
+        for node1 in cset1:
+            push(fringe[0], (0, [node1]))
+            dist[0][node1]=[(0, [node1])]
+        for node2 in cset2:
+            push(fringe[1], (0, [node2]))
+            dist[1][node2]=[(0, [node2])]
+
+        while fringe[0] or wholeQ:
+            if wholeQ:
+                yield pop(wholeQ)
+
+            if fringe[0]:
+                # forward
+                (d, p) = pop(fringe[0])
+
+                end = p[-1]
+                if end in dist[1]:
+                    for (re_d, re_p) in dist[1][end]:
+                        re_p = re_p[::-1]
+                        bi_d = d + re_d
+                        bi_p = p + re_p[1:]
+                        push(wholeQ, (bi_d, bi_p))
+                    if end not in cset2:
+                        for nei in G.adj[end].keys():
+                            if nei not in cset1 and nei not in p and nei not in dist[1]:
+                                up_d = d + G[nei][end][tp]
+                                up_p = p + [nei]
+                                push(fringe[0], (up_d, up_p))
+                else:
+                    if len(p)>1:
+                        dist[0].setdefault(end, list()).append((d, p))
+                    for nei in G.adj[end].keys():
+                        if nei not in cset1 and nei not in p:
+                            up_d = d + G[nei][end][tp]
+                            up_p = p + [nei]
+                            push(fringe[0], (up_d, up_p))
+
+                # backward
+                if fringe[1]:
+                    (d, p) = pop(fringe[1])
+                    end = p[-1]
+
+                    if end in dist[0]:
+                        continue
+                    else:
+                        if len(p)>1:
+                            dist[1].setdefault(end, list()).append((d, p))
+                        for nei in G.adj[end].keys():
+                            if nei not in p and nei not in cset2:
+                                up_d = d + G[nei][end][tp]
+                                up_p = p + [nei]
+                                push(fringe[1], (up_d, up_p))
+
+        raise ValueError('no paths more between two clusters.')
+
 
 
 
