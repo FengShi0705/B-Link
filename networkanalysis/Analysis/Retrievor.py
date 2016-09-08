@@ -22,7 +22,7 @@ class UndirectedG(object):
         self.cnx, self.cursor = PF.creatCursor(self.schema, 'R')
         print "----Connect mysql"
         self.user_generators={}
-        self.gencode={'get_Rel_one':self.get_Rel_one}
+        self.gencode={'get_Rel_one':self.get_Rel_one,'find_paths':nx.shortest_simple_paths}
 
 
 
@@ -154,23 +154,28 @@ class UndirectedG(object):
 
                 end = p[-1]
                 if end in dist[1]:
-                    end_Bs=set()
+                    # link forward and backward
+                    nb_in_Bpaths = set()
                     for (re_d, re_p) in dist[1][end]:
                         if len(re_p)>1:
-                            end_Bs.add(re_p[-2])
-                        if len(set(p)&set(re_p))==1:
-                            re_p = re_p[::-1]
-                            bi_d = d + re_d
-                            bi_p = p + re_p[1:]
-                            push(wholeQ, (bi_d, bi_p))
-                    if end!=target: #continue explore
+                            nb_in_Bpaths.add(re_p[-2])
+                        re_p = re_p[::-1]
+                        bi_d = d + re_d
+                        bi_p = p + re_p[1:]
+                        push(wholeQ, (bi_d, bi_p))
+
+                    # continue explore
+                    if end!=target:
                         for nei in G.adj[end].keys():
-                            if nei not in p and nei not in end_Bs:
+                            # push to forward fringe
+                            if nei not in p and nei not in nb_in_Bpaths:
                                 up_d = d + G[nei][end][tp]
                                 up_p = p + [nei]
                                 push(fringe[0], (up_d, up_p))
+                                if nei not in dist[1]:
+                                    dist[0][nei] = True
                 else:
-                    dist[0].setdefault(end, list()).append((d, p))
+                    dist[0][end]=True
                     for nei in G.adj[end].keys():
                         if nei not in p:
                             up_d = d + G[nei][end][tp]
