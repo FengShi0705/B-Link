@@ -44,6 +44,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
           d.vx = born.vx;
           d.vy = born.vy;
           CLIENT_NODES.push(d);
+          CLIENT_NODES_ids.push(d.wid);
       }else{ // update existing nodes degree
           cnode=cnode[0];
           cnode.n=d.n;
@@ -206,6 +207,8 @@ function circle_layout_neighbor(dataset){
 };
 
 // highlight dataset.paths and dataset.paths1 in different style, and dataset.nodes which are highlighted in a different style as well.
+// dataset.nodes is a list of nodes
+// Both dataset.paths and dataset.paths1 are list of paths
 function highlight_nodespaths(dataset){
     // generate a highlighted graph based on dataset.paths
     var hltG = new jsnx.Graph();
@@ -243,7 +246,7 @@ function highlight_nodespaths(dataset){
     TITLECOLOR_CHANGE();
 };
 
-// zooming to multiple nodes so that the nodes fill up the screen.
+// zooming to multiple nodes so that the nodes fill up the screen.nodes is a list
 function ZoomToNodes(nodes){
     var obj_nodes = d3.selectAll('.gnode').filter(function(d){return _.contains(nodes,d.wid);});
     obj_nodes = obj_nodes.data();
@@ -313,7 +316,7 @@ function check_explore_LG(){
 // Query is the queried node to be highlighted
 // born is the wid of the node as the bornplace.
 function Explore_Nearby(LorG,start,N,query,born){
-    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+    var currentnodes = CLIENT_NODES_ids;
     if ( LorG=="local" ){
         var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
@@ -323,28 +326,38 @@ function Explore_Nearby(LorG,start,N,query,born){
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
     };
+    //calculate bornplace
+    assert( _.contains(currentnodes,born), 'current nodes do not include born node');
+    var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==born;})[0];
+    var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
 
+    generator_update_graphAndPanel(info,bornplace,[query]);
+
+};
+
+
+// Access generator url, update force graph and information panel
+// info for the generator server
+// bornplace is the x,y,vx,vy for the newly added nodes
+// h_nodes are the end nodes to be highlighted
+function generator_update_graphAndPanel(info,bornplace,h_nodes){
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
-        if(data.AddNew==true){
-            if(born){
-                assert( _.contains(currentnodes,born), 'current nodes do not include born node');
-                var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==born;})[0];
-                var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
-            }else{
-                var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};
-            };
+        if(data.AddNew==true){;
             SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
             node_left_click_on();
         };
         var hlpath1 = [];
-        data.paths.slice(1, data.paths.length).forEach(function(d){ hlpath1.push(d.ids); });
-        var highlights={'nodes':[query],'paths':[data.paths[0].ids],'paths1':hlpath1}; //highlight nodes and paths
+        var z_nodes =[];
+        data.paths.forEach(function(d,i){
+            if (i!=0){ hlpath1.push(d.ids); };
+            z_nodes= _.union(z_nodes,d.ids);
+        });
+        var highlights={'nodes':h_nodes,'paths':[data.paths[0].ids],'paths1':hlpath1}; //highlight nodes and paths
         highlight_nodespaths(highlights);
-        ZoomToNodes([query]); // zoom to the node
+        ZoomToNodes(z_nodes); // zoom to the node
         //update the information panel here
         update_informationPanel(data.paths,data.position);
     });
-
 };
 
 // paths are the information to be updated on the information panel
@@ -378,8 +391,32 @@ function update_informationPanel(paths,position){
                 hltP1.push(p.ids);
             };
         });
-        var highlights={'nodes':[d.ids[0]],'paths':[d.ids],'paths1':hltP1};
+        var highlights={'nodes':[d.ids[0], d.ids[d.ids.length-1]],'paths':[d.ids],'paths1':hltP1};
         highlight_nodespaths(highlights);
         ZoomToNodes(d.ids);
     });
+};
+
+
+
+
+
+//find paths between two nodes
+function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
+    if ( LorG=="local" ){
+        var subparameters = {"source":node1,"target":node2,"tp":Type_distance, "minhops":minhops, "localnodes":CLIENT_NODES_ids};
+        var parameters={"N":N, "parameters":subparameters,"generator":'find_paths',"start":start};
+        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
+    }else{
+        var subparameters = {"source":node1,"target":node2,"tp":Type_distance,"minhops":minhops,"localnodes":null};
+        var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
+        var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+    };
+    // calculate bornplace
+    assert( _.contains(CLIENT_NODES_ids,node1) && _.contains(CLIENT_NODES_ids,node2) , 'path ends do not exist!');
+    var bornnode1=CLIENT_NODES.filter(function(obj){return obj["wid"]==node1;})[0];
+    var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==node2;})[0];
+    var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
+
+    generator_update_graphAndPanel(info, bornplace, [node1,node2]);
 };

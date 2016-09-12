@@ -70,6 +70,7 @@ BACKLAYER = SVG.insert("rect",":first-child")
 
 //set nodes and edges and simulation
 CLIENT_NODES=[];
+CLIENT_NODES_ids=[];
 CLIENT_EDGES=[];
 //define SIMULATION
 SIMULATION = d3.forceSimulation()
