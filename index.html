@@ -5,67 +5,186 @@
     <title>Data drive creativity</title>
     <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
-      <script src="static/jsnetworkx.js"></script>
+    <script src="static/jsnetworkx.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/mystyle.css">
+    <link rel="stylesheet" type="text/css" href="static/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   </head>
 
   <body onresize="SVG_change_size()">
-      <div class="func-nav">
-          <button type="button" onclick="findpoint()" name="b-findpoint" id="b-findpoint"></button>
-          <p class="t-func-nav">P O I N T</p>
-          <button type="button" onclick="findline()" name="b-findline" id="b-findline"></button>
-          <p class="t-func-nav">L I N E</p>
-          <button type="button" onclick="cluster()" name="b-cluster" id="b-cluster"></button>
-          <p class="t-func-nav">CLUSTER</p>
+
+      <div id="mainSearchBox">
+          <input class="w3-hover-border-blue" type="text" id="keywords" name="keywords" placeholder="Search..."
+                 autocomplete="on" onkeyup="checkTextField(this)">
+          <input type="button" name="search" value="" onclick="searchbutton()">  <!-- onclick event should be removed on formal version -->
+          <input type="reset" name="clear" value="">
       </div>
 
-      <form class="input">
-          <input type="text" id="keywords" name="keywords" placeholder="Search..." autocomplete="on" onkeyup="checkTextField(this)">
-          <input type="button" name="search" value="">
-          <input type="reset" name="clear" value="">
-      </form>
-
-      <div class="header">
+      <div class="w3-container w3-center header w3-text-blue">
           Data-Drive Creativity
       </div>
 
-      <div id="left-panel">
-          <p class="p-text">Min Hop:
-               <select class="minhop">
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-              </select>
-          </p>
-
-          <div id="t-global">Global</div>
-          <label class="switch">
-                <input type="checkbox" name="switch-1" id="switch-check" onclick="checkswitch()" >
-                <div class="slider round"></div>
-          </label>
-          <div id="t-local">Local</div>
-          <div class="blockline"></div>
-
-          <div id="info-display">
-              <p class="list" >1</p>
-              <p class="list" >2</p>
-              <p class="list" >3</p>
-              <p class="list" >4</p>
-              <p class="list" >5</p>
-              <p class="list" >6</p>
-              <p class="list" >7</p>
-              <p class="list" >8</p>
-              <p class="list" >9</p>
-              <p class="list" >10</p>
+      <div class="panel">
+          <div id="func-nav" class="w3-container w3-border w3-border-cyan w3-round-large" >
+              <div class="w3-white w3-btn w3-third " onclick="show_panel('point')">
+                  <img class="w3-border w3-border-blue w3-round" src="static/point.png" style="width:50px;">
+                  <div class="w3-small w3-text-cyan">P O I N T</div>
+              </div>
+              <div class="w3-white w3-btn w3-third  " onclick="show_panel('line')">
+                  <img class="w3-border w3-border-blue w3-round" src="static/line.png" style="width:50px;">
+                  <div class="w3-small w3-text-cyan">L I N E</div>
+              </div>
+              <div class="w3-white w3-btn w3-third " onclick="show_panel('cluster')">
+                  <img class="w3-border w3-border-blue w3-round" src="static/cluster.png" style="width:50px;">
+                  <div class="w3-small w3-text-cyan">CLUSTER</div>
+              </div>
           </div>
-          <div id="page-button">
-              <button type="button" onclick="pageup()" name="b-up" class="button">PREVIOUS</button>
-              <button type="button" onclick="pagedown()" name="b-down" class="button">NEXT</button>
+
+          <div id="point" class="func_setting w3-border w3-border-cyan w3-round-large" style="height:170px;">
+              <div class="w3-row" style="margin:15px 0;">
+                  <div class="w3-container w3-col w3-center" style="width:160px;">
+                      <div class="w3-center w3-large" style="padding-top:10px;">Min Hop:</div>
+                      <br>
+                      <select class="minhop" onchange="change_exploreMinhop()">
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                      </select>
+                  </div>
+                  <div class="w3-container w3-rest w3-border-left w3-border-cyan" >
+                    <div class="w3-display-container" style="width:80px; height:100px; margin-right:20px; display:inline-block;">
+                        <div class="w3-display-topright t-global" >Global</div>
+                        <div class="w3-display-bottomright t-local" >Local</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="switch-1" id="switch-1">
+                        <div class="slider round"></div>
+                    </label>
+                  </div>
+              </div>
+              <div class="w3-container w3-center">
+                  <button class="w3-btn w3-blue" onclick="show_info('point')" >Show Results</button>
+              </div>
+          </div>
+
+          <div id="line" class="func_setting w3-border w3-border-cyan w3-round-large" style="top:-50px; height:250px;">
+              <div class="w3-row " style="width:350px; margin-bottom:10px;">
+                  <a href="#" class="w3-col w3-xxxlarge material-icons w3-blue" onclick="closePanel('line')" style="width:50px;">
+                      arrow_back
+                  </a>
+                  <div class="w3-rest w3-display-container" style="margin-right:3px;">
+                      <input class="w3-input w3-border w3-round w3-hover-border-blue" style="height:45px;"
+                             placeholder="Start Point..." autocomplete="on" onkeydown="closeInfoPanel(this)">
+                      <input class="w3-input w3-border w3-round w3-hover-border-blue" style="height:45px;"
+                             placeholder="End   Point..." autocomplete="on" onkeydown="closeInfoPanel(this)">
+                      <div class="w3-display-topright material-icons w3-xxlarge"
+                           style="opacity:0.3;margin-top:5px;cursor:pointer;" >search</div>
+                      <div class="w3-display-bottomright material-icons w3-xxlarge"
+                           style="opacity:0.3;margin-bottom:5px;cursor:pointer">search</div>
+                  </div>
+              </div>
+              <div class="w3-row">
+                  <div class="w3-container w3-col w3-center" style="width:160px;">
+                      <div class="w3-center w3-large" style="padding-top:10px;">Min Hop:</div>
+                      <br>
+                      <select class="minhop" onchange="change_exploreMinhop()">
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                      </select>
+                  </div>
+                  <div class="w3-container w3-rest w3-border-left w3-border-cyan" >
+                    <div class="w3-display-container" style="width:80px; height:100px; margin-right:20px; display:inline-block;">
+                        <div class="w3-display-topright t-global" >Global</div>
+                        <div class="w3-display-bottomright t-local" >Local</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="switch-2" id="switch-2">
+                        <div class="slider round"></div>
+                    </label>
+                  </div>
+              </div>
+              <div class="w3-container w3-center" style="margin-top:10px;">
+                  <button class="w3-btn w3-blue" onclick="show_info('line')">Show Results</button>
+              </div>
+          </div>
+
+          <div id="cluster" class="func_setting " style="top:-50px;">
+              <div class="w3-row">
+                  <a href="#" class="w3-col material-icons w3-xxxlarge w3-blue" style="width:50px;" onclick="closePanel('cluster')">
+                      arrow_back
+                  </a>
+                  <div class="w3-rest w3-container w3-center w3-text-blue" style="height:50px;"><h4> Clustered Successfully !</h4></div>
+              </div>
+
+              <ul class="w3-navbar  w3-row">
+                  <li id="clusterBtnPath" class="w3-half w3-center " style="cursor:pointer; ">
+                      <a class="w3-align-center" href="#" onclick="clusterPan('findPath')"><h5 id="textPath">Find Path</h5></a>
+                  </li>
+                  <li id="clusterBtnNode" class="w3-half w3-center " style="cursor:pointer; ">
+                      <a class="w3-align-center" href="#" onclick="clusterPan('generateMore')"><h5 id="textNode">More Nodes</h5></a>
+                  </li>
+              </ul>
+
+              <div id="findPath" class="w3-white cluster-panel w3-container w3-center w3-center w3-border-bottom w3-border-cyan" style="height:240px;">
+                  <ul class="w3-navbar w3-row w3-section w3-center">
+                      <li class="w3-container t-global"  style="width:109px;">Global</li>
+                      <li>
+                          <label class="switch-cluster ">
+                            <input type="checkbox" name="switch-3" id="switch-3">
+                            <div class="slider round"></div>
+                          </label>
+                      </li>
+                      <li class="w3-container t-local" style="width:109px;">Local</li>
+                  </ul>
+                  <div class="w3-section w3-border-top w3-border-black" >
+                      <br>
+                      <select class="w3-select" name="selectCluster1">
+                          <option value="" disabled selected>Choose your FIRST cluster</option>
+                          <option value="1">A-Red</option>
+                          <option value="2">B-Blue</option>
+                          <option value="3">C-Yellow</option>
+                      </select>
+                      <select class="w3-select" name="selectCluster2">
+                          <option value="" disabled selected>Choose your SECOND cluster</option>
+                          <option value="1">A-Red</option>
+                          <option value="2">B-Blue</option>
+                          <option value="3">C-Yellow</option>
+                      </select>
+                  </div>
+
+                  <div class="w3-section"><div class="w3-btn w3-blue" onclick="show_info('cluster')"> Show Results</div></div>
+              </div>
+
+              <div id="generateMore" class="w3-display-container cluster-panel w3-white">
+                  <div style="height:10px;"></div>
+                  <input class="w3-input w3-border w3-round w3-hover-border-blue" style="height:45px;"
+                             placeholder="Point 1..." onkeydown="closeInfoPanel(this)">
+                  <div class="w3-display-topright material-icons w3-xxlarge cluster-searchicon" style="margin-top:15px;">search</div>
+                  <div id="field1" class="w3-center" style="position:relative; margin-top:5px;">
+                      <a id="addBtn" class="w3-btn-floating w3-teal">+</a>
+                      <a id="remBtn" class="w3-btn-floating w3-red">-</a>
+                  </div>
+                  <div class="w3-panel w3-center">
+                      <button class="w3-btn w3-blue">Generate</button>
+                  </div>
+              </div>
+          </div>
+
+          <div class="w3-border w3-border-cyan w3-round-large" id="info_panel">
+              <div class="w3-container info-display w3-center">
+              </div>
+              <ul class="w3-pagination page-button" >
+                  <li><a href="#" class="w3-left w3-text-blue" onclick="pageup()">&#10094; Previous</a></li>
+                  <li><a href="#" class="w3-right w3-text-blue" onclick="pagedown()">Next &#10095;</a></li>
+              </ul>
           </div>
       </div>
-
 
       <script type="text/javascript" src="static/setting.js"></script>
       <script type="text/javascript" src="static/myfunctions.js"></script>
