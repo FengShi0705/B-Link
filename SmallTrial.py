@@ -6,7 +6,8 @@ from sklearn.utils.arpack import eigsh
 from sklearn.cluster.k_means_ import k_means
 import math
 from heapq import heappush, heappop
-
+import networkx as nx
+from networkanalysis.Analysis import Retrievor
 
 class tri(object):
     def print_parameters(self,parameters,function):
@@ -104,6 +105,65 @@ def dijkstra_cluster(G,cluster1,cluster2,tp):
                 up_d=d+G[nei][end][tp]
                 up_p=p+[nei]
                 push(fringe,(up_d,up_p))
+
+
+
+
+def test_clusterPaths():
+    R = Retrievor.UndirectedG(nx.read_gpickle('../undirected(abcdeijm_test).gpickle'), 'fortest')
+    cluster1=[R.G.neighbors(100)[0]]+[100]
+    cluster2=[R.G.neighbors(10000)[0]]+[10000]
+    cset1=set(cluster1)
+    cset2=set(cluster2)
+    print 'cluster1:',cluster1
+    print 'cluster2:', cluster2
+    q_pair=[]
+    for s in cluster1:
+        for t in cluster2:
+            ge=R.get_pathsBetween_twonodes(s,t,'Fw',1)
+            length, path=ge.next()
+            while ( cset1.issubset(set(path)) or cset2.issubset(set(path)) ):
+                length, path = ge.next()
+            q_pair.append((length,path))
+
+    q_pair=sorted(q_pair,key=lambda x:x[0])
+    final_length=q_pair[-1][0]+0.001
+    all_pair=[]
+
+    for (length,path) in q_pair:
+        ge=R.get_pathsBetween_twonodes(path[0],path[-1],'Fw',1)
+        while True:
+            d,p=ge.next()
+            while ( cset1.issubset(set(p)) or cset2.issubset(set(p)) ):
+                d,p=ge.next()
+            if d > final_length:
+                break
+            else:
+                all_pair.append((d,p))
+                print 'all_pair',d,p
+
+
+    all_pair=sorted(all_pair,key=lambda x:x[0])
+
+    cl_paths=[]
+    ge=R.get_pathsBetween_twoClusters(cluster1,cluster2,'Fw')
+    while True:
+        d,p=ge.next()
+        if d > final_length:
+            break
+        else:
+            cl_paths.append((d,p))
+            print 'cl_paths',d,p
+
+
+    print 'all_pair:',all_pair
+    print 'cl_paths:',cl_paths
+    if all_pair==cl_paths:
+        print 'succeed!!!!!!!!!!!!!!!!!!'
+    print 'finish'
+    return
+
+
 
 
 
