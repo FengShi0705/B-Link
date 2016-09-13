@@ -135,17 +135,11 @@ SIMULATION = d3.forceSimulation()
 
 // CSS - search-box control
   function checkTextField(field) {
-    document.getElementById("info_panel").style.display = "none";
     if (field.value != '') {
         d3.select('input[name="clear"]').style("visibility","visible");
     }
     else{
         d3.select('input[name="clear"]').style("visibility","hidden");
-        document.getElementById("info_panel").style.display = "none";
-        document.getElementById("point").style.display = "none";
-        document.getElementById("line").style.display = "none";
-        document.getElementById("cluster").style.display ="none";
-        document.getElementById("func-nav").style.top = "-999px";
     }
   };
 
@@ -161,17 +155,22 @@ var clear_button=d3.select('input[name="clear"]');
 
 // --------------------------------just for testing; please remove on formal version --------------------------------//
   function searchbutton(){
-    if(document.getElementById("point").style.display == "none" &&
-       document.getElementById("line").style.display == "none" &&
-       document.getElementById("cluster").style.display == "none")
-       {
-        if(document.getElementById("func-nav").style.top == "-999px"){
-            document.getElementById("func-nav").style.top = "0px";
-        };
-    };
-    document.getElementById("func-nav").style.display = "block";
+  Handle_Search_Button();
+}
 
-  }
+ d3.select("#mainSearchBox input[name='keywords']").on('keydown',function(){
+
+  if (d3.event.keyCode==13){
+      searchbutton();
+  }else{
+      document.getElementById("info_panel").style.display = "none";
+      document.getElementById("point").style.display = "none";
+      document.getElementById("line").style.display = "none";
+      document.getElementById("cluster").style.display ="none";
+      document.getElementById("func-nav").style.top = "-999px";
+  };
+
+});
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // CSS - Global-local switch control
@@ -215,6 +214,7 @@ function show_panel(panelname){
 function show_info(panelname){
     if (panelname == "point"){
         document.getElementById("info_panel").style.top = "170px";
+        Explore_showRessult();
     }
     else if (panelname == "line"){
         document.getElementById("info_panel").style.top = "200px";

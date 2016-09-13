@@ -231,14 +231,14 @@ input[name="endpoint"]{
 }
 
 
-p.list{
+div.row p.list{
     width: 10%;
     float: left;
     margin: 0;
     font-size: 16px;
 }
 
-div.info-display div.content{
+div.row div.content{
     width: 90%;
     float: left;
     padding: 0px;

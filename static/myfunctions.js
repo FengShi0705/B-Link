@@ -248,31 +248,45 @@ function highlight_nodespaths(dataset){
 
 // zooming to multiple nodes so that the nodes fill up the screen.nodes is a list
 function ZoomToNodes(nodes){
-    var obj_nodes = d3.selectAll('.gnode').filter(function(d){return _.contains(nodes,d.wid);});
-    obj_nodes = obj_nodes.data();
-    if(obj_nodes.length == 1){
-        var k = 1;
-        var x=obj_nodes[0].x
-        var y=obj_nodes[0].y
+    if (  SIMULATION.alphaTarget()==0 ){
+
+        console.log('zoom begin:'+SIMULATION.alpha())
+        var obj_nodes = d3.selectAll('.gnode').filter(function(d){return _.contains(nodes,d.wid);});
+        obj_nodes = obj_nodes.data();
+        if(obj_nodes.length == 1){
+            var k = 1;
+            var x=obj_nodes[0].x
+            var y=obj_nodes[0].y
+        }else{
+            var max_x=d3.max(obj_nodes,function(d){return d.x});
+            var max_y=d3.max(obj_nodes,function(d){return d.y});
+            var min_x=d3.min(obj_nodes,function(d){return d.x});
+            var min_y=d3.min(obj_nodes,function(d){return d.y});
+            var x = (max_x+min_x)/2;
+            var y = (max_y+min_y)/2;
+            var kx = w/(max_x-min_x+4*maxNodeRadius);
+            var ky = h/(max_y-min_y+4*maxNodeRadius);
+            var k = Math.min(kx,ky);
+            console.log(k);
+        };
+        function transform(){
+            return d3.zoomIdentity
+                     .translate(w/2,h/2)
+                     .scale(k)
+                     .translate(-x,-y);
+        };
+        BACKLAYER.transition('zoom').duration(3000).call(BACKLAYER_Zoom.transform, transform);
+
+        SIMULATION.on('tick.zoom',null);
+
     }else{
-        var max_x=d3.max(obj_nodes,function(d){return d.x});
-        var max_y=d3.max(obj_nodes,function(d){return d.y});
-        var min_x=d3.min(obj_nodes,function(d){return d.x});
-        var min_y=d3.min(obj_nodes,function(d){return d.y});
-        var x = (max_x+min_x)/2;
-        var y = (max_y+min_y)/2;
-        var kx = w/(max_x-min_x+4*maxNodeRadius);
-        var ky = h/(max_y-min_y+4*maxNodeRadius);
-        var k = Math.min(kx,ky);
-        console.log(k);
+        SIMULATION.on('tick.zoom', function(){
+
+            if (  SIMULATION.alphaTarget()==0 ){
+                ZoomToNodes(nodes);
+            };
+        });
     };
-    function transform(){
-        return d3.zoomIdentity
-                 .translate(w/2,h/2)
-                 .scale(k)
-                 .translate(-x,-y);
-    };
-    BACKLAYER.transition('zoom').duration(3000).call(BACKLAYER_Zoom.transform, transform);
 };
 
 // Back to force layout
@@ -339,20 +353,25 @@ function Explore_Nearby(LorG,start,N,query,born){
 // Access generator url, update force graph and information panel
 // info for the generator server
 // bornplace is the x,y,vx,vy for the newly added nodes
-// h_nodes are the end nodes to be highlighted
-function generator_update_graphAndPanel(info,bornplace,h_nodes){
+// queries are the queries
+function generator_update_graphAndPanel(info,bornplace,queries){
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
         if(data.AddNew==true){;
             SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
             node_left_click_on();
         };
+
+        var hlpath=[];
         var hlpath1 = [];
-        var z_nodes =[];
+        var z_nodes =queries.slice();
         data.paths.forEach(function(d,i){
-            if (i!=0){ hlpath1.push(d.ids); };
+            /*if (i==0){ hlpath.push(d.ids); }
+            else{ hlpath1.push(d.ids); };*/
+            hlpath1.push(d.ids)
             z_nodes= _.union(z_nodes,d.ids);
         });
-        var highlights={'nodes':h_nodes,'paths':[data.paths[0].ids],'paths1':hlpath1}; //highlight nodes and paths
+
+        var highlights={'nodes':queries,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
         highlight_nodespaths(highlights);
         ZoomToNodes(z_nodes); // zoom to the node
         //update the information panel here
@@ -363,8 +382,8 @@ function generator_update_graphAndPanel(info,bornplace,h_nodes){
 // paths are the information to be updated on the information panel
 // position is the position of the current paths
 function update_informationPanel(paths,position){
-    d3.select('div#left-panel div#info-display').selectAll('div.row').remove();
-    var inforow = d3.select('div#left-panel div#info-display')
+    d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
+    var inforow = d3.select('div#info_panel div.info-display')
                     .selectAll('div.row')
                     .data(paths)
                     .enter()
@@ -372,17 +391,15 @@ function update_informationPanel(paths,position){
                     .attr('class','row');
     inforow.append('p').attr('class','list')
                        .text(function(d,i){
-                           if(i==0){d3.select(this).style('background-color','#F2F3F4'); };
                            return parseInt(i)+position;
                        });
     inforow.append('div').attr('class','content')
-                         .text(function(d){
-                             if(i==0){ d3.select(this).style('background-color','#F2F3F4'); };
-                             return d.labels.join(' > ');
+                         .text(function(d,i){
+                             return d.labels.join(' --> ');
                          });
 
     //information clickable
-    d3.select('div#left-panel div#info-display').selectAll('div.row').on('click',function(d,i){
+    d3.select('div#info_panel div.info-display').selectAll('div.row').on('click',function(d,i){
         d3.selectAll('div.row').style('background-color','white');
         d3.select(this).style('background-color','#F2F3F4');
         var hltP1=[];

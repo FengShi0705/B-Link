@@ -1,38 +1,38 @@
-
-var Search_Button=d3.select("input[name='search']");
-
-//Search button click
-Search_Button.on('click', Handle_Search_Button);
-
-//input box enter
-d3.select("input[name='keywords']").on('keydown',function(){
-  if (d3.event.keyCode==13){
-      Handle_Search_Button();
-  };
-});
-
 // Handle search button
 function Handle_Search_Button(){
     d3.json('/texttowid/'+get_inputtext(),function(error,data){
-        var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-        var query = data;
-        if(_.contains(currentnodes,query)){
-            var highlights = {'nodes':[query],'paths':[],'paths1':[]};
-            highlight_nodespaths(highlights);
-            ZoomToNodes([query]);
-        }else{
-            var info={'currentnodes':currentnodes,'query':query};
-            d3.json('/searchbutton/'+JSON.stringify(info),function(error,data){
-                if(data.bornnode){
-                    var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==data.bornnode;})[0];
-                    var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
-                }else{var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};};
-                SHOW_UPDATE_FORCE(data,bornplace);
-                node_left_click_on();
-                var highlights = {'nodes':[query],'paths':data.paths,'paths1':[]};
+        if (data){
+            var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+            var query = data;
+            if(_.contains(currentnodes,query)){
+                var highlights = {'nodes':[query],'paths':[],'paths1':[]};
                 highlight_nodespaths(highlights);
                 ZoomToNodes([query]);
-            });
+            }else{
+                var info={'currentnodes':currentnodes,'query':query};
+                d3.json('/searchbutton/'+JSON.stringify(info),function(error,data){
+                    if(data.bornnode){
+                        var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==data.bornnode;})[0];
+                        var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
+                    }else{var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};};
+                    SHOW_UPDATE_FORCE(data,bornplace);
+                    node_left_click_on();
+                    var highlights = {'nodes':[query],'paths':data.paths,'paths1':[]};
+                    highlight_nodespaths(highlights);
+                    ZoomToNodes([query]);
+                });
+            };
+
+            if(document.getElementById("point").style.display == "none" &&
+              document.getElementById("line").style.display == "none" &&
+              document.getElementById("cluster").style.display == "none")
+            {
+              if(document.getElementById("func-nav").style.top == "-999px"){
+                  document.getElementById("func-nav").style.top = "0px";
+              };
+            };
+             document.getElementById("func-nav").style.display = "block";
+
         };
     });
 };
