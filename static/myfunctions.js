@@ -313,7 +313,7 @@ function RedoBack(){
 
 
 //get the value of minhops
-function get_minhops(){
+function get_minhops_forPoint(){
     return parseInt(d3.select('select.minhop').node().value);
 };
 // check swith is either local or global
@@ -329,14 +329,14 @@ function check_explore_LG(){
 // Start or Previous or Next
 // Query is the queried node to be highlighted
 // born is the wid of the node as the bornplace.
-function Explore_Nearby(LorG,start,N,query,born){
+function Explore_Nearby(LorG,start,minhops,N,query,born){
     var currentnodes = CLIENT_NODES_ids;
     if ( LorG=="local" ){
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':minhops,'localnodes':currentnodes};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
     }else{
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':null};
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':minhops,'localnodes':null};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
     };

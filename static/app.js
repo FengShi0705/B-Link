@@ -39,22 +39,26 @@ function Handle_Search_Button(){
 
 //Explore show results
 function Explore_showRessult(){
-    d3.json('/texttowid/'+get_inputtext(),function(error,data){
-        var query = data;
-        Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
-    });
+        var hltNode = d3.select('circle.hltA').data()[0];
+        var query = hltNode.wid;
+        var label = hltNode.label;
+        var minhops = get_minhops_forPoint();
+        Explore_Nearby(check_explore_LG(),true,minhops,N_SearchButton,query,query);
+        d3.select('input[name="keywords"]').node().value = label;
 };
 
 //Explore next handler OK
 function Explore_Next(){
     var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),false,N_SearchButton,query,query);
+    var minhops = get_minhops_forPoint();
+    Explore_Nearby(check_explore_LG(),false,minhops,N_SearchButton,query,query);
 };
 
 //Explore previous handler OK
 function Explore_Previous(){
     var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),false,-N_SearchButton,query,query);
+    var minhops = get_minhops_forPoint();
+    Explore_Nearby(check_explore_LG(), false, minhops, -N_SearchButton, query, query);
 };
 
 

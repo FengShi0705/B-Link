@@ -140,11 +140,16 @@ SIMULATION = d3.forceSimulation()
     }
     else{
         d3.select('input[name="clear"]').style("visibility","hidden");
+        document.getElementById("point").style.display = "none";
+        document.getElementById("line").style.display = "none";
+        document.getElementById("cluster").style.display ="none";
+        document.getElementById("func-nav").style.top = "-999px";
     }
   };
 
 var clear_button=d3.select('input[name="clear"]');
     clear_button.on('click', function(){
+            document.getElementById("func-nav").style.top = "-999px";
             document.getElementById("info_panel").style.display = "none";
             document.getElementById("point").style.display = "none";
             document.getElementById("line").style.display = "none";
@@ -156,6 +161,7 @@ var clear_button=d3.select('input[name="clear"]');
 // --------------------------------just for testing; please remove on formal version --------------------------------//
   function searchbutton(){
   Handle_Search_Button();
+  document.getElementById("info_panel").style.display = "none";
 }
 
  d3.select("#mainSearchBox input[name='keywords']").on('keydown',function(){
@@ -164,10 +170,6 @@ var clear_button=d3.select('input[name="clear"]');
       searchbutton();
   }else{
       document.getElementById("info_panel").style.display = "none";
-      document.getElementById("point").style.display = "none";
-      document.getElementById("line").style.display = "none";
-      document.getElementById("cluster").style.display ="none";
-      document.getElementById("func-nav").style.top = "-999px";
   };
 
 });
