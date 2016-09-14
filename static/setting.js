@@ -121,16 +121,12 @@ SIMULATION = d3.forceSimulation()
 };
 
 
-// CSS - function-navigation panel
+// hide information panel
+function Hide_InfoPanel(){
+    document.getElementById("info_panel").style.display = "none";
+    d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
+};
 
-// explore next page
-   function pagedown(){
-       Handle_ExploreNext_Button();
-   };
-// explore previous page
-   function pageup(){
-       Handle_Exploreprevious_Button();
-   };
 
 
 // CSS - search-box control
@@ -150,7 +146,7 @@ SIMULATION = d3.forceSimulation()
 var clear_button=d3.select('input[name="clear"]');
     clear_button.on('click', function(){
             document.getElementById("func-nav").style.top = "-999px";
-            document.getElementById("info_panel").style.display = "none";
+            Hide_InfoPanel();
             document.getElementById("point").style.display = "none";
             document.getElementById("line").style.display = "none";
             document.getElementById("cluster").style.display ="none";
@@ -159,29 +155,32 @@ var clear_button=d3.select('input[name="clear"]');
     });
 
 // --------------------------------just for testing; please remove on formal version --------------------------------//
-  function searchbutton(){
-  Handle_Search_Button();
-  document.getElementById("info_panel").style.display = "none";
-}
 
  d3.select("#mainSearchBox input[name='keywords']").on('keydown',function(){
-
   if (d3.event.keyCode==13){
-      searchbutton();
+      Handle_Search_Button('keywords');
   }else{
-      document.getElementById("info_panel").style.display = "none";
+      Hide_InfoPanel();
   };
-
 });
+ d3.selectAll("input#pathstart_textinput, input#pathend_textinput").on('keydown',function(){
+  var seachid = this.id;
+  if (d3.event.keyCode==13){
+      Handle_pathSearchbutton(seachid);
+  }else{
+      Hide_InfoPanel();
+  };
+});
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // CSS - Global-local switch control
 $(document).ready(function(){
-    $('#switch-1').click(function(){
+    $('#switch').click(function(){
         $('.t-global').toggleClass('t-global-toggle');
         $('.t-local').toggleClass('t-local-toggle');
     });
-    $('#switch-2').click(function(){
+    $('#switch').click(function(){
         $('.t-global').toggleClass('t-global-toggle');
         $('.t-local').toggleClass('t-local-toggle');
     });
@@ -193,12 +192,19 @@ $(document).ready(function(){
 
 // selet explore minhops
 function change_exploreMinhop(){
-    ExploreHops();
+    Hide_InfoPanel();
 };
-
+// switch local and global
+d3.selectAll('label.switchLG').on('click',function(){
+    Hide_InfoPanel();
+});
 
 // show func-nav panel
 function show_panel(panelname){
+    //reset minhop and local or global
+    d3.selectAll('select.minhop').each(function(d){this.value=1;});
+    d3.selectAll('label.switchLG input').each(function(d){this.checked=false;});
+
     if (panelname == "line" || panelname == "cluster"){
         document.getElementById("mainSearchBox").style.top = "-999px";
     }
@@ -215,10 +221,14 @@ function show_panel(panelname){
 // show results panel
 function show_info(panelname){
     if (panelname == "point"){
+        console.log('point show');
         document.getElementById("info_panel").style.top = "170px";
         Explore_showRessult();
+        d3.select('#info_panel #pageup').on('click',Explore_Previous);
+        d3.select('#info_panel #pagedown').on('click',Explore_Next);
     }
     else if (panelname == "line"){
+        console.log('line show');
         document.getElementById("info_panel").style.top = "200px";
     }
     else if (panelname == "cluster"){
@@ -230,12 +240,12 @@ function show_info(panelname){
 // close line function panel
 function closePanel(panelname){
     if(panelname == "line"){
-        document.getElementById("info_panel").style.display = "none";
+        Hide_InfoPanel();
         document.getElementById("line").style.display = "none";
         document.getElementById("mainSearchBox").style.top = "10px";
     }
     else if(panelname == "cluster"){
-        document.getElementById("info_panel").style.display = "none";
+        Hide_InfoPanel();
         document.getElementById("cluster").style.display = "none";
         document.getElementById("mainSearchBox").style.top = "10px";
     };
@@ -243,7 +253,7 @@ function closePanel(panelname){
 }
 
 function closeInfoPanel(field){
-    document.getElementById("info_panel").style.display = "none";
+    Hide_InfoPanel();
 }
 
 // cluster input box control
@@ -292,7 +302,7 @@ function clusterPan(clusterPanel){
         x[i].style.display = "none";
     }
     document.getElementById(clusterPanel).style.display="block";
-    document.getElementById("info_panel").style.display = "none";
+    Hide_InfoPanel();
     if(clusterPanel == "findPath"){
         d3.select("#clusterBtnPath").style("background-color","white");
         d3.select("#textPath").style("font-weight","bold");

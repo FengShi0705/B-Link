@@ -8,8 +8,9 @@ function assert(condition, message) {
 
 
 // get the text in inputbox
-function get_inputtext(){
-  return d3.select('input[name="keywords"]').node().value;
+function get_inputtext(searchbutton_id){
+  var selector='input#'+searchbutton_id
+  return d3.select(selector).node().value;
 };
 
 // Get an array which consists of the values of a paticular key of objects in another array
@@ -313,12 +314,14 @@ function RedoBack(){
 
 
 //get the value of minhops
-function get_minhops_forPoint(){
-    return parseInt(d3.select('select.minhop').node().value);
+function get_minhops(minhop_id){
+    var selector = 'select#'+minhop_id;
+    return parseInt(d3.select(selector).node().value);
 };
 // check swith is either local or global
-function check_explore_LG(){
-    if( d3.select('label.switch input[name="switch-1"]').node().checked==true ){
+function check_explore_LG(switcher){
+    var selector = 'label.switchLG input#'+switcher
+    if( d3.select(selector).node().checked==true ){
         return 'local';
     }else{
         return 'global';
