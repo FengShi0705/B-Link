@@ -9,6 +9,7 @@ import math
 from sklearn.cluster.k_means_ import k_means
 import itertools
 from heapq import heappush, heappop
+from itertools import count
 
 
 
@@ -22,7 +23,7 @@ class UndirectedG(object):
         self.cnx, self.cursor = PF.creatCursor(self.schema, 'R')
         print "----Connect mysql"
         self.user_generators={}
-        self.gencode={'get_Rel_one':self.get_Rel_one}
+        self.gencode={'get_Rel_one':self.get_Rel_one,'find_paths':self.get_pathsBetween_twonodes,'find_paths_clusters':self.get_pathsBetween_twoClusters}
 
 
 
@@ -105,7 +106,7 @@ class UndirectedG(object):
                 continue # already searched this node
 
             dist[v]=d
-            if len(paths[v])>=minhops+1 or len(paths[v])==1:
+            if len(paths[v])>=minhops+1:
                 yield (d, paths[v])
 
             for u in G.adj[v].keys():
@@ -121,6 +122,32 @@ class UndirectedG(object):
                     seen[u] = vu_dist
                     push(fringe, (vu_dist, next(c), u))
                     paths[u] = paths[v] + [u]
+
+
+
+    def get_pathsBetween_twonodes(self,source,target,tp,minhops,localnodes=None):
+        """
+        Generator of shortest paths between two nodes using bidirectional_dijkstra, starting from shortest length.
+        This method is faster than single_directional_dijkstra in large graph
+
+        :param source: start node
+        :param target: end node
+        :param tp: edge property to be distance
+        :param minhops: the minimum hops the generated path should contain
+        :param localnodes: if none find the path in the whole graph, else find the path in the local graph.
+        :return: (length, path)
+        """
+
+        if localnodes == None:
+            G = self.G
+        else:
+            G = self.G.subgraph(localnodes)
+
+        for (length,path) in shortest_simple_paths(G,source,target,weight=tp):
+            if len(path) >=minhops+1:
+                yield (length,path)
+
+
 
 
 
@@ -172,13 +199,13 @@ class UndirectedG(object):
 
         results['allpaths'] = self.user_generators[user]['records'][min(startposition,startposition+N):max(startposition,startposition+N)]
         results['allnodes'] = set()
-        labelpaths = []
+        finalpaths = []
         for path in results['allpaths']:
             results['allnodes'].update(path)
             lapath = [self.G.node[n]['label'] for n in path]
-            labelpaths.append(lapath)
+            finalpaths.append({'ids':path,'labels':lapath})
 
-        return results['allnodes'],{'ids':results['allpaths'],'labels':labelpaths},min(startposition,startposition+N)+1
+        return results['allnodes'],finalpaths,min(startposition,startposition+N)+1
 
 
 
@@ -326,6 +353,7 @@ class UndirectedG(object):
     def generate_Bpaths(self,cluster1,cluster2,tp):
         """
         Generator of B-paths between cluster1 and cluster2, ordered by length from shortest to longest
+        Note: this method uses single directional dijkstra algorithm which will be very slow in large graph.
 
         :param cluster1: list of nodes in cluster1
 
@@ -359,32 +387,527 @@ class UndirectedG(object):
                     up_p = p + [nei]
                     push(fringe, (up_d, up_p))
 
+    def get_pathsBetween_twoClusters(self, cluster1, cluster2, tp, localnodes=None):
+        """
+        generator of shortest paths between two clusters using bidirectional_dijkstra. Starting from shortest.
+        This method is faster than single directional dijkstra in large graph
+
+        :param cluster1: list of nodes in cluster1
+        :param cluster2: list of nodes in cluster2
+        :param tp: edges property to be the distance
+        :param localnodes: if none find the paths in whole graph, else find the paths in the local graph
+        :return: (length, path)
+        """
+
+        if localnodes == None:
+            G = self.G
+        else:
+            G = self.G.subgraph(localnodes)
+
+        for (length,path) in shortest_simple_pathsForClusters(G,cluster1,cluster2,weight=tp):
+            yield (length-0.2,path[1:-1])
 
 
 
 
 
 
+#-----------------------functions-----------------------------------------
+def shortest_simple_paths(G, source, target, weight=None):
+
+    if source not in G:
+        raise nx.NetworkXError('source node %s not in graph' % source)
+
+    if target not in G:
+        raise nx.NetworkXError('target node %s not in graph' % target)
+
+    if weight is None:
+        raise TypeError('weight not defined')
+    else:
+        def length_func(path):
+            return sum(G.edge[u][v][weight] for (u, v) in zip(path, path[1:]))
+        shortest_path_func = bidirectional_dijkstra
+
+    listA = list()
+    listB = PathBuffer()
+    prev_path = None
+    while True:
+        if not prev_path:
+            length, path = shortest_path_func(G, source, target, weight=weight)
+            listB.push(length, path)
+        else:
+            ignore_nodes = set()
+            ignore_edges = set()
+            for i in range(1, len(prev_path)):
+                root = prev_path[:i]
+                root_length = length_func(root)
+                for path in listA:
+                    if path[:i] == root:
+                        ignore_edges.add((path[i-1], path[i]))
+                ignore_nodes.add(root[-1])
+                try:
+                    length, spur = shortest_path_func(G, root[-1], target,
+                                                      ignore_nodes=ignore_nodes,
+                                                      ignore_edges=ignore_edges,
+                                                      weight=weight)
+                    path = root[:-1] + spur
+                    listB.push(root_length + length, path)
+                except nx.NetworkXNoPath:
+                    pass
+
+        if listB:
+            length_of_path,path = listB.pop()
+            yield (length_of_path,path)
+            listA.append(path)
+            prev_path = path
+        else:
+            break
+
+def bidirectional_dijkstra(G, source, target, weight='weight',
+                                        ignore_nodes=None, ignore_edges=None):
+
+    if source == target:
+        return (0, [source])
+
+    # handle either directed or undirected
+    if G.is_directed():
+        Gpred = G.predecessors_iter
+        Gsucc = G.successors_iter
+    else:
+        Gpred = G.neighbors_iter
+        Gsucc = G.neighbors_iter
+
+    # support optional nodes filter
+    if ignore_nodes:
+        def filter_iter(nodes_iter):
+            def iterate(v):
+                for w in nodes_iter(v):
+                    if w not in ignore_nodes:
+                        yield w
+
+            return iterate
+
+
+        Gpred = filter_iter(Gpred)
+        Gsucc = filter_iter(Gsucc)
+
+    # support optional edges filter
+    if ignore_edges:
+        if G.is_directed():
+            def filter_pred_iter(pred_iter):
+                def iterate(v):
+                    for w in pred_iter(v):
+                        if (w, v) not in ignore_edges:
+                            yield w
+
+                return iterate
+
+
+            def filter_succ_iter(succ_iter):
+                def iterate(v):
+                    for w in succ_iter(v):
+                        if (v, w) not in ignore_edges:
+                            yield w
+
+                return iterate
+
+
+            Gpred = filter_pred_iter(Gpred)
+            Gsucc = filter_succ_iter(Gsucc)
+
+        else:
+            def filter_iter(nodes_iter):
+                def iterate(v):
+                    for w in nodes_iter(v):
+                        if (v, w) not in ignore_edges \
+                                and (w, v) not in ignore_edges:
+                            yield w
+
+                return iterate
+
+
+            Gpred = filter_iter(Gpred)
+            Gsucc = filter_iter(Gsucc)
+
+    push = heappush
+    pop = heappop
+    # Init:   Forward             Backward
+    dists = [{}, {}]  # dictionary of final distances
+    paths = [{source: [source]}, {target: [target]}]  # dictionary of paths
+    fringe = [[], []]  # heap of (distance, node) tuples for
+    # extracting next node to expand
+    seen = [{source: 0}, {target: 0}]  # dictionary of distances to
+    # nodes seen
+    c = count()
+    # initialize fringe heap
+    push(fringe[0], (0, next(c), source))
+    push(fringe[1], (0, next(c), target))
+    # neighs for extracting correct neighbor information
+    neighs = [Gsucc, Gpred]
+    # variables to hold shortest discovered path
+    # finaldist = 1e30000
+    finalpath = []
+    dir = 1
+    while fringe[0] and fringe[1]:
+        # choose direction
+        # dir == 0 is forward direction and dir == 1 is back
+        dir = 1 - dir
+        # extract closest to expand
+        (dist, _, v) = pop(fringe[dir])
+        if v in dists[dir]:
+            # Shortest path to v has already been found
+            continue
+        # update distance
+        dists[dir][v] = dist  # equal to seen[dir][v]
+        if v in dists[1 - dir]:
+            # if we have scanned v in both directions we are done
+            # we have now discovered the shortest path
+            return (finaldist, finalpath)
+
+        for w in neighs[dir](v):
+            if (dir == 0):  # forward
+                if G.is_multigraph():
+                    minweight = min((dd.get(weight, 1)
+                                     for k, dd in G[v][w].items()))
+                else:
+                    minweight = G[v][w].get(weight, 1)
+                vwLength = dists[dir][v] + minweight  # G[v][w].get(weight,1)
+            else:  # back, must remember to change v,w->w,v
+                if G.is_multigraph():
+                    minweight = min((dd.get(weight, 1)
+                                     for k, dd in G[w][v].items()))
+                else:
+                    minweight = G[w][v].get(weight, 1)
+                vwLength = dists[dir][v] + minweight  # G[w][v].get(weight,1)
+
+            if w in dists[dir]:
+                if vwLength < dists[dir][w]:
+                    raise ValueError(
+                        "Contradictory paths found: negative weights?")
+            elif w not in seen[dir] or vwLength < seen[dir][w]:
+                # relaxing
+                seen[dir][w] = vwLength
+                push(fringe[dir], (vwLength, next(c), w))
+                paths[dir][w] = paths[dir][v] + [w]
+                if w in seen[0] and w in seen[1]:
+                    # see if this path is better than than the already
+                    # discovered shortest path
+                    totaldist = seen[0][w] + seen[1][w]
+                    if finalpath == [] or finaldist > totaldist:
+                        finaldist = totaldist
+                        revpath = paths[1][w][:]
+                        revpath.reverse()
+                        finalpath = paths[0][w] + revpath[1:]
+    raise nx.NetworkXNoPath("No path between %s and %s." % (source, target))
+
+
+def shortest_simple_pathsForClusters(G, cluster1, cluster2, weight=None):
+    cset1 = set(cluster1)
+    cset2 = set(cluster2)
+    if not cset1.issubset( set(G.nodes()) ):
+        raise nx.NetworkXError('cluster1 nodes not in graph')
+
+    if not cset2.issubset( set(G.nodes()) ):
+        raise nx.NetworkXError('cluster2 nodes not in graph')
+
+    if weight is None:
+        raise TypeError('weight not defined')
+    else:
+        def length_func(path):
+            length = 0
+            for (u, v) in zip(path, path[1:]):
+                if set([u,v]) & set(['source','target']):
+                    length += 0.1
+                else:
+                    length += G.edge[u][v][weight]
+            return length
+        shortest_path_func = bidirectional_dijkstra_forClusters
+
+    listA = list()
+    listB = PathBuffer()
+    prev_path = None
+    ori_ignEdges = set( G.subgraph(cluster1).edges() + G.subgraph(cluster2).edges() )
+    while True:
+        if not prev_path:
+            length, path = shortest_path_func(G, 'source', 'target', cluster1, cluster2, ignore_edges=set(ori_ignEdges), weight=weight)
+            listB.push(length, path)
+        else:
+            ignore_nodes = set()
+            ignore_edges = set(ori_ignEdges)
+            for i in range(1, len(prev_path)):
+                root = prev_path[:i]
+                root_length = length_func(root)
+                for path in listA:
+                    if path[:i] == root:
+                        ignore_edges.add((path[i-1], path[i]))
+                ignore_nodes.add(root[-1])
+                try:
+                    length, spur = shortest_path_func(G, root[-1], 'target',cluster1,cluster2,
+                                                      ignore_nodes=ignore_nodes,
+                                                      ignore_edges=ignore_edges,
+                                                      weight=weight)
+                    path = root[:-1] + spur
+                    listB.push(root_length + length, path)
+                except nx.NetworkXNoPath:
+                    pass
+
+        if listB:
+            length_of_path, path = listB.pop()
+            yield (length_of_path, path)
+            listA.append(path)
+            prev_path = path
+        else:
+            break
 
 
 
+class PathBuffer(object):
+
+    def __init__(self):
+        self.paths = set()
+        self.sortedpaths = list()
+        self.counter = count()
+
+    def __len__(self):
+        return len(self.sortedpaths)
+
+    def push(self, cost, path):
+        hashable_path = tuple(path)
+        if hashable_path not in self.paths:
+            heappush(self.sortedpaths, (cost, next(self.counter), path))
+            self.paths.add(hashable_path)
+
+    def pop(self):
+        (cost, num, path) = heappop(self.sortedpaths)
+        hashable_path = tuple(path)
+        self.paths.remove(hashable_path)
+        return cost,path
 
 
+#####
+def bidirectional_dijkstra_forClusters(G, source, target,cluster1,cluster2, weight='weight',
+                                    ignore_nodes=set(), ignore_edges=None):
+    """Dijkstra's algorithm for shortest paths using bidirectional search.
+
+    This function returns the shortest path between source and target
+    ignoring nodes and edges in the containers ignore_nodes and
+    ignore_edges.
+
+    This is a custom modification of the standard Dijkstra bidirectional
+    shortest path implementation at networkx.algorithms.weighted
+
+    Parameters
+    ----------
+    G : NetworkX graph
+
+    source : node
+       Starting node.
+
+    target : node
+       Ending node.
+
+    weight: string, optional (default='weight')
+       Edge data key corresponding to the edge weight
+
+    ignore_nodes : container of nodes
+       nodes to ignore, optional
+
+    ignore_edges : container of edges
+       edges to ignore, optional
+
+    Returns
+    -------
+    length : number
+        Shortest path length.
+
+    Returns a tuple of two dictionaries keyed by node.
+    The first dictionary stores distance from the source.
+    The second stores the path from the source to that node.
+
+    Raises
+    ------
+    NetworkXNoPath
+        If no path exists between source and target.
+
+    Notes
+    -----
+    Edge weight attributes must be numerical.
+    Distances are calculated as sums of weighted edges traversed.
+
+    In practice  bidirectional Dijkstra is much more than twice as fast as
+    ordinary Dijkstra.
+
+    Ordinary Dijkstra expands nodes in a sphere-like manner from the
+    source. The radius of this sphere will eventually be the length
+    of the shortest path. Bidirectional Dijkstra will expand nodes
+    from both the source and the target, making two spheres of half
+    this radius. Volume of the first sphere is pi*r*r while the
+    others are 2*pi*r/2*r/2, making up half the volume.
+
+    This algorithm is not guaranteed to work if edge weights
+    are negative or are floating point numbers
+    (overflows and roundoff errors can cause problems).
+
+    See Also
+    --------
+    shortest_path
+    shortest_path_length
+    """
+    if source == target:
+        return (0, [source])
+
+    # handle either directed or undirected
+    if G.is_directed():
+        Gpred = G.predecessors_iter
+        Gsucc = G.successors_iter
+    else:
+        Gpred = G.neighbors_iter
+        Gsucc = G.neighbors_iter
+
+    # support optional nodes filter
+    #if ignore_nodes:
+    def filter_nodes(nodes_iter):
+        def iterate(v):
+            if v == 'source':
+                nb=cluster1
+            elif v=='target':
+                nb=cluster2
+            else:
+                nb=list(nodes_iter(v))
+                if v in cluster1:
+                    nb += ['source']
+                if v in cluster2:
+                    nb += ['target']
+
+            for w in nb:
+                if w not in ignore_nodes:
+                    yield w
+
+        return iterate
 
 
+    Gpred = filter_nodes(Gpred)
+    Gsucc = filter_nodes(Gsucc)
+
+    # support optional edges filter
+    if ignore_edges:
+        if G.is_directed():
+            def filter_pred_iter(pred_iter):
+                def iterate(v):
+                    for w in pred_iter(v):
+                        if (w, v) not in ignore_edges:
+                            yield w
+
+                return iterate
 
 
+            def filter_succ_iter(succ_iter):
+                def iterate(v):
+                    for w in succ_iter(v):
+                        if (v, w) not in ignore_edges:
+                            yield w
+
+                return iterate
 
 
+            Gpred = filter_pred_iter(Gpred)
+            Gsucc = filter_succ_iter(Gsucc)
+
+        else:
+            def filter_edges(nodes_iter):
+                def iterate(v):
+                    for w in nodes_iter(v):
+                        if (v, w) not in ignore_edges \
+                                and (w, v) not in ignore_edges:
+                            yield w
+
+                return iterate
 
 
+            Gpred = filter_edges(Gpred)
+            Gsucc = filter_edges(Gsucc)
 
+    push = heappush
+    pop = heappop
+    # Init:   Forward             Backward
+    dists = [{}, {}]  # dictionary of final distances
+    paths = [{source: [source]}, {target: [target]}]  # dictionary of paths
+    fringe = [[], []]  # heap of (distance, node) tuples for
+    # extracting next node to expand
+    seen = [{source: 0}, {target: 0}]  # dictionary of distances to
+    # nodes seen
+    c = count()
+    # initialize fringe heap
+    push(fringe[0], (0, next(c), source))
+    push(fringe[1], (0, next(c), target))
+    # neighs for extracting correct neighbor information
+    neighs = [Gsucc, Gpred]
+    # variables to hold shortest discovered path
+    # finaldist = 1e30000
+    finalpath = []
+    dir = 1
+    while fringe[0] and fringe[1]:
+        # choose direction
+        # dir == 0 is forward direction and dir == 1 is back
+        dir = 1 - dir
+        # extract closest to expand
+        (dist, _, v) = pop(fringe[dir])
+        if v in dists[dir]:
+            # Shortest path to v has already been found
+            continue
+        # update distance
+        dists[dir][v] = dist  # equal to seen[dir][v]
+        if v in dists[1 - dir]:
+            # if we have scanned v in both directions we are done
+            # we have now discovered the shortest path
+            return (finaldist, finalpath)
 
+        for w in neighs[dir](v):
+            if (dir == 0):  # forward
+                if v!='source' and w in cluster1:
+                    continue
+                if v in cluster2 and w!='target':
+                    continue
+                if G.is_multigraph():
+                    minweight = min((dd.get(weight, 1)
+                                     for k, dd in G[v][w].items()))
+                else:
+                    if set([w,v]) & set(['source','target']):
+                        minweight = 0.1
+                    else:
+                        minweight = G[v][w].get(weight, 1)
+                vwLength = dists[dir][v] + minweight  # G[v][w].get(weight,1)
+            else:  # back, must remember to change v,w->w,v
+                if v!='target' and w in cluster2:
+                    continue
+                if v in cluster1 and w!='source':
+                    continue
+                if G.is_multigraph():
+                    minweight = min((dd.get(weight, 1)
+                                     for k, dd in G[w][v].items()))
+                else:
+                    if set([w,v]) & set(['source','target']):
+                        minweight = 0.1
+                    else:
+                        minweight = G[w][v].get(weight, 1)
+                vwLength = dists[dir][v] + minweight  # G[w][v].get(weight,1)
 
-
-
-
-
-
-
-
+            if w in dists[dir]:
+                if vwLength < dists[dir][w]:
+                    raise ValueError(
+                        "Contradictory paths found: negative weights?")
+            elif w not in seen[dir] or vwLength < seen[dir][w]:
+                # relaxing
+                seen[dir][w] = vwLength
+                push(fringe[dir], (vwLength, next(c), w))
+                paths[dir][w] = paths[dir][v] + [w]
+                if w in seen[0] and w in seen[1]:
+                    # see if this path is better than than the already
+                    # discovered shortest path
+                    totaldist = seen[0][w] + seen[1][w]
+                    if finalpath == [] or finaldist > totaldist:
+                        finaldist = totaldist
+                        revpath = paths[1][w][:]
+                        revpath.reverse()
+                        finalpath = paths[0][w] + revpath[1:]
+    raise nx.NetworkXNoPath("No path between %s and %s." % (source, target))

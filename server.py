@@ -129,4 +129,6 @@ def wordrank(node):
     response=json.dumps(nodesandpaths)
     return make_response(response)
 
-app.run(threaded=True)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', threaded=True)

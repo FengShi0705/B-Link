@@ -4,69 +4,10 @@ svg#Mainback {
 
 html, body { margin:0; padding:0; overflow:hidden }
 
-/* search box and function_navigation panel */
-div.func-nav{
+/* search box design  */
+#mainSearchBox {
   position:fixed;
-  width:66.5px;
-  left:0px;
-  top:0px;
-  bottom:0px;
-  border-right:2px solid black;
-}
-
-#b-findpoint{
-  margin-left:10px;
-  margin-top:60px;
-  width:50px;
-  height:50px;
-  border:1px solid #0099ff;
-  border-radius:5px;
-  background-color:white;
-  background-image:url("/static/explore.png");
-  background-size:100%;
-  cursor:pointer;
-}
-
-p.t-func-nav{
-  margin-left:10px;
-  margin-top:5px;
-  width:50px;
-  font-size:10px;
-  font-family:arial;
-  font-weight:bold;
-  text-align:center;
-  color:blue;
-}
-
-#b-findline{
-  margin-left:10px;
-  margin-top:20px;
-  width:50px;
-  height:50px;
-  border:1px solid #0099ff;
-  border-radius:5px;
-  background-color:white;
-  background-image:url("/static/lookup.png");
-  background-size:100%;
-  cursor:pointer;
-}
-
-#b-cluster{
-  margin-left:10px;
-  margin-top:20px;
-  width:50px;
-  height:50px;
-  border:1px solid #0099ff;
-  border-radius:5px;
-  background-color:white;
-  background-image:url("/static/bisociation.png");
-  background-size:100%;
-  cursor:pointer;
-}
-
-div.input {
-  position:fixed;
-  left:75px;
+  left:10px;
   top:10px;
 }
 
@@ -78,7 +19,6 @@ input[name="keywords"]{
   border-radius:10px;
   font-size: 20px;
   padding:12px 70px 12px 12px;
-
 }
 
 input[name="search"]{
@@ -116,12 +56,222 @@ input[name="search"]:hover{
 div.header{
    height:50px;
    position: fixed;
-   left:500px;
+   left:360px;
    top:5px;
+   right:0;
    font-size:40px;
    font-family:cursive;
-   color:#4776DA;
+   pointer-events:none;
 }
+
+/* the whole panel control  */
+.panel{
+  position:absolute;
+  top:60px;
+  left:10px;
+  width:350px;
+}
+
+/* function_navigation panel */
+#func-nav{
+  position:absolute;
+  width:350px;
+  display:none;
+}
+
+div.func_setting{
+  position:absolute;
+  width:350px;
+  display:none;
+}
+
+/* the drawing of toggle switch */
+
+.t-global {
+    font-family:arial;
+    font-size:22px;
+    color:#2196F3;
+    font-weight: bold;
+    display:inline-block;
+}
+
+.t-global-toggle{
+    color:black;
+    font-weight:normal;
+}
+
+.t-local {
+    font-family:arial;
+    font-size:22px;
+    font-weight:normal;
+    display:inline-block;
+}
+
+.t-local-toggle{
+    color:#2196F3;
+    font-weight:bold;
+}
+
+
+label.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 100px;
+}
+
+label.switch-cluster {
+  position: relative;
+  display: inline-block;
+  width: 100px;
+  height: 34px;
+}
+
+label.switch input {display:none;}
+label.switch-cluster input {display:none;}
+
+div.slider, .slider-cluster {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2196F3;
+}
+
+div.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  top: 4px;
+  background-color: white;
+}
+
+input[name="switch-1"]:checked + .slider {
+  background-color: #2196F3;
+}
+
+input[name="switch-2"]:checked + .slider {
+  background-color: #2196F3;
+}
+
+input[name="switch-3"]:checked + .slider {
+  background-color: #2196F3;
+}
+
+input[name="switch-1"]:checked + .slider:before {
+  transform: translateY(66px);
+}
+
+input[name="switch-2"]:checked + .slider:before {
+  transform: translateY(66px);
+}
+
+input[name="switch-3"]:checked + .slider:before {
+  transform: translateX(66px);
+}
+
+/* Rounded sliders */
+div.slider.round {
+  border-radius: 34px;
+}
+
+div.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Min Hop Panel  */
+select.minhop{
+    width:80px;
+    height:30px;
+    font-size:20px;
+    padding-left:26px;
+}
+
+/* Line-panel text input box */
+input[name="endpoint"]{
+  width: 350px;
+  height:50px;
+  box-sizing:border-box;
+  border:2px solid #ccc;
+  border-radius:10px;
+  font-size: 20px;
+  padding:12px 70px 12px 12px;
+}
+
+/* cluster-panel search-icon */
+.cluster-searchicon{
+  opacity:0.3;
+  cursor:pointer;
+}
+
+
+/* info display panel */
+#info_panel{
+    position:fixed;
+    left:10px;
+    bottom:0px;
+    width:350px;
+    display:none;
+}
+
+.info-display{
+    background-color:white;
+    border:1px solid black;
+    border-radius:2px;
+    position:absolute;
+    top:16px;
+    left:25px;
+    bottom:60px;
+    width:300px;
+    overflow-y:scroll;
+    word-wrap:break-word;
+}
+
+
+div.row p.list{
+    width: 10%;
+    float: left;
+    margin: 0;
+    font-size: 16px;
+}
+
+div.row div.content{
+    width: 90%;
+    float: left;
+    padding: 0px;
+    font-size: 12px;
+    font-family:arial;
+    line-height: 150%;
+}
+
+div.info-display div.row{
+    padding-top:10px;
+    padding-bottom:10px;
+    clear: both;
+    border-bottom:2px solid #b3b3b3;
+}
+
+div.info-display div.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.page-button{
+    position:absolute;
+    bottom:15px;
+    left:25px;
+    width:300px;
+}
+
+
+
+
+
 
 /* svg */
 .edge {
@@ -170,183 +320,5 @@ svg rect#Backlayer{
    stroke-width:5;
    fill-opacity:0.1;
    stroke-opacity:0.9;
-}
-
-/* left panel */
-#left-panel {
-  width: 346px;
-  border: 2px solid blue;
-  background-color: #ccffcc;
-  position: fixed;
-  top: 60px;
-  left: 75px;
-  bottom:10px;
-  border-radius:10px;
-  /*-webkit-transition: all 0.5s ease-in-out;   transition animation*/
-  visibility:hidden;
-}
-
-p.p-text{
-    text-align:center;
-    font-family:arial;
-    font-size:25px;
-    padding-bottom:10px;
-    margin-bottom:15px;
-    border-bottom:2px solid #b3b3b3;
-}
-
-div.blockline{
-    padding-bottom:15px;
-    border-bottom:2px solid #b3b3b3;
-}
-
-select.minhop{
-    width:80px;
-    height:30px;
-    font-size:20px;
-    padding-left:26px;
-}
-
-/* the drawing of toggle switch */
-
-#t-global{
-    margin-top:-27px;
-    margin-left:38px;
-    padding-right:10px;
-    font-family:arial;
-    font-size:22px;
-    display:inline-block;
-    line-height:34px;
-    height:34px;
-    width:75px;
-    text-align:right;
-    vertical-align:middle;
-    color:#2196F3;
-    font-weight: bold;
-}
-
-#t-local{
-    margin-top:-27px;
-    padding-left:10px;
-    font-family:arial;
-    font-size:22px;
-    display:inline-block;
-    line-height:34px;
-    height:34px;
-    width:75px;
-    text-align:left;
-    vertical-align:middle;
-    font-weight:normal;
-}
-
-label.switch {
-  position: relative;
-  display: inline-block;
-  width: 100px;
-  height: 34px;
-}
-
-label.switch input {display:none;}
-
-div.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #2196F3;
-}
-
-div.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-}
-
-input[name="switch-1"]:checked + .slider {
-  background-color: #2196F3;
-}
-
-input[name="switch-1"]:checked + .slider:before {
-  transform: translateX(66px);
-}
-
-/* Rounded sliders */
-div.slider.round {
-  border-radius: 34px;
-}
-
-div.slider.round:before {
-  border-radius: 50%;
-}
-
-
-/*  the buttons */
-
-.button{
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    width:120px;
-    padding: 15px 15px;
-    text-align: center;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight:bold;
-    margin: 4px 25px;
-    cursor: pointer;
-}
-
-#info-display{
-    background-color:white;
-    border:1px solid black;
-    border-radius:2px;
-    position:fixed;
-    top:220px;
-    left:100px;
-    bottom:100px;
-    width:300px;
-    overflow-y:scroll;
-    word-wrap:break-word;
-}
-
-p.list{
-    width: 10%;
-    float: left;
-    margin: 0;
-    font-size: 16px;
-}
-div#info-display div.content{
-    width: 90%;
-    float: left;
-    padding: 0px;
-    font-size: 12px;
-    font-family:arial;
-    line-height: 150%;
-}
-div#info-display div.row{
-    padding-top:10px;
-    padding-bottom:10px;
-    clear: both;
-    border-bottom:2px solid #b3b3b3;
-}
-div#info-display div.row:after {
-    content: "";
-    display: table;
-    clear: both;
-}
-
-#page-button{
-    position:fixed;
-    bottom:30px;
-    left:75px;
-    width:350px;
-    display:flex;
-    justify-content:space-between;
 }
 

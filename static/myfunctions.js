@@ -8,8 +8,9 @@ function assert(condition, message) {
 
 
 // get the text in inputbox
-function get_inputtext(){
-  return d3.select('input[name="keywords"]').node().value;
+function get_inputtext(searchbutton_id){
+  var selector='input#'+searchbutton_id
+  return d3.select(selector).node().value;
 };
 
 // Get an array which consists of the values of a paticular key of objects in another array
@@ -20,6 +21,14 @@ function CURRENT_NODESSET(nodes,key){
     });
     return nodesset;
 };
+
+// if the node exists in current CLIENT_NODES, transfer the id to object
+function NODE_IdToObj(id){
+    var cnode = CLIENT_NODES.filter(function(d){return d.wid==id;});
+    assert(cnode.length==1, 'no such node id in current client nodes')
+    return cnode[0];
+};
+
 
 // update force layout
 function SHOW_UPDATE_FORCE(dataset,born){
@@ -44,6 +53,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
           d.vx = born.vx;
           d.vy = born.vy;
           CLIENT_NODES.push(d);
+          CLIENT_NODES_ids.push(d.wid);
       }else{ // update existing nodes degree
           cnode=cnode[0];
           cnode.n=d.n;
@@ -206,16 +216,16 @@ function circle_layout_neighbor(dataset){
 };
 
 // highlight dataset.paths and dataset.paths1 in different style, and dataset.nodes which are highlighted in a different style as well.
+// dataset.nodes is a list of nodes
+// Both dataset.paths and dataset.paths1 are list of paths
 function highlight_nodespaths(dataset){
     // generate a highlighted graph based on dataset.paths
-    var hltG=new jsnx.Graph();
+    var hltG = new jsnx.Graph();
     for (var i = 0; i < dataset.paths.length; i++){
-        hltG.addNode(dataset.paths[i][0]);//in case a path only have one node
         hltG.addPath(dataset.paths[i]);
     };
     var hltG1=new jsnx.Graph();
     for (var i = 0; i < dataset.paths1.length; i++){
-        hltG1.addNode(dataset.paths1[i][0]);//in case a path only have one node
         hltG1.addPath(dataset.paths1[i]);
     };
 
@@ -245,33 +255,47 @@ function highlight_nodespaths(dataset){
     TITLECOLOR_CHANGE();
 };
 
-// zooming to multiple nodes so that the nodes fill up the screen.
+// zooming to multiple nodes so that the nodes fill up the screen.nodes is a list
 function ZoomToNodes(nodes){
-    var obj_nodes = d3.selectAll('.gnode').filter(function(d){return _.contains(nodes,d.wid);});
-    obj_nodes = obj_nodes.data();
-    if(obj_nodes.length == 1){
-        var k = 1;
-        var x=obj_nodes[0].x
-        var y=obj_nodes[0].y
+    if (  SIMULATION.alphaTarget()==0 ){
+
+        console.log('zoom begin:'+SIMULATION.alpha())
+        var obj_nodes = d3.selectAll('.gnode').filter(function(d){return _.contains(nodes,d.wid);});
+        obj_nodes = obj_nodes.data();
+        if(obj_nodes.length == 1){
+            var k = 1;
+            var x=obj_nodes[0].x
+            var y=obj_nodes[0].y
+        }else{
+            var max_x=d3.max(obj_nodes,function(d){return d.x});
+            var max_y=d3.max(obj_nodes,function(d){return d.y});
+            var min_x=d3.min(obj_nodes,function(d){return d.x});
+            var min_y=d3.min(obj_nodes,function(d){return d.y});
+            var x = (max_x+min_x)/2;
+            var y = (max_y+min_y)/2;
+            var kx = w/(max_x-min_x+4*maxNodeRadius);
+            var ky = h/(max_y-min_y+4*maxNodeRadius);
+            var k = Math.min(kx,ky);
+            console.log(k);
+        };
+        function transform(){
+            return d3.zoomIdentity
+                     .translate(w/2,h/2)
+                     .scale(k)
+                     .translate(-x,-y);
+        };
+        BACKLAYER.transition('zoom').duration(3000).call(BACKLAYER_Zoom.transform, transform);
+
+        SIMULATION.on('tick.zoom',null);
+
     }else{
-        var max_x=d3.max(obj_nodes,function(d){return d.x});
-        var max_y=d3.max(obj_nodes,function(d){return d.y});
-        var min_x=d3.min(obj_nodes,function(d){return d.x});
-        var min_y=d3.min(obj_nodes,function(d){return d.y});
-        var x = (max_x+min_x)/2;
-        var y = (max_y+min_y)/2;
-        var kx = w/(max_x-min_x+4*maxNodeRadius);
-        var ky = h/(max_y-min_y+4*maxNodeRadius);
-        var k = Math.min(kx,ky);
-        console.log(k);
+        SIMULATION.on('tick.zoom', function(){
+            var maxv = d3.max(d3.selectAll('.gnode circle').data(),function(d){return Math.sqrt(d.vx*d.vx+d.vy*d.vy);});
+            if (  SIMULATION.alphaTarget()==0 && maxv<0.1 ){
+                ZoomToNodes(nodes);
+            };
+        });
     };
-    function transform(){
-        return d3.zoomIdentity
-                 .translate(w/2,h/2)
-                 .scale(k)
-                 .translate(-x,-y);
-    };
-    BACKLAYER.transition('zoom').duration(3000).call(BACKLAYER_Zoom.transform, transform);
 };
 
 // Back to force layout
@@ -296,133 +320,142 @@ function RedoBack(){
     TITLECOLOR_CHANGE();
 };
 
-
-
-//Explore button handler
-function Handle_Explore_Button(){
-    d3.json('/texttowid/'+get_inputtext(),function(error,data){
-        var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-        var query = data;
-        d3.select('label.switch input[name="switch-1"]').node().checked = false; //set to globle
-        d3.select('select.minhop').node().value=1; // set hops to 1
-
-        if( _.contains(currentnodes,query) ){
-            Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
-        }else{
-            var info1 = {'currentnodes':currentnodes,'query':query};
-            d3.json('/findnear/'+JSON.stringify(info1),function(error,data){
-                Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,data);
-            });
-        };
-    });
-};
-
-//Explore next handler OK
-function Handle_ExploreNext_Button(){
-    var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),false,N_SearchButton,query,query);
-};
-
-//Explore previous handler OK
-function Handle_Exploreprevious_Button(){
-    var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),false,-N_SearchButton,query,query);
-};
-
+//reset minhops and switchLG
+function reset_hops_switcher(panel_id){
+    var panel = d3.select('#'+panel_id);
+    //reset minhops
+    panel.select('select.minhop').each(function(d){this.value=1;});
+    //reset switch
+    panel.selectAll('.t-global').classed('t-global-toggle',false);
+    panel.selectAll('.t-local').classed('t-local-toggle',false);
+    panel.selectAll('label.switchLG input').each(function(d){this.checked=false;});
+}
 
 //get the value of minhops
-function get_minhops(){
-    return parseInt(d3.select('select.minhop').node().value);
+function get_minhops(minhop_id){
+    var selector = 'select#'+minhop_id;
+    return parseInt(d3.select(selector).node().value);
 };
-// check swith
-function check_explore_LG(){
-    if( d3.select('label.switch input[name="switch-1"]').node().checked==true ){
+// check swith is either local or global
+function check_explore_LG(switcher){
+    var selector = 'label.switchLG input#'+switcher
+    if( d3.select(selector).node().checked==true ){
         return 'local';
     }else{
         return 'global';
     };
 };
 
-// Hop handler
-function ExploreHops(){
-    var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
-};
-//Switch handler
-function Explore_LG_switch(){
-    var query = d3.select('circle.hltA').data()[0].wid;
-    Explore_Nearby(check_explore_LG(),true,N_SearchButton,query,query);
-};
-
 // Explore either global or local graph
 // Start or Previous or Next
 // Query is the queried node to be highlighted
 // born is the wid of the node as the bornplace.
-function Explore_Nearby(LorG,start,N,query,born){
-    var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
+function Explore_Nearby(LorG,start,minhops,N,query,born){
+    var currentnodes = CLIENT_NODES_ids;
     if ( LorG=="local" ){
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':currentnodes};
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':minhops,'localnodes':currentnodes};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
     }else{
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':get_minhops(),'localnodes':null};
+        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':minhops,'localnodes':null};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
     };
+    //calculate bornplace
+    assert( _.contains(currentnodes,born), 'current nodes do not include born node');
+    var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==born;})[0];
+    var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
 
-    d3.json('/generator/'+JSON.stringify(info),function(error,data){
-        if(data.AddNew==true){
-            if(born){
-                assert( _.contains(currentnodes,born), 'current nodes do not include born node');
-                var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==born;})[0];
-                var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
-            }else{
-                var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};
-            };
-            SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
-            node_left_click_on();
-        };
-        var highlights={'nodes':[query],'paths':[data.paths.ids[0]],'paths1':data.paths.ids.slice(1,data.paths.ids.length)}; //highlight nodes and paths
-        highlight_nodespaths(highlights);
-        ZoomToNodes([query]); // zoom to the node
-        //update the information panel here
-        var inforow = d3.select('div#left-panel div#info-display').selectAll('div.row').data(data.paths.labels);
-        inforow.select('p.list').text(function(d,i){return parseInt(i)+data.position;});
-        inforow.select('div.content').text(function(d){return d.join(' > ');});
-        var newrows=inforow.enter().append('div').attr('class','row')
-        newrows.append('p').attr('class','list').text(function(d,i){return parseInt(i)+data.position;});
-        newrows.append('div').attr('class','content').text(function(d){return d.join(' > ');});
-        inforow.exit().remove();
-        console.log(data.position);
-    });
+    generator_update_graphAndPanel(info,bornplace,[query]);
 
 };
 
 
-
-// Handle search button
-function Handle_Search_Button(){
-    document.getElementById("left-panel").style.visibility = "hidden";
-    d3.json('/texttowid/'+get_inputtext(),function(error,data){
-        var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-        var query = data;
-        if(_.contains(currentnodes,query)){
-            var highlights = {'nodes':[query],'paths':[],'paths1':[]};
-            highlight_nodespaths(highlights);
-            ZoomToNodes([query]);
-        }else{
-            var info={'currentnodes':currentnodes,'query':query};
-            d3.json('/searchbutton/'+JSON.stringify(info),function(error,data){
-                if(data.bornnode){
-                    var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==data.bornnode;})[0];
-                    var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
-                }else{var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};};
-                SHOW_UPDATE_FORCE(data,bornplace);
-                node_left_click_on();
-                var highlights = {'nodes':[query],'paths':data.paths,'paths1':[]};
-                highlight_nodespaths(highlights);
-                ZoomToNodes([query]);
-            });
+// Access generator url, update force graph and information panel
+// info for the generator server
+// bornplace is the x,y,vx,vy for the newly added nodes
+// queries are the queries
+function generator_update_graphAndPanel(info,bornplace,queries){
+    d3.json('/generator/'+JSON.stringify(info),function(error,data){
+        if(data.AddNew==true){;
+            SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
+            node_left_click_on();
         };
+
+        var hlpath=[];
+        var hlpath1 = [];
+        var z_nodes =queries.slice();
+        data.paths.forEach(function(d,i){
+            /*if (i==0){ hlpath.push(d.ids); }
+            else{ hlpath1.push(d.ids); };*/
+            hlpath1.push(d.ids)
+            z_nodes= _.union(z_nodes,d.ids);
+        });
+
+        var highlights={'nodes':queries,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
+        highlight_nodespaths(highlights);
+        ZoomToNodes(z_nodes); // zoom to the node
+        //update the information panel here
+        update_informationPanel(data.paths,data.position);
     });
+};
+
+// paths are the information to be updated on the information panel
+// position is the position of the current paths
+function update_informationPanel(paths,position){
+    d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
+    var inforow = d3.select('div#info_panel div.info-display')
+                    .selectAll('div.row')
+                    .data(paths)
+                    .enter()
+                    .append('div')
+                    .attr('class','row');
+    inforow.append('p').attr('class','list')
+                       .text(function(d,i){
+                           return parseInt(i)+position;
+                       });
+    inforow.append('div').attr('class','content')
+                         .text(function(d,i){
+                             return d.labels.join(' --> ');
+                         });
+
+    //information clickable
+    d3.select('div#info_panel div.info-display').selectAll('div.row').on('click',function(d,i){
+        d3.selectAll('div.row').style('background-color','white');
+        d3.select(this).style('background-color','#F2F3F4');
+        var hltP1=[];
+        paths.forEach(function(p,pi){
+            if(pi!=i){
+                hltP1.push(p.ids);
+            };
+        });
+        var highlights={'nodes':[d.ids[0], d.ids[d.ids.length-1]],'paths':[d.ids],'paths1':hltP1};
+        highlight_nodespaths(highlights);
+        ZoomToNodes(d.ids);
+    });
+};
+
+
+
+
+
+//find paths between two nodes
+function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
+    if ( LorG=="local" ){
+        var subparameters = {"source":node1,"target":node2,"tp":Type_distance, "minhops":minhops, "localnodes":CLIENT_NODES_ids};
+        var parameters = {"N":N, "parameters":subparameters, "generator":'find_paths', "start":start};
+        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
+    }else{
+        var subparameters = {"source":node1,"target":node2,"tp":Type_distance,"minhops":minhops,"localnodes":null};
+        var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
+        var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+    };
+    // calculate bornplace
+    assert( _.contains(CLIENT_NODES_ids,node1) && _.contains(CLIENT_NODES_ids,node2) , 'path ends do not exist!');
+    assert ( node1!=node2, 'start and end node should not be the same node!'  )
+    var bornnode1=CLIENT_NODES.filter(function(obj){return obj["wid"]==node1;})[0];
+    var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==node2;})[0];
+    var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
+
+    generator_update_graphAndPanel(info, bornplace, [node1,node2]);
 };
