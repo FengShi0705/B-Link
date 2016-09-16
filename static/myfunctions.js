@@ -22,6 +22,14 @@ function CURRENT_NODESSET(nodes,key){
     return nodesset;
 };
 
+// if the node exists in current CLIENT_NODES, transfer the id to object
+function NODE_IdToObj(id){
+    var cnode = CLIENT_NODES.filter(function(d){return d.wid==id;});
+    assert(cnode.length==1, 'no such node id in current client nodes')
+    return cnode[0];
+};
+
+
 // update force layout
 function SHOW_UPDATE_FORCE(dataset,born){
 
@@ -282,8 +290,8 @@ function ZoomToNodes(nodes){
 
     }else{
         SIMULATION.on('tick.zoom', function(){
-
-            if (  SIMULATION.alphaTarget()==0 ){
+            var maxv = d3.max(d3.selectAll('.gnode circle').data(),function(d){return Math.sqrt(d.vx*d.vx+d.vy*d.vy);});
+            if (  SIMULATION.alphaTarget()==0 && maxv<0.1 ){
                 ZoomToNodes(nodes);
             };
         });
@@ -312,6 +320,16 @@ function RedoBack(){
     TITLECOLOR_CHANGE();
 };
 
+//reset minhops and switchLG
+function reset_hops_switcher(panel_id){
+    var panel = d3.select('#'+panel_id);
+    //reset minhops
+    panel.select('select.minhop').each(function(d){this.value=1;});
+    //reset switch
+    panel.selectAll('.t-global').classed('t-global-toggle',false);
+    panel.selectAll('.t-local').classed('t-local-toggle',false);
+    panel.selectAll('label.switchLG input').each(function(d){this.checked=false;});
+}
 
 //get the value of minhops
 function get_minhops(minhop_id){
@@ -425,7 +443,7 @@ function update_informationPanel(paths,position){
 function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
     if ( LorG=="local" ){
         var subparameters = {"source":node1,"target":node2,"tp":Type_distance, "minhops":minhops, "localnodes":CLIENT_NODES_ids};
-        var parameters={"N":N, "parameters":subparameters,"generator":'find_paths',"start":start};
+        var parameters = {"N":N, "parameters":subparameters, "generator":'find_paths', "start":start};
         var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
     }else{
         var subparameters = {"source":node1,"target":node2,"tp":Type_distance,"minhops":minhops,"localnodes":null};
@@ -434,6 +452,7 @@ function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
     };
     // calculate bornplace
     assert( _.contains(CLIENT_NODES_ids,node1) && _.contains(CLIENT_NODES_ids,node2) , 'path ends do not exist!');
+    assert ( node1!=node2, 'start and end node should not be the same node!'  )
     var bornnode1=CLIENT_NODES.filter(function(obj){return obj["wid"]==node1;})[0];
     var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==node2;})[0];
     var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };

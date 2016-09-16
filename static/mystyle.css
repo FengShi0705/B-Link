@@ -61,14 +61,14 @@ div.header{
    right:0;
    font-size:40px;
    font-family:cursive;
+   pointer-events:none;
 }
 
 /* the whole panel control  */
 .panel{
-  position:fixed;
+  position:absolute;
   top:60px;
   left:10px;
-  bottom:0px;
   width:350px;
 }
 
@@ -211,7 +211,8 @@ input[name="endpoint"]{
 
 /* info display panel */
 #info_panel{
-    position:absolute;
+    position:fixed;
+    left:10px;
     bottom:0px;
     width:350px;
     display:none;

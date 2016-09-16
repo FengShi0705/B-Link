@@ -46,7 +46,7 @@ var N_ExploreFunctionpanel=20;
 var HltPathColor = '#FF6800';
 var NodeColor = '#3498DB';
 var EdgeColor = '#aaa';
-
+var FOCUSING_NODE = -1;
 //add svg
 SVG = d3.select('body').append('svg').attr('id',"Mainback").attr('width',w) .attr('height',h);
 function SVG_change_size(){
@@ -175,12 +175,20 @@ var clear_button=d3.select('input[name="clear"]');
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // CSS - Global-local switch control
-$(document).ready(function(){
-    $('#switch').click(function(){
+d3.selectAll('#switch-1,#switch-2,#switch-3').on('click',function(d){
+    Hide_InfoPanel();
+    d3.select(this.parentNode.parentNode).select('.t-global').classed('t-global-toggle',function(d){return !d3.select(this).classed('t-global-toggle');});
+    d3.select(this.parentNode.parentNode).select('.t-local').classed('t-local-toggle',function(d){return !d3.select(this).classed('t-local-toggle');});
+});
+
+/*$(document).ready(function(){
+    $('#switch-1').click(function(){
+        console.log('click$')
         $('.t-global').toggleClass('t-global-toggle');
         $('.t-local').toggleClass('t-local-toggle');
     });
-    $('#switch').click(function(){
+    $('#switch-2').click(function(){
+        console.log('click$')
         $('.t-global').toggleClass('t-global-toggle');
         $('.t-local').toggleClass('t-local-toggle');
     });
@@ -188,26 +196,35 @@ $(document).ready(function(){
         $('.t-global').toggleClass('t-global-toggle');
         $('.t-local').toggleClass('t-local-toggle');
     });
-});
+});*/
 
 // selet explore minhops
 function change_exploreMinhop(){
     Hide_InfoPanel();
 };
-// switch local and global
-d3.selectAll('label.switchLG').on('click',function(){
-    Hide_InfoPanel();
-});
 
 // show func-nav panel
 function show_panel(panelname){
     //reset minhop and local or global
-    d3.selectAll('select.minhop').each(function(d){this.value=1;});
-    d3.selectAll('label.switchLG input').each(function(d){this.checked=false;});
+    reset_hops_switcher(panelname);
+
+    //update search box according to highlighted nodes
+    var wid = d3.select('input#keywords').data()[0];
+    var label = NODE_IdToObj(wid).label;
 
     if (panelname == "line" || panelname == "cluster"){
         document.getElementById("mainSearchBox").style.top = "-999px";
-    }
+        if ( panelname == "line" ){
+            // update search box
+            d3.select('input#pathstart_textinput').node().value = label;
+            d3.select('input#pathend_textinput').node().value='';
+            // attach data
+            d3.select('input#pathstart_textinput').data([wid]);
+            d3.select('input#pathend_textinput').data([null]);
+        };
+    }else{
+        d3.select('input#keywords').node().value = label;
+    };
 
     var i;
     var x = document.getElementsByClassName("func_setting");
@@ -222,19 +239,19 @@ function show_panel(panelname){
 function show_info(panelname){
     if (panelname == "point"){
         console.log('point show');
-        document.getElementById("info_panel").style.top = "170px";
-        Explore_showRessult();
-        d3.select('#info_panel #pageup').on('click',Explore_Previous);
-        d3.select('#info_panel #pagedown').on('click',Explore_Next);
+        document.getElementById("info_panel").style.top = "230px";
+        Explore_showResult();
     }
     else if (panelname == "line"){
         console.log('line show');
-        document.getElementById("info_panel").style.top = "200px";
+        document.getElementById("info_panel").style.top = "260px";
+        FindPath_showResult();
     }
     else if (panelname == "cluster"){
-        document.getElementById("info_panel").style.top ="303px";
+        document.getElementById("info_panel").style.top ="363px";
     };
     document.getElementById("info_panel").style.display = "block";
+
 }
 
 // close line function panel
