@@ -66,21 +66,8 @@ div.header{
 
 /* the whole panel control  */
 .panel{
-  position:absolute;
-  top:60px;
+  position:fixed;
   left:10px;
-  width:350px;
-}
-
-/* function_navigation panel */
-#func-nav{
-  position:absolute;
-  width:350px;
-  display:none;
-}
-
-div.func_setting{
-  position:absolute;
   width:350px;
   display:none;
 }

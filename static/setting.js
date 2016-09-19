@@ -55,6 +55,7 @@ function SVG_change_size(){
     SVG.attr('width',w) .attr('height',h);
     BACKLAYER.attr("width", w).attr("height", h);
 };
+
 //add  main canvas
 GRAPH = SVG.append("g")
            .attr("id","MainGraph");
@@ -121,13 +122,18 @@ SIMULATION = d3.forceSimulation()
 };
 
 
+/////////////////////////////////////////-----  HTML DESIGN ONLY below -----///////////////////////////////////////////
 // hide information panel
 function Hide_InfoPanel(){
     document.getElementById("info_panel").style.display = "none";
     d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
 };
 
-
+function Hide_FuncPanel(){
+    document.getElementById("func-nav").style.display = "none";
+    document.getElementById("point_show_results").style.display = "none";
+    document.getElementById("line_show_results").style.display = "none";
+};
 
 // CSS - search-box control
   function checkTextField(field) {
@@ -136,31 +142,25 @@ function Hide_InfoPanel(){
     }
     else{
         d3.select('input[name="clear"]').style("visibility","hidden");
-        document.getElementById("point").style.display = "none";
-        document.getElementById("line").style.display = "none";
-        document.getElementById("cluster").style.display ="none";
-        document.getElementById("func-nav").style.top = "-999px";
+        document.getElementById("func-nav").style.display = "none";
+        Hide_FuncPanel();
+        Hide_InfoPanel();
     }
   };
 
 var clear_button=d3.select('input[name="clear"]');
     clear_button.on('click', function(){
-            document.getElementById("func-nav").style.top = "-999px";
-            Hide_InfoPanel();
-            document.getElementById("point").style.display = "none";
-            document.getElementById("line").style.display = "none";
-            document.getElementById("cluster").style.display ="none";
+        document.getElementById("func-nav").style.display = "none";
         document.getElementById("keywords").value = "";
         this.style.visibility = "hidden";
     });
 
-// --------------------------------just for testing; please remove on formal version --------------------------------//
-
+// main search box setting //
  d3.select("#mainSearchBox input[name='keywords']").on('keydown',function(){
   if (d3.event.keyCode==13){
       Handle_Search_Button('keywords');
   }else{
-      Hide_InfoPanel();
+      Hide_FuncPanel();
   };
 });
  d3.selectAll("input#pathstart_textinput, input#pathend_textinput").on('keydown',function(){
@@ -168,7 +168,7 @@ var clear_button=d3.select('input[name="clear"]');
   if (d3.event.keyCode==13){
       Handle_pathSearchbutton(seachid);
   }else{
-      Hide_InfoPanel();
+      Hide_FuncPanel();
   };
 });
 
@@ -211,9 +211,15 @@ function show_panel(panelname){
     //update search box according to highlighted nodes
     var wid = d3.select('input#keywords').data()[0];
     var label = NODE_IdToObj(wid).label;
+    document.getElementById("mainSearchBox").style.display = "none";
+    document.getElementById("func-nav").style.display = "none";
+    document.getElementById(panelname).style.display = "block";
+
+    if (panelname == "point"){
+        document.getElementById('point_show_results').style.display = "block";
+    };
 
     if (panelname == "line" || panelname == "cluster"){
-        document.getElementById("mainSearchBox").style.top = "-999px";
         if ( panelname == "line" ){
             // update search box
             d3.select('input#pathstart_textinput').node().value = label;
@@ -224,15 +230,8 @@ function show_panel(panelname){
         };
     }else{
         d3.select('input#keywords').node().value = label;
+        d3.select('input#point_textinput').node().value = label;
     };
-
-    var i;
-    var x = document.getElementsByClassName("func_setting");
-    for (i=0;i < x.length; i++){
-        x[i].style.display = "none";
-    }
-    document.getElementById("func-nav").style.top = "-999px";
-    document.getElementById(panelname).style.display = "block";
 }
 
 // show results panel
@@ -256,21 +255,10 @@ function show_info(panelname){
 
 // close line function panel
 function closePanel(panelname){
-    if(panelname == "line"){
-        Hide_InfoPanel();
-        document.getElementById("line").style.display = "none";
-        document.getElementById("mainSearchBox").style.top = "10px";
-    }
-    else if(panelname == "cluster"){
-        Hide_InfoPanel();
-        document.getElementById("cluster").style.display = "none";
-        document.getElementById("mainSearchBox").style.top = "10px";
-    };
-
-}
-
-function closeInfoPanel(field){
     Hide_InfoPanel();
+    Hide_FuncPanel();
+    document.getElementById("mainSearchBox").style.display = "block";
+    document.getElementById(panelname).style.display = "none";
 }
 
 // cluster input box control

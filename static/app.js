@@ -25,16 +25,6 @@ function updateGraph_searchButton(query,zh_nodes){
     //update previous focus
     FOCUSING_NODE = query;
 
-    if(document.getElementById("point").style.display == "none" &&
-      document.getElementById("line").style.display == "none" &&
-      document.getElementById("cluster").style.display == "none")
-    {
-      if(document.getElementById("func-nav").style.top == "-999px"){
-          document.getElementById("func-nav").style.top = "0px";
-      };
-    };
-     document.getElementById("func-nav").style.display = "block";
-
 };
 
 
@@ -49,7 +39,7 @@ function Handle_Search_Button(searchbutton_id){
             alert('Can not match your input concepts');
         };
     });
-    Hide_InfoPanel();
+    document.getElementById("func-nav").style.display = "block";
 };
 
 // handle search button of path
@@ -78,7 +68,6 @@ function Handle_pathSearchbutton(searchbutton_id){
              alert('Can not match your input concepts');
          };
      });
-     Hide_InfoPanel();
 };
 
 //Explore show results
