@@ -239,6 +239,9 @@ class UndirectedG(object):
 
         k: the number of clusters to be generated
 
+        weight: is the kernal value between two nodes. Higher kernal value means the two nodes are more similar and closer.
+                Here the weight can be the original frequence that two words appear together.
+
         algorithm: {'normalized', 'modularity'}, default to 'normalized'
 
         Return
@@ -295,6 +298,9 @@ class UndirectedG(object):
         :param nodes: a list of node to be clustered.
 
         :param r: inflation factor
+
+        :param weight: is the kernal value between two nodes. Higher kernal value means the two nodes are more similar and closer.
+                Here the weight can be the original frequence that two words appear together.
 
         :return M: the convergent matrix
 
