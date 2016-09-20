@@ -31,8 +31,12 @@ class UndirectedG(object):
     # return ids list of input words
     # Inputs is a list of words
     def input_ids(self,ipts):
+        try:
+            ipwids = PF.find_id(ipts, self.cursor)
+        except:
+            self.cnx, self.cursor = PF.creatCursor(self.schema, 'R')
 
-        ipwids=PF.find_id(ipts,self.cursor)
+        ipwids = PF.find_id(ipts, self.cursor)
         ipwids=list(set(ipwids))
         for n in ipwids:
             print n, self.G.node[n]['label']

@@ -135,6 +135,16 @@ function Hide_FuncPanel(){
     document.getElementById("line_show_results").style.display = "none";
 };
 
+function Show_FuncPanel(searchId){
+    var search_To_funcP = {'keywords':'func-nav','point_textinput':'point_show_results','pathstart_textinput':'line_show_results','pathend_textinput':'line_show_results'};
+    var panelId = search_To_funcP[searchId];
+
+    //reset minhop and local or global
+    reset_hops_switcher(panelId);
+
+    d3.select('#'+panelId).style('display','block');
+};
+
 // CSS - search-box control
   function checkTextField(field) {
     if (field.value != '') {
@@ -156,19 +166,23 @@ var clear_button=d3.select('input[name="clear"]');
     });
 
 // main search box setting //
- d3.select("#mainSearchBox input[name='keywords']").on('keydown',function(){
+ d3.selectAll("input#keywords, input#point_textinput").on('keydown',function(){
+  var searchid=this.id;
   if (d3.event.keyCode==13){
-      Handle_Search_Button('keywords');
+      Handle_Search_Button(searchid);
   }else{
       Hide_FuncPanel();
+      Hide_InfoPanel();
   };
 });
+
  d3.selectAll("input#pathstart_textinput, input#pathend_textinput").on('keydown',function(){
   var seachid = this.id;
   if (d3.event.keyCode==13){
       Handle_pathSearchbutton(seachid);
   }else{
       Hide_FuncPanel();
+      Hide_InfoPanel()
   };
 });
 
@@ -177,8 +191,8 @@ var clear_button=d3.select('input[name="clear"]');
 // CSS - Global-local switch control
 d3.selectAll('#switch-1,#switch-2,#switch-3').on('click',function(d){
     Hide_InfoPanel();
-    d3.select(this.parentNode.parentNode).select('.t-global').classed('t-global-toggle',function(d){return !d3.select(this).classed('t-global-toggle');});
-    d3.select(this.parentNode.parentNode).select('.t-local').classed('t-local-toggle',function(d){return !d3.select(this).classed('t-local-toggle');});
+    d3.select(this.parentNode.parentNode.parentNode).select('.t-global').classed('t-global-toggle',function(d){return !d3.select(this).classed('t-global-toggle');});
+    d3.select(this.parentNode.parentNode.parentNode).select('.t-local').classed('t-local-toggle',function(d){return !d3.select(this).classed('t-local-toggle');});
 });
 
 /*$(document).ready(function(){
@@ -205,8 +219,6 @@ function change_exploreMinhop(){
 
 // show func-nav panel
 function show_panel(panelname){
-    //reset minhop and local or global
-    reset_hops_switcher(panelname);
 
     //update search box according to highlighted nodes
     var wid = d3.select('input#keywords').data()[0];
@@ -217,21 +229,29 @@ function show_panel(panelname){
 
     if (panelname == "point"){
         document.getElementById('point_show_results').style.display = "block";
+        //reset minhop and local or global
+        reset_hops_switcher('point_show_results');
+        // update search box
+        d3.select('input#point_textinput').node().value = label;
+        // attach data
+        d3.select('input#point_textinput').data([wid]);
     };
 
-    if (panelname == "line" || panelname == "cluster"){
-        if ( panelname == "line" ){
-            // update search box
-            d3.select('input#pathstart_textinput').node().value = label;
-            d3.select('input#pathend_textinput').node().value='';
-            // attach data
-            d3.select('input#pathstart_textinput').data([wid]);
-            d3.select('input#pathend_textinput').data([null]);
-        };
-    }else{
-        d3.select('input#keywords').node().value = label;
-        d3.select('input#point_textinput').node().value = label;
+
+    if ( panelname == "line" ){
+        // update search box
+        d3.select('input#pathstart_textinput').node().value = label;
+        d3.select('input#pathend_textinput').node().value='';
+        // attach data
+        d3.select('input#pathstart_textinput').data([wid]);
+        d3.select('input#pathend_textinput').data([null]);
     };
+
+    if(panelname == "cluster"){
+        //reset minhop and local or global
+        reset_hops_switcher('cluster');
+    };
+
 }
 
 // show results panel

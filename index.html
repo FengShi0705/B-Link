@@ -46,9 +46,9 @@
           </i>
           <div class="w3-rest w3-display-container" style="margin-right:3px;">
               <input id="point_textinput" class="w3-input w3-border w3-round w3-hover-border-blue" style="height:50px; font-size:20px;"
-                     placeholder="Start Point..." autocomplete="on" onkeyup="checkTextField(this)">
+                     placeholder="Explore Nearby..." autocomplete="on">
               <div id="point_input_search" class="w3-display-topright material-icons w3-xxlarge"
-                   onclick="" style="opacity:0.3;margin-top:8px;cursor:pointer;" >search</div>
+                   onclick="Handle_Search_Button('point_textinput')" style="opacity:0.3;margin-top:8px;cursor:pointer;" >search</div>
           </div>
       </div>
       <div id="point_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:60px;">
@@ -87,9 +87,9 @@
               </i>
               <div class="w3-rest w3-display-container" style="margin-right:3px;">
                   <input id="pathstart_textinput" class="w3-input w3-border w3-round w3-hover-border-blue" style="height:45px;"
-                         placeholder="Start Point..." autocomplete="on" onkeydown="Hide_InfoPanel()" >
+                         placeholder="Start Point..." autocomplete="on" >
                   <input id="pathend_textinput" class="w3-input w3-border w3-round w3-hover-border-blue" style="height:45px;"
-                         placeholder="End   Point..." autocomplete="on" onkeydown="Hide_InfoPanel()">
+                         placeholder="End   Point..." autocomplete="on" >
                   <div id="pathstart_search" class="w3-display-topright material-icons w3-xxlarge"
                        onclick="Handle_pathSearchbutton('pathstart_textinput')" style="opacity:0.3;margin-top:5px;cursor:pointer;" >search</div>
                   <div id="pathend_search" class="w3-display-bottomright material-icons w3-xxlarge"
