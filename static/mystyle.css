@@ -220,19 +220,34 @@ input[name="endpoint"]{
 
 
 div.row p.list{
-    width: 10%;
+    width: 20%;
     float: left;
     margin: 0;
     font-size: 16px;
 }
 
-div.row div.content{
-    width: 90%;
+div.row p.infoHead{
+    width: 80%;
     float: left;
-    padding: 0px;
-    font-size: 12px;
+    margin: 0;
+    font-size: 16px;
     font-family:arial;
-    line-height: 150%;
+    text-align: left;
+    /*line-height: 150%;*/
+}
+
+
+div.row p.infoDetail{
+    width: 80%;
+    clear: left;
+    float: right;
+    margin: 0;
+    font-size: 14px;
+    color : #839192;
+    font-family:arial;
+    text-align: left;
+    padding-top:5px;
+    /*line-height: 150%;*/
 }
 
 div.info-display div.row{
