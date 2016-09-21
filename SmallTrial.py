@@ -165,7 +165,45 @@ def test_clusterPaths():
 
 
 
+def test_normalizedCluster():
+    G = nx.Graph()
+    G.add_edge('a','b',weight=1.0)
+    G.add_edge('a', 'd', weight=2.0)
+    G.add_edge('a', 'c', weight=3.0)
+    G.add_edge('b', 'd', weight=4.0)
+    G.add_edge('b', 'c', weight=5.0)
+    G.add_edge('c', 'e', weight=6.0)
+    G.add_node('f')
 
+    G1 = nx.Graph()
+    G1.add_edge('a', 'b', weight=2)
+    G1.add_edge('a', 'c', weight=1)
+    G1.add_edge('b', 'c', weight=1)
+    G1.add_node('d')
+
+    R = Retrievor.UndirectedG(G, 'fortest')
+
+    print 'For connected graph, cutgraph_sp:'
+    for k in [1,2,3,4,5]:
+        clusters = R.cutgraph_sp(['a','b','c','d','e'], k)
+        print clusters
+
+    print 'For connected graph, cutgraph_fr:'
+    for k in [1, 2, 3, 4]:
+        clusters = R.cutgraph_fr(['a', 'b', 'c', 'd', 'e'], k)
+        print clusters
+
+    print 'For whole graph, cutgraph_sp:'
+    for k in [1, 2, 3, 4, 5, 6]:
+        clusters = R.cutgraph_sp(['a', 'b', 'c', 'd', 'e','f'], k)
+        print clusters
+
+    print 'For whole graph, cutgraph_fr:'
+    for k in [1, 2, 3, 4, 5]:
+        clusters = R.cutgraph_fr(['a', 'b', 'c', 'd', 'e', 'f'], k)
+        print clusters
+
+    return
 
 
 

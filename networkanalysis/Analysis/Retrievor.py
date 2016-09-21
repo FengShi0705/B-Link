@@ -219,27 +219,15 @@ class UndirectedG(object):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def cut_connectedgraph(self,nodes,k,weight='weight',algorithm='normalized'):
+    def cutgraph_sp(self,nodes,k,weight='weight',algorithm='normalized'):
         """
         applying clustering on the subgraph consisting of the input nodes
+        This method may be slower that 'cutgraph_fr',
+        but it doesn't have the problem of 'cutgraph_fr' when the graph is unconnected.
 
         Paramters
         ----------
-        nodes: a list of node to be clustered. The subgraph projected by the nodes should be connected.
+        nodes: a list of node to be clustered. The subgraph projected by the nodes can be connected or unconnected.
 
         k: the number of clusters to be generated
 
@@ -247,13 +235,90 @@ class UndirectedG(object):
                 Here the weight can be the original frequence that two words appear together.
 
         algorithm: {'normalized', 'modularity'}, default to 'normalized'
+                   The performance of 'modularity' is NOT good.
 
         Return
         ----------
         clusters: array of lists. Each list contains the nodes of a cluster
         """
         G = self.G.subgraph(nodes)
-        assert nx.is_connected(G)==True, "graph is not connected"
+
+        A = nx.adjacency_matrix(G, weight=weight)
+
+        if algorithm=="normalized":
+            Ls, dd = graph_laplacian(A, normed=True, return_diag=True)
+            eigenvalue_n, eigenvector_n = np.linalg.eigh(Ls.toarray())
+            n_nodes=len(nodes)
+            eigenvector_n[:,0] = np.full( n_nodes , 1.0/math.sqrt(n_nodes) ) # eigenvector for eigenvalue zero
+            #select the smallest k eigenvector
+            eigenvector_n = eigenvector_n[:,0:k]
+
+
+        elif algorithm=="modularity":
+            tr = np.sum(A)
+            d = np.sum(A,axis=1)
+            Q = ( A - (d*d.T)/tr ) /tr
+            eigenvalue_n, eigenvector_n = np.linalg.eigh(Q)
+            for i,vl in enumerate(eigenvalue_n):
+                if vl > 1e-10:
+                    eigenvector_n = eigenvector_n[:,i:]
+                    break
+
+        else:
+            raise TypeError, "unrecognized algorithm: {}".format(algorithm)
+
+        # normalize row vector
+        for i, v in enumerate(eigenvector_n):
+            eigenvector_n[i] = v / float(np.linalg.norm(v))
+
+        _, labels, _ = k_means(eigenvector_n, k, random_state=None,
+                               n_init=10)
+
+        dic_clusters={}
+        for index,n in enumerate(G.nodes()):
+            dic_clusters.setdefault(labels[index],list()).append(n)
+
+        clusters=dic_clusters.values()
+
+        return clusters
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def cutgraph_fr(self,nodes,k,weight='weight',algorithm='normalized'):
+        """
+        applying clustering on the subgraph consisting of the input nodes
+        This method may be faster than 'cutgraph_sp',
+        but the result may not be precise when the graph is not connected and k is more than N-M,
+        where N is the number of nodes and M is the number of connected components.
+
+        Paramters
+        ----------
+        nodes: a list of node to be clustered. The subgraph projected by the nodes can be connected or unconnected.
+
+        k: the number of clusters to be generated
+
+        weight: is the kernal value between two nodes. Higher kernal value means the two nodes are more similar and closer.
+                Here the weight can be the original frequence that two words appear together.
+
+        algorithm: {'normalized', 'modularity'}, default to 'normalized'
+                   The performance of 'modularity' is NOT good.
+
+        Return
+        ----------
+        clusters: array of lists. Each list contains the nodes of a cluster
+        """
+        G = self.G.subgraph(nodes)
+        #assert nx.is_connected(G)==True, "graph is not connected"
         A = nx.adjacency_matrix(G, weight=weight)
 
         if algorithm=="normalized":
