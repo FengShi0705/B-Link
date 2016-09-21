@@ -267,7 +267,7 @@ function show_info(panelname){
         FindPath_showResult();
     }
     else if (panelname == "cluster"){
-        document.getElementById("info_panel").style.top ="363px";
+        document.getElementById("info_panel").style.top ="347px";
     };
     document.getElementById("info_panel").style.display = "block";
 
@@ -279,6 +279,29 @@ function closePanel(panelname){
     Hide_FuncPanel();
     document.getElementById("mainSearchBox").style.display = "block";
     document.getElementById(panelname).style.display = "none";
+}
+
+// show the selected cluster setting option
+function clusterSettingOption(){
+    var option = document.getElementById("clusterMethod").value;
+    if(option == "method1"){
+        document.getElementById("clusterMethod1Setting").style.display = 'block';
+        document.getElementById("clusterMethod2Setting").style.display = 'none';
+    }
+    else if(option == "method2"){
+    document.getElementById("clusterMethod1Setting").style.display = 'none';
+    document.getElementById("clusterMethod2Setting").style.display = 'block';
+    };
+}
+// go back to cluster level 1 page
+function backClusterLevel1(){
+    document.getElementById("cluster_level_1").style.display = "block"
+    document.getElementById("cluster_level_2").style.display = "none";
+}
+// go to cluster level 2 page
+function showClusterLevel2(){
+    document.getElementById("cluster_level_1").style.display = "none";
+    document.getElementById("cluster_level_2").style.display = "block";
 }
 
 // cluster input box control
