@@ -31,8 +31,12 @@ class UndirectedG(object):
     # return ids list of input words
     # Inputs is a list of words
     def input_ids(self,ipts):
+        try:
+            ipwids = PF.find_id(ipts, self.cursor)
+        except:
+            self.cnx, self.cursor = PF.creatCursor(self.schema, 'R')
 
-        ipwids=PF.find_id(ipts,self.cursor)
+        ipwids = PF.find_id(ipts, self.cursor)
         ipwids=list(set(ipwids))
         for n in ipwids:
             print n, self.G.node[n]['label']
@@ -239,6 +243,9 @@ class UndirectedG(object):
 
         k: the number of clusters to be generated
 
+        weight: is the kernal value between two nodes. Higher kernal value means the two nodes are more similar and closer.
+                Here the weight can be the original frequence that two words appear together.
+
         algorithm: {'normalized', 'modularity'}, default to 'normalized'
 
         Return
@@ -295,6 +302,9 @@ class UndirectedG(object):
         :param nodes: a list of node to be clustered.
 
         :param r: inflation factor
+
+        :param weight: is the kernal value between two nodes. Higher kernal value means the two nodes are more similar and closer.
+                Here the weight can be the original frequence that two words appear together.
 
         :return M: the convergent matrix
 

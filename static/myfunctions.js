@@ -414,10 +414,32 @@ function update_informationPanel(paths,position){
                        .text(function(d,i){
                            return parseInt(i)+position;
                        });
-    inforow.append('div').attr('class','content')
+
+    if ( d3.select('#point_show_results').style('display')=="block" ){
+        inforow.append('p').attr('class','infoHead')
+                         .text(function(d,i){
+                             return d.labels.slice(-1)[0];
+                         });
+        inforow.append('p').attr('class','infoDetail')
                          .text(function(d,i){
                              return d.labels.join(' --> ');
                          });
+    }else{
+        var pathinfo = inforow.append('p').attr('class','infoHead');
+        pathinfo.append('span').text(function(d){return d.labels[0];});
+        pathinfo.append('span').style('color','#839192').style('font-size', '14px')
+                .text(function(d){
+                    if ( d.labels.slice(1,-1).length==0 ){
+                        return ' --> ';
+                    }else{
+                        return ' --> '+d.labels.slice(1,-1).join(' --> ')+' --> ';
+                    };
+                });
+
+        pathinfo.append('span').text(function(d){return d.labels.slice(-1)[0];});
+
+    };
+
 
     //information clickable
     d3.select('div#info_panel div.info-display').selectAll('div.row').on('click',function(d,i){

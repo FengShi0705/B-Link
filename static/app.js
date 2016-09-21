@@ -33,13 +33,15 @@ function Handle_Search_Button(searchbutton_id){
     d3.json('/texttowid/'+get_inputtext(searchbutton_id),function(error,data){
         if (data){
             var zh_nodes=[data];
-            d3.select('input#keywords').data([data]);
+            d3.select('input#' + searchbutton_id ).data([data]);
             updateGraph_searchButton(data,zh_nodes);
+
+            Show_FuncPanel(searchbutton_id);
         }else{
             alert('Can not match your input concepts');
         };
     });
-    document.getElementById("func-nav").style.display = "block";
+
 };
 
 // handle search button of path
@@ -56,13 +58,15 @@ function Handle_pathSearchbutton(searchbutton_id){
                      var node2=data;
                      var selector2='input#'+theother_id;
                      d3.select(selector2).data([node2]);
-
                      var zh_nodes=[node1,node2];
-                     updateGraph_searchButton(node1,zh_nodes);
+
+                     if( _.contains(CLIENT_NODES_ids,node2) && node1!=node2 ){
+                         Show_FuncPanel(searchbutton_id);
+                     };
                  }else{
                      var zh_nodes=[node1];
-                     updateGraph_searchButton(node1,zh_nodes);
                  };
+                 updateGraph_searchButton(node1,zh_nodes);
              });
          }else{
              alert('Can not match your input concepts');
@@ -72,12 +76,12 @@ function Handle_pathSearchbutton(searchbutton_id){
 
 //Explore show results
 function Explore_showResult(){
-        var query = d3.select('input#keywords').data()[0];
+        var query = d3.select('input#point_textinput').data()[0];
         var label = NODE_IdToObj(query).label;
         var minhops = get_minhops('minhop_point');
         Explore_Nearby(check_explore_LG('switch-1'),true,minhops,N_SearchButton,query,query);
         //update input search box
-        d3.select('input[name="keywords"]').node().value = label;
+        d3.select('input#point_textinput').node().value = label;
         //onclick next and previous
         d3.select('#info_panel #pageup').on('click', Explore_Previous);
         d3.select('#info_panel #pagedown').on('click', Explore_Next);
@@ -85,14 +89,14 @@ function Explore_showResult(){
 
 //Explore next handler OK
 function Explore_Next(){
-    var query = d3.select('input#keywords').data()[0];
+    var query = d3.select('input#point_textinput').data()[0];
     var minhops = get_minhops('minhop_point');
     Explore_Nearby(check_explore_LG('switch-1'),false,minhops,N_SearchButton,query,query);
 };
 
 //Explore previous handler OK
 function Explore_Previous(){
-    var query = d3.select('input#keywords').data()[0];
+    var query = d3.select('input#point_textinput').data()[0];
     var minhops = get_minhops('minhop_point');
     Explore_Nearby(check_explore_LG('switch-1'), false, minhops, -N_SearchButton, query, query);
 };
@@ -146,7 +150,7 @@ function node_right_click_on(){
 // node left click behavior
 function node_left_click_on(){
       GRAPH.selectAll('.gnode').on('mouseover',function(){
-          d3.selectAll('input#keywords,input#pathstart_textinput,input#pathend_textinput').each(function(d){this.blur();});
+          d3.selectAll('input#keywords,input#point_textinput,input#pathstart_textinput,input#pathend_textinput').each(function(d){this.blur();});
       });
 
       GRAPH.selectAll('.gnode').on('click',function(d){
@@ -174,17 +178,20 @@ function node_left_click_on(){
                     .filter(function(d){return d!=preNode;})
                     .data([clicked_data.wid]) //data attach
                     .each(function(d){this.value = clicked_data.label;});
-
+                  Show_FuncPanel('pathstart_textinput');
               };
 
           }else{
               // highlight the clicked node
               var highlights = {'nodes':[d.wid],'paths':[],'paths1':[]};
               highlight_nodespaths(highlights);
+
+              if(d3.select('#point').style('display')=='block'){ var searchid='point_textinput';}
+              if(d3.select('#mainSearchBox').style('display')=='block'){ var searchid='keywords';};
               //update inputbox
-              d3.select('input[name="keywords"]').node().value = d.label;
+              d3.select('input#'+searchid).node().value = d.label;
               //attach data
-              d3.select('input[name="keywords"]').data([d.wid]);
+              d3.select('input#'+searchid).data([d.wid]);
           };
    });
 };
