@@ -407,7 +407,10 @@ class UndirectedG(object):
 
         G=self.G.subgraph(nodes)
         A = nx.adjacency_matrix(G, weight=weight).todense()
+
+        # use np.fill_diagonal(A, 2*np.sum(A, axis=1) + 1.0) if you want to quickly divde smaller clusters
         np.fill_diagonal(A, np.sum(A, axis=1) + 1.0)
+
         M=normalize_matrix(A)
 
         while True:

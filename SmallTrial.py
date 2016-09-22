@@ -183,7 +183,7 @@ def test_normalizedCluster():
 
     R = Retrievor.UndirectedG(G, 'fortest')
 
-    print 'For connected graph, cutgraph_sp:'
+    """print 'For connected graph, cutgraph_sp:'
     for k in [1,2,3,4,5]:
         clusters = R.cutgraph_sp(['a','b','c','d','e'], k)
         print clusters
@@ -201,7 +201,12 @@ def test_normalizedCluster():
     print 'For whole graph, cutgraph_fr:'
     for k in [1, 2, 3, 4, 5]:
         clusters = R.cutgraph_fr(['a', 'b', 'c', 'd', 'e', 'f'], k)
-        print clusters
+        print clusters"""
+
+    print 'mcl'
+    for r in np.linspace(1,10,num=91):
+        M,clusters = R.mcl_cluster(['a','b','c','d','e','f'],r)
+        print r,':',clusters
 
     return
 
