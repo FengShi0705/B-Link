@@ -284,11 +284,11 @@ function closePanel(panelname){
 // show the selected cluster setting option
 function clusterSettingOption(){
     var option = document.getElementById("clusterMethod").value;
-    if(option == "method1"){
+    if(option == "normalized"){
         document.getElementById("clusterMethod1Setting").style.display = 'block';
         document.getElementById("clusterMethod2Setting").style.display = 'none';
     }
-    else if(option == "method2"){
+    else if(option == "mcl"){
     document.getElementById("clusterMethod1Setting").style.display = 'none';
     document.getElementById("clusterMethod2Setting").style.display = 'block';
     };

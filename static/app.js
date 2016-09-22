@@ -181,7 +181,7 @@ function node_left_click_on(){
                   Show_FuncPanel('pathstart_textinput');
               };
 
-          }else{
+          }else if( d3.select('#point').style('display')=='block' || d3.select('#mainSearchBox').style('display')=='block' ){
               // highlight the clicked node
               var highlights = {'nodes':[d.wid],'paths':[],'paths1':[]};
               highlight_nodespaths(highlights);

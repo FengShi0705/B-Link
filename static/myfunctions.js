@@ -384,15 +384,18 @@ function generator_update_graphAndPanel(info,bornplace,queries){
 
         var hlpath=[];
         var hlpath1 = [];
+        var hlA = [];
         var z_nodes =queries.slice();
         data.paths.forEach(function(d,i){
-            /*if (i==0){ hlpath.push(d.ids); }
-            else{ hlpath1.push(d.ids); };*/
-            hlpath1.push(d.ids)
-            z_nodes= _.union(z_nodes,d.ids);
+            if (i==0){
+                hlpath.push(d.ids);
+                hlA = [d.ids[0], d.ids[d.ids.length-1]];
+            }else{ hlpath1.push(d.ids); };
+            //hlpath1.push(d.ids)
+            z_nodes = _.union(z_nodes,d.ids);
         });
 
-        var highlights={'nodes':queries,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
+        var highlights={'nodes':hlA,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
         highlight_nodespaths(highlights);
         ZoomToNodes(z_nodes); // zoom to the node
         //update the information panel here
@@ -409,7 +412,13 @@ function update_informationPanel(paths,position){
                     .data(paths)
                     .enter()
                     .append('div')
-                    .attr('class','row');
+                    .attr('class',function(d,i){
+                        if( i==0 ){
+                            return 'row clicked';
+                        }else{
+                            return 'row';
+                        };
+                    });
     inforow.append('p').attr('class','list')
                        .text(function(d,i){
                            return parseInt(i)+position;
@@ -443,8 +452,8 @@ function update_informationPanel(paths,position){
 
     //information clickable
     d3.select('div#info_panel div.info-display').selectAll('div.row').on('click',function(d,i){
-        d3.selectAll('div.row').style('background-color','white');
-        d3.select(this).style('background-color','#F2F3F4');
+        d3.selectAll('div.row').classed('clicked',false);
+        d3.select(this).classed('clicked',true);
         var hltP1=[];
         paths.forEach(function(p,pi){
             if(pi!=i){

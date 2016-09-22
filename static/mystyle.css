@@ -254,13 +254,19 @@ div.info-display div.row{
     padding-bottom:10px;
     clear: both;
     border-bottom:2px solid #9ed1fa;
-}
-
-.info-display .row:hover{
-    border:2px solid #9ed1fa;
-    box-shadow:0px 2px 10px 0 #86c5f9,0px 2px 20px 0 #86c5f9;
     cursor:pointer;
 }
+
+.info-display .row.clicked{
+    border:2px solid #9ed1fa;
+    box-shadow:0px 2px 10px 0 #86c5f9,0px 2px 20px 0 #86c5f9;
+}
+
+/*.info-display .row:hover{
+    border:2px solid #9ed1fa;
+    box-shadow:0px 2px 10px 0 #86c5f9,0px 2px 20px 0 #86c5f9;
+
+}*/
 
 div.info-display div.row:after {
     content: "";

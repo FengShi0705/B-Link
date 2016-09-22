@@ -214,6 +214,28 @@ class UndirectedG(object):
 
 
 
+    def sort_clustersCentrality(self,clusters,distance):
+        """
+        This method sorts the nodes of each clusters based on their centrality in descending.
+        The first node in the list has highest centrality.
+
+        This method uses closeness centrality. But if possible, we can try other centrality such as betweenness, eigenvector,
+        degree, or eccentricity, etc.
+
+        :param clusters: array of lists. Each list contains the nodes of a cluster
+        :param distance: distance is the edge attribute as the distance
+        :return: array of lists. Each list is a cluster sorted by centrality.
+        """
+        def sort_oneCluster(cluster,distance):
+            G = self.G.subgraph(cluster)
+            centrality =[ nx.closeness_centrality(G,u=n,distance=distance) for n in cluster ]
+            sortcluster = [y for (x,y) in sorted(zip(centrality,cluster),reverse=True)]
+            return sortcluster
+
+        clusters = [sort_oneCluster(cluster,distance) for cluster in clusters]
+
+        return  clusters
+
 
 
 
