@@ -195,7 +195,6 @@ input[name="endpoint"]{
   cursor:pointer;
 }
 
-
 /* info display panel */
 #info_panel{
     position:fixed;
@@ -254,7 +253,13 @@ div.info-display div.row{
     padding-top:10px;
     padding-bottom:10px;
     clear: both;
-    border-bottom:2px solid #b3b3b3;
+    border-bottom:2px solid #9ed1fa;
+}
+
+.info-display .row:hover{
+    border:2px solid #9ed1fa;
+    box-shadow:0px 2px 10px 0 #86c5f9,0px 2px 20px 0 #86c5f9;
+    cursor:pointer;
 }
 
 div.info-display div.row:after {
@@ -269,7 +274,6 @@ div.info-display div.row:after {
     left:25px;
     width:300px;
 }
-
 
 
 

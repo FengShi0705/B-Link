@@ -177,7 +177,7 @@ input[type=checkbox].w3-check:disabled+.w3-validate,input[type=radio].w3-radio:d
 .w3-xlarge{font-size:24px!important}.w3-xxlarge{font-size:36px!important}
 .w3-xxxlarge{font-size:48px!important}.w3-jumbo{font-size:64px!important}
 .w3-vertical{word-break:break-all;line-height:1;text-align:center;width:0.6em}
-.w3-left-align{text-align:left!important}.w3-right-align{text-align:right!important}
+.w3-left-align{text-align:left!important}.w3-right-align{text-align:right!important}.w3-center-align{text-align:center!important}
 .w3-justify{text-align:justify!important}.w3-center{text-align:center!important}
 .w3-display-topleft{position:absolute;left:0;top:0}.w3-display-topright{position:absolute;right:0;top:0}
 .w3-display-bottomleft{position:absolute;left:0;bottom:0}.w3-display-bottomright{position:absolute;right:0;bottom:0}
