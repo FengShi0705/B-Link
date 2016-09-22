@@ -78,7 +78,24 @@ def findnear(info):
 
 
 
+# Generate clusters based on current nodes
+@app.route('/generateClusters/<info>')
+def generateClusters(info):
+    info = json.loads(info)
+    nodes = info['nodes']
+    method = info['method']
+    weight = info['weight']
+    if method=='normalized':
+        k = info['k']
+        clusters = myRtr.cutgraph_fr(nodes,k,weight=weight)
+    elif method=='mcl':
+        r = info['r']
+        M, clusters = myRtr.mcl_cluster(nodes,r,weight=weight)
+    else:
+        raise TypeError('unknown clustering method')
 
+    response = json.dumps(clusters)
+    return make_response(response)
 
 
 
