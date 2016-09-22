@@ -217,7 +217,7 @@ class UndirectedG(object):
     def sort_clustersCentrality(self,clusters,distance):
         """
         This method sorts the nodes of each clusters based on their centrality in descending.
-        The first node in the list has highest centrality.
+        The first node in each list has highest centrality.
 
         This method uses closeness centrality. But if possible, we can try other centrality such as betweenness, eigenvector,
         degree, or eccentricity, etc.

@@ -211,6 +211,25 @@ def test_normalizedCluster():
     return
 
 
+def test_clustersCentrality():
+    G = nx.Graph()
+    G.add_edge('a', 'b', Fw = 2.047)
+    G.add_edge('a', 'd', Fw=1.099)
+    G.add_edge('a', 'c', Fw=1.117)
+    G.add_edge('b', 'd', Fw=0.661)
+    G.add_edge('b', 'c', Fw=0.861)
+    G.add_edge('c', 'e', Fw=0.424)
+    G.add_node('f')
+
+    R = Retrievor.UndirectedG(G, 'fortest')
+
+    print 'For whole graph, cutgraph_sp:'
+    for k in [1, 2, 3, 4, 5]:
+        clusters = R.cutgraph_sp(['a', 'b', 'c', 'd', 'e'], k)
+        clusters = R.sort_clustersCentrality(clusters,'Fw')
+        print clusters
+
+    return
 
 
 
