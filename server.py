@@ -87,13 +87,22 @@ def generateClusters(info):
     weight = info['weight']
     if method=='normalized':
         k = info['k']
-        clusters = myRtr.cutgraph_fr(nodes,k,weight=weight)
+        N = len(nodes)
+        sG = myRtr.G.subgraph(nodes)
+        M = nx.number_connected_components(sG)
+        if k>(N-M):
+            clusters = myRtr.cutgraph_sp(nodes,k,weight=weight)
+        else:
+            clusters = myRtr.cutgraph_fr(nodes,k,weight=weight)
     elif method=='mcl':
         r = info['r']
         M, clusters = myRtr.mcl_cluster(nodes,r,weight=weight)
     else:
         raise TypeError('unknown clustering method')
 
+    #sort clusters by centrality
+    distance = info['distance']
+    clusters = myRtr.sort_clustersCentrality(clusters,distance)
     response = json.dumps(clusters)
     return make_response(response)
 

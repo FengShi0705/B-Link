@@ -371,6 +371,32 @@ function Explore_Nearby(LorG,start,minhops,N,query,born){
 };
 
 
+
+
+//find paths between two nodes
+function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
+    if ( LorG=="local" ){
+        var subparameters = {"source":node1,"target":node2,"tp":Type_distance, "minhops":minhops, "localnodes":CLIENT_NODES_ids};
+        var parameters = {"N":N, "parameters":subparameters, "generator":'find_paths', "start":start};
+        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
+    }else{
+        var subparameters = {"source":node1,"target":node2,"tp":Type_distance,"minhops":minhops,"localnodes":null};
+        var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
+        var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+    };
+    // calculate bornplace
+    assert( _.contains(CLIENT_NODES_ids,node1) && _.contains(CLIENT_NODES_ids,node2) , 'path ends do not exist!');
+    assert ( node1!=node2, 'start and end node should not be the same node!'  )
+    var bornnode1=CLIENT_NODES.filter(function(obj){return obj["wid"]==node1;})[0];
+    var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==node2;})[0];
+    var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
+
+    generator_update_graphAndPanel(info, bornplace, [node1,node2]);
+};
+
+
+
+
 // Access generator url, update force graph and information panel
 // info for the generator server
 // bornplace is the x,y,vx,vy for the newly added nodes
@@ -467,26 +493,64 @@ function update_informationPanel(paths,position){
 };
 
 
-
-
-
-//find paths between two nodes
-function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
-    if ( LorG=="local" ){
-        var subparameters = {"source":node1,"target":node2,"tp":Type_distance, "minhops":minhops, "localnodes":CLIENT_NODES_ids};
-        var parameters = {"N":N, "parameters":subparameters, "generator":'find_paths', "start":start};
-        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
+// get the setting for cluster algorithm
+function get_clusterSetting(){
+    if( d3.select("#clusterMethod").node().value=='normalized'){
+        var method = 'normalized';
+        var parameter = parseInt( d3.select('div#clusterMethod1Setting input').node().value );
     }else{
-        var subparameters = {"source":node1,"target":node2,"tp":Type_distance,"minhops":minhops,"localnodes":null};
-        var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
-        var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+        var method = 'mcl';
+        var parameter = parseInt( d3.select('div#clusterMethod2Setting input').node().value );
     };
-    // calculate bornplace
-    assert( _.contains(CLIENT_NODES_ids,node1) && _.contains(CLIENT_NODES_ids,node2) , 'path ends do not exist!');
-    assert ( node1!=node2, 'start and end node should not be the same node!'  )
-    var bornnode1=CLIENT_NODES.filter(function(obj){return obj["wid"]==node1;})[0];
-    var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==node2;})[0];
-    var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
+    return [method,parameter];
+};
 
-    generator_update_graphAndPanel(info, bornplace, [node1,node2]);
+//generate clusters
+function generate_Clusters(){
+    var setting = get_clusterSetting();
+    if (setting[0] == 'normalized'){
+        var info = {'nodes':CLIENT_NODES_ids,'method':'normalized','weight':Kernal_Weight,'k':setting[1],'distance':Type_distance }
+    }else{
+        var info = {'nodes':CLIENT_NODES_ids,'method':'mcl','weight':Kernal_Weight,'r':setting[1],'distance':Type_distance }
+    };
+    d3.json('/generateClusters/'+JSON.stringify(info),function(error,data){
+        var clusters = data
+        //---------Coler_Cluster!!!!!!!!!!!!!!
+        Colorized_Clusters(clusters);
+    });
+
+};
+
+// Colorized Clusters
+function Colorized_Clusters(clusters){
+    var n_clusters = clusters.length
+    // not more than 10 clusters
+    if (n_clusters<=10) {
+        var scaleColor_h = d3.scaleLinear().domain([0,9]).range([0,324]);
+        var colorh=[];
+        for (var i=0;i<=9;i++){
+            colorh.push(scaleColor_h(i));
+        };
+        colorh = _.shuffle(colorh)
+        colorh = colorh.slice(0,n_clusters)
+    } else {
+        var scaleColor_h = d3.scaleLinear().domain([0,n_clusters-1]).range([0,324]);
+        var colorh=[];
+        for (var i=0;i<=n_clusters-1;i++){
+            colorh.push(scaleColor_h(i));
+        };
+    };
+
+    d3.selectAll('.gnode circle').each(function(d){
+        for (var i=0;i<=n_clusters-1;i++){
+            var cluster = clusters[i];
+            var j = cluster.indexOf(d.wid);
+            if ( j>=0 ){
+                //var scaleColor_s = d3.scaleLinear().domain( [0, cluster.length-1] ).range([0.5,1.0]);
+                d3.select(this).style('fill',d3.hsl( colorh[i], 1 ,0.5 )).classed('hltA',false);
+                break;
+            };
+        };
+    });
+
 };

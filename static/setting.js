@@ -42,6 +42,7 @@ var HltNodesNumber=20;
 var POSITIONFORCE_STRENGTH=0.8;
 var N_SearchButton=3;
 var Type_distance = 'Fw';
+var Kernal_Weight = 'weight';
 var N_ExploreFunctionpanel=20;
 var HltPathColor = '#FF6800';
 var NodeColor = '#3498DB';
@@ -302,6 +303,7 @@ function backClusterLevel1(){
 function showClusterLevel2(){
     document.getElementById("cluster_level_1").style.display = "none";
     document.getElementById("cluster_level_2").style.display = "block";
+    generate_Clusters();
 }
 
 // cluster input box control
