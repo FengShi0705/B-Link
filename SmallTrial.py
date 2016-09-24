@@ -173,40 +173,92 @@ def test_normalizedCluster():
     G.add_edge('b', 'd', weight=4.0)
     G.add_edge('b', 'c', weight=5.0)
     G.add_edge('c', 'e', weight=6.0)
-    G.add_node('f')
+    G.add_edge('f','g',weight = 5.0)
+    G.add_edge('h', 'g', weight=1.0)
+    G.add_edge('h', 'f', weight=1.0)
 
-    G1 = nx.Graph()
-    G1.add_edge('a', 'b', weight=2)
-    G1.add_edge('a', 'c', weight=1)
-    G1.add_edge('b', 'c', weight=1)
-    G1.add_node('d')
+
+    """G.add_edge(1, 2, weight=1.0)
+    G.add_edge(1, 4, weight=2.0)
+    G.add_edge(1, 3, weight=3.0)
+    G.add_edge(2, 4, weight=4.0)
+    G.add_edge(2, 3, weight=5.0)
+    G.add_edge(3, 5, weight=6.0)
+    G.add_node(6)
+    G.add_node(7)
+    G.add_node(8)
+    G.add_edge(6, 7, weight=5.0)
+    G.add_edge(8, 6, weight=1.0)
+    G.add_edge(8, 7, weight=1.0)"""
+
+    #G1 = nx.Graph()
+    #G1.add_edge('a', 'b', weight=2)
+    #G1.add_edge('a', 'c', weight=1)
+    #G1.add_edge('b', 'c', weight=1)
+    #G1.add_node('d')
 
     R = Retrievor.UndirectedG(G, 'fortest')
 
-    print 'For connected graph, cutgraph_sp:'
+    """print 'For connected graph, cutgraph_sp:'
     for k in [1,2,3,4,5]:
-        clusters = R.cutgraph_sp(['a','b','c','d','e'], k)
+        clusters = R.cutgraph_sp([1,2,3,4,5], k)
         print clusters
 
     print 'For connected graph, cutgraph_fr:'
     for k in [1, 2, 3, 4]:
-        clusters = R.cutgraph_fr(['a', 'b', 'c', 'd', 'e'], k)
+        clusters = R.cutgraph_fr([1,2,3,4,5], k)
         print clusters
 
     print 'For whole graph, cutgraph_sp:'
     for k in [1, 2, 3, 4, 5, 6]:
-        clusters = R.cutgraph_sp(['a', 'b', 'c', 'd', 'e','f'], k)
+        clusters = R.cutgraph_sp([1,2,3,4,5,6], k)
+        print clusters"""
+
+    """print 'fr, 5 nodes'
+    for k in [1, 2, 3, 4]:
+        clusters = R.cutgraph_fr([1,2,3,4,5], k)
         print clusters
 
-    print 'For whole graph, cutgraph_fr:'
+    print 'fr, 6 nodes'
     for k in [1, 2, 3, 4, 5]:
-        clusters = R.cutgraph_fr(['a', 'b', 'c', 'd', 'e', 'f'], k)
+        clusters = R.cutgraph_fr([1, 2, 3, 4, 5,6], k)
         print clusters
 
-    """print 'mcl'
-    for r in np.linspace(1,10,num=91):
-        M,clusters = R.mcl_cluster(['a','b','c','d','e','f'],r)
-        print r,':',clusters"""
+    print 'fr, 7 nodes'
+    for k in [1, 2, 3, 4, 5,6]:
+        clusters = R.cutgraph_fr([1, 2, 3, 4, 5,6,7], k)
+        print clusters
+
+    print 'fr, 8 nodes'
+    for k in [1, 2, 3, 4, 5,6,7]:
+        clusters = R.cutgraph_fr([1, 2, 3, 4, 5,6,7,8], k)
+        print clusters"""
+
+    print '5 nodes'
+    for k in [1, 2, 3, 4]:
+        clusters = R.cutgraph(['a', 'b', 'c', 'd', 'e'], k)
+        print clusters
+
+    print ' 6 nodes'
+    for k in [1, 2, 3, 4, 5]:
+        clusters = R.cutgraph(['a', 'b', 'c', 'd', 'e','f'], k)
+        print clusters
+
+    print '7 nodes'
+    for k in [1, 2, 3, 4, 5, 6]:
+        clusters = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g'], k)
+        print clusters
+
+    print ' 8 nodes'
+    for k in [1, 2, 3, 4, 5, 6, 7]:
+        clusters = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g','h'], k)
+        print clusters
+
+
+    print 'mcl'
+    for r in np.linspace(1,15,num=45):
+        M,clusters = R.mcl_cluster(['a','b','c','d','e','f','g','h'],r)
+        print r,':',clusters
 
     return
 
@@ -232,7 +284,15 @@ def test_clustersCentrality():
     return
 
 
+def see_variable():
+    a=[1]
+    def haha():
+        b=a[0]
 
+
+
+    haha()
+    return a
 
 
 

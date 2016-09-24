@@ -526,18 +526,14 @@ function Colorized_Clusters(clusters){
     var n_clusters = clusters.length
     // not more than 10 clusters
     if (n_clusters<=10) {
-        var scaleColor_h = d3.scaleLinear().domain([0,9]).range([0,324]);
-        var colorh=[];
-        for (var i=0;i<=9;i++){
-            colorh.push(scaleColor_h(i));
-        };
-        colorh = _.shuffle(colorh)
-        colorh = colorh.slice(0,n_clusters)
+        var colors=d3.schemeCategory10;
+        colors = _.shuffle(colors)
+        colors = colors.slice(0,n_clusters)
     } else {
         var scaleColor_h = d3.scaleLinear().domain([0,n_clusters-1]).range([0,324]);
-        var colorh=[];
+        var colors=[];
         for (var i=0;i<=n_clusters-1;i++){
-            colorh.push(scaleColor_h(i));
+            colors.push( d3.hsl( scaleColor_h(i), 1 , 0.5 ) );
         };
     };
 
@@ -547,7 +543,7 @@ function Colorized_Clusters(clusters){
             var j = cluster.indexOf(d.wid);
             if ( j>=0 ){
                 //var scaleColor_s = d3.scaleLinear().domain( [0, cluster.length-1] ).range([0.5,1.0]);
-                d3.select(this).style('fill',d3.hsl( colorh[i], 1 ,0.5 )).classed('hltA',false);
+                d3.select(this).style('fill', colors[i] ).classed('hltA',false);
                 break;
             };
         };
