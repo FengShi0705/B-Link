@@ -498,6 +498,11 @@ function get_clusterSetting(){
     if( d3.select("#clusterMethod").node().value=='normalized'){
         var method = 'normalized';
         var parameter = parseInt( d3.select('div#clusterMethod1Setting input').node().value );
+        // if the number of clusters is too large
+        if ( parameter>= CLIENT_NODES_ids.length ){
+            parameter = CLIENT_NODES_ids.length-1;
+            d3.select('div#clusterMethod1Setting input').node().value = CLIENT_NODES_ids.length-1;
+        };
     }else{
         var method = 'mcl';
         var parameter = parseInt( d3.select('div#clusterMethod2Setting input').node().value );
@@ -516,7 +521,35 @@ function generate_Clusters(){
     d3.json('/generateClusters/'+JSON.stringify(info),function(error,data){
         var clusters = data
         //---------Coler_Cluster!!!!!!!!!!!!!!
-        Colorized_Clusters(clusters);
+        var colors = Colorized_Clusters(clusters);
+        // show the number of clusters!!!!
+        d3.select('#cluster_level_2').select('#numberOfClusters h4').text(function(){
+            return 'Get '+clusters.length+' Clusters!';
+        });
+        // set options
+        var options = d3.select('#findPath').selectAll('select')
+                                            .selectAll('option.optionCluster')
+                                            .data(clusters)
+                                            .attr('value',function(d,i){
+                                                return i;
+                                            })
+                                            .style('background-color',function(d,i){
+                                                return colors[i];
+                                            });
+        options.enter()
+               .append('option')
+               .classed('optionCluster',true)
+               .attr('value',function(d,i){
+                    return i;
+               })
+               .style('background-color',function(d,i){
+                   return colors[i];
+               })
+               /* show text of option
+               .text(function(d){
+                   return 'cluster centering at: '+NODE_IdToObj(d[0]).label;
+               })*/;
+        options.exit().remove();
     });
 
 };
@@ -543,10 +576,11 @@ function Colorized_Clusters(clusters){
             var j = cluster.indexOf(d.wid);
             if ( j>=0 ){
                 //var scaleColor_s = d3.scaleLinear().domain( [0, cluster.length-1] ).range([0.5,1.0]);
+                d.icluster = i;
                 d3.select(this).style('fill', colors[i] ).classed('hltA',false);
                 break;
             };
         };
     });
-
+    return colors;
 };

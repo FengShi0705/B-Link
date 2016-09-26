@@ -165,7 +165,7 @@
                   <i class="w3-col material-icons w3-xxxlarge w3-blue" style="width:50px;cursor:pointer;" onclick="backClusterLevel1()">
                       arrow_back
                   </i>
-                  <div class="w3-rest w3-container w3-center w3-text-blue" style="height:50px;"><h4> Clustered Successfully !</h4></div>
+                  <div class="w3-rest w3-container w3-center w3-text-blue" id="numberOfClusters" style="height:50px;"><h4> Clustered Successfully !</h4></div>
               </div>
 
               <ul class="w3-navbar  w3-row">
@@ -190,17 +190,11 @@
                   </ul>
                   <div class="w3-section w3-border-top w3-border-black" >
                       <br>
-                      <select class="w3-select w3-large " name="selectCluster1">
-                          <option value="" disabled selected>Choose your FIRST cluster</option>
-                          <option value="1">A-Red</option>
-                          <option value="2">B-Blue</option>
-                          <option value="3">C-Yellow</option>
+                      <select class="w3-select w3-large " name="selectCluster1" onchange="ChangeSelectCluster(this)">
+                          <option value="" disabled selected>Starting cluster of the path</option>
                       </select>
-                      <select class="w3-select w3-large " name="selectCluster2">
-                          <option value="" disabled selected>Choose your SECOND cluster</option>
-                          <option value="1">A-Red</option>
-                          <option value="2">B-Blue</option>
-                          <option value="3">C-Yellow</option>
+                      <select class="w3-select w3-large " name="selectCluster2" onchange="ChangeSelectCluster(this)">
+                          <option value="" disabled selected>Ending cluster of the path</option>
                       </select>
                   </div>
 
