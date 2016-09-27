@@ -371,6 +371,32 @@ function Explore_Nearby(LorG,start,minhops,N,query,born){
 };
 
 
+
+
+//find paths between two nodes
+function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
+    if ( LorG=="local" ){
+        var subparameters = {"source":node1,"target":node2,"tp":Type_distance, "minhops":minhops, "localnodes":CLIENT_NODES_ids};
+        var parameters = {"N":N, "parameters":subparameters, "generator":'find_paths', "start":start};
+        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
+    }else{
+        var subparameters = {"source":node1,"target":node2,"tp":Type_distance,"minhops":minhops,"localnodes":null};
+        var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
+        var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+    };
+    // calculate bornplace
+    assert( _.contains(CLIENT_NODES_ids,node1) && _.contains(CLIENT_NODES_ids,node2) , 'path ends do not exist!');
+    assert ( node1!=node2, 'start and end node should not be the same node!'  )
+    var bornnode1=CLIENT_NODES.filter(function(obj){return obj["wid"]==node1;})[0];
+    var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==node2;})[0];
+    var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
+
+    generator_update_graphAndPanel(info, bornplace, [node1,node2]);
+};
+
+
+
+
 // Access generator url, update force graph and information panel
 // info for the generator server
 // bornplace is the x,y,vx,vy for the newly added nodes
@@ -384,15 +410,18 @@ function generator_update_graphAndPanel(info,bornplace,queries){
 
         var hlpath=[];
         var hlpath1 = [];
+        var hlA = [];
         var z_nodes =queries.slice();
         data.paths.forEach(function(d,i){
-            /*if (i==0){ hlpath.push(d.ids); }
-            else{ hlpath1.push(d.ids); };*/
-            hlpath1.push(d.ids)
-            z_nodes= _.union(z_nodes,d.ids);
+            if (i==0){
+                hlpath.push(d.ids);
+                hlA = [d.ids[0], d.ids[d.ids.length-1]];
+            }else{ hlpath1.push(d.ids); };
+            //hlpath1.push(d.ids)
+            z_nodes = _.union(z_nodes,d.ids);
         });
 
-        var highlights={'nodes':queries,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
+        var highlights={'nodes':hlA,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
         highlight_nodespaths(highlights);
         ZoomToNodes(z_nodes); // zoom to the node
         //update the information panel here
@@ -409,7 +438,13 @@ function update_informationPanel(paths,position){
                     .data(paths)
                     .enter()
                     .append('div')
-                    .attr('class','row');
+                    .attr('class',function(d,i){
+                        if( i==0 ){
+                            return 'row clicked';
+                        }else{
+                            return 'row';
+                        };
+                    });
     inforow.append('p').attr('class','list')
                        .text(function(d,i){
                            return parseInt(i)+position;
@@ -443,8 +478,8 @@ function update_informationPanel(paths,position){
 
     //information clickable
     d3.select('div#info_panel div.info-display').selectAll('div.row').on('click',function(d,i){
-        d3.selectAll('div.row').style('background-color','white');
-        d3.select(this).style('background-color','#F2F3F4');
+        d3.selectAll('div.row').classed('clicked',false);
+        d3.select(this).classed('clicked',true);
         var hltP1=[];
         paths.forEach(function(p,pi){
             if(pi!=i){
@@ -458,26 +493,94 @@ function update_informationPanel(paths,position){
 };
 
 
-
-
-
-//find paths between two nodes
-function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
-    if ( LorG=="local" ){
-        var subparameters = {"source":node1,"target":node2,"tp":Type_distance, "minhops":minhops, "localnodes":CLIENT_NODES_ids};
-        var parameters = {"N":N, "parameters":subparameters, "generator":'find_paths', "start":start};
-        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
+// get the setting for cluster algorithm
+function get_clusterSetting(){
+    if( d3.select("#clusterMethod").node().value=='normalized'){
+        var method = 'normalized';
+        var parameter = parseInt( d3.select('div#clusterMethod1Setting input').node().value );
+        // if the number of clusters is too large
+        if ( parameter>= CLIENT_NODES_ids.length ){
+            parameter = CLIENT_NODES_ids.length-1;
+            d3.select('div#clusterMethod1Setting input').node().value = CLIENT_NODES_ids.length-1;
+        };
     }else{
-        var subparameters = {"source":node1,"target":node2,"tp":Type_distance,"minhops":minhops,"localnodes":null};
-        var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
-        var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+        var method = 'mcl';
+        var parameter = parseInt( d3.select('div#clusterMethod2Setting input').node().value );
     };
-    // calculate bornplace
-    assert( _.contains(CLIENT_NODES_ids,node1) && _.contains(CLIENT_NODES_ids,node2) , 'path ends do not exist!');
-    assert ( node1!=node2, 'start and end node should not be the same node!'  )
-    var bornnode1=CLIENT_NODES.filter(function(obj){return obj["wid"]==node1;})[0];
-    var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==node2;})[0];
-    var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
+    return [method,parameter];
+};
 
-    generator_update_graphAndPanel(info, bornplace, [node1,node2]);
+//generate clusters
+function generate_Clusters(){
+    var setting = get_clusterSetting();
+    if (setting[0] == 'normalized'){
+        var info = {'nodes':CLIENT_NODES_ids,'method':'normalized','weight':Kernal_Weight,'k':setting[1],'distance':Type_distance }
+    }else{
+        var info = {'nodes':CLIENT_NODES_ids,'method':'mcl','weight':Kernal_Weight,'r':setting[1],'distance':Type_distance }
+    };
+    d3.json('/generateClusters/'+JSON.stringify(info),function(error,data){
+        var clusters = data
+        //---------Coler_Cluster!!!!!!!!!!!!!!
+        var colors = Colorized_Clusters(clusters);
+        // show the number of clusters!!!!
+        d3.select('#cluster_level_2').select('#numberOfClusters h4').text(function(){
+            return 'Get '+clusters.length+' Clusters!';
+        });
+        // set options
+        var options = d3.select('#findPath').selectAll('select')
+                                            .selectAll('option.optionCluster')
+                                            .data(clusters)
+                                            .attr('value',function(d,i){
+                                                return i;
+                                            })
+                                            .style('background-color',function(d,i){
+                                                return colors[i];
+                                            });
+        options.enter()
+               .append('option')
+               .classed('optionCluster',true)
+               .attr('value',function(d,i){
+                    return i;
+               })
+               .style('background-color',function(d,i){
+                   return colors[i];
+               })
+               /* show text of option
+               .text(function(d){
+                   return 'cluster centering at: '+NODE_IdToObj(d[0]).label;
+               })*/;
+        options.exit().remove();
+    });
+
+};
+
+// Colorized Clusters
+function Colorized_Clusters(clusters){
+    var n_clusters = clusters.length
+    // not more than 10 clusters
+    if (n_clusters<=10) {
+        var colors=d3.schemeCategory10;
+        colors = _.shuffle(colors)
+        colors = colors.slice(0,n_clusters)
+    } else {
+        var scaleColor_h = d3.scaleLinear().domain([0,n_clusters-1]).range([0,324]);
+        var colors=[];
+        for (var i=0;i<=n_clusters-1;i++){
+            colors.push( d3.hsl( scaleColor_h(i), 1 , 0.5 ) );
+        };
+    };
+
+    d3.selectAll('.gnode circle').each(function(d){
+        for (var i=0;i<=n_clusters-1;i++){
+            var cluster = clusters[i];
+            var j = cluster.indexOf(d.wid);
+            if ( j>=0 ){
+                //var scaleColor_s = d3.scaleLinear().domain( [0, cluster.length-1] ).range([0.5,1.0]);
+                d.icluster = i;
+                d3.select(this).style('fill', colors[i] ).classed('hltA',false);
+                break;
+            };
+        };
+    });
+    return colors;
 };

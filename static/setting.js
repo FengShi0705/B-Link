@@ -42,11 +42,13 @@ var HltNodesNumber=20;
 var POSITIONFORCE_STRENGTH=0.8;
 var N_SearchButton=3;
 var Type_distance = 'Fw';
+var Kernal_Weight = 'weight';
 var N_ExploreFunctionpanel=20;
 var HltPathColor = '#FF6800';
 var NodeColor = '#3498DB';
 var EdgeColor = '#aaa';
 var FOCUSING_NODE = -1;
+var FOCUSING_CLUSTER = -1;
 //add svg
 SVG = d3.select('body').append('svg').attr('id',"Mainback").attr('width',w) .attr('height',h);
 function SVG_change_size(){
@@ -247,10 +249,10 @@ function show_panel(panelname){
         d3.select('input#pathend_textinput').data([null]);
     };
 
-    if(panelname == "cluster"){
+    /*if(panelname == "cluster"){
         //reset minhop and local or global
         reset_hops_switcher('cluster');
-    };
+    };*/
 
 }
 
@@ -284,11 +286,11 @@ function closePanel(panelname){
 // show the selected cluster setting option
 function clusterSettingOption(){
     var option = document.getElementById("clusterMethod").value;
-    if(option == "method1"){
+    if(option == "normalized"){
         document.getElementById("clusterMethod1Setting").style.display = 'block';
         document.getElementById("clusterMethod2Setting").style.display = 'none';
     }
-    else if(option == "method2"){
+    else if(option == "mcl"){
     document.getElementById("clusterMethod1Setting").style.display = 'none';
     document.getElementById("clusterMethod2Setting").style.display = 'block';
     };
@@ -297,11 +299,19 @@ function clusterSettingOption(){
 function backClusterLevel1(){
     document.getElementById("cluster_level_1").style.display = "block"
     document.getElementById("cluster_level_2").style.display = "none";
+    //reset setting for Bpath panel
+    d3.selectAll('select[name="selectCluster1"],select[name="selectCluster2"]')
+          .style('background-color','white')
+          .each(function(){
+              this.value = "";
+          });
+    reset_hops_switcher('cluster');
 }
 // go to cluster level 2 page
 function showClusterLevel2(){
     document.getElementById("cluster_level_1").style.display = "none";
     document.getElementById("cluster_level_2").style.display = "block";
+    generate_Clusters();
 }
 
 // cluster input box control
@@ -367,4 +377,12 @@ function clusterPan(clusterPanel){
         d3.select("#textPath").style("font-weight","normal");
         d3.select("#textPath").style("color","white");
     };
+};
+
+//change the select of cluster
+function ChangeSelectCluster(node){
+    Hide_InfoPanel();
+    var option = d3.select(node).selectAll('option.optionCluster').filter(function(d){return node.value==d3.select(this).attr('value');});
+    d3.select(node).style('background-color',option.style('background-color'));
+    FOCUSING_CLUSTER = node.value;
 };

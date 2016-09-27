@@ -214,32 +214,40 @@ class UndirectedG(object):
 
 
 
+    def sort_clustersCentrality(self,clusters,distance):
+        """
+        This method sorts the nodes of each clusters based on their centrality in descending.
+        The first node in each list has highest centrality.
+
+        This method uses closeness centrality. But if possible, we can try other centrality such as betweenness, eigenvector,
+        degree, or eccentricity, etc.
+
+        :param clusters: array of lists. Each list contains the nodes of a cluster
+        :param distance: distance is the edge attribute as the distance
+        :return: array of lists. Each list is a cluster sorted by centrality.
+        """
+        def sort_oneCluster(cluster,distance):
+            G = self.G.subgraph(cluster)
+            centrality =[ nx.closeness_centrality(G,u=n,distance=distance) for n in cluster ]
+            sortcluster = [y for (x,y) in sorted(zip(centrality,cluster),reverse=True)]
+            return sortcluster
+
+        clusters = [sort_oneCluster(cluster,distance) for cluster in clusters]
+
+        return  clusters
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def cut_connectedgraph(self,nodes,k,weight='weight',algorithm='normalized'):
+    def cutgraph(self,nodes,k,weight='weight',algorithm='normalized'):
         """
         applying clustering on the subgraph consisting of the input nodes
+        This method may be faster than np.linalg.eigh( )
 
         Paramters
         ----------
-        nodes: a list of node to be clustered. The subgraph projected by the nodes should be connected.
+        nodes: a list of node to be clustered. The subgraph projected by the nodes can be connected or unconnected.
 
         k: the number of clusters to be generated
 
@@ -247,13 +255,14 @@ class UndirectedG(object):
                 Here the weight can be the original frequence that two words appear together.
 
         algorithm: {'normalized', 'modularity'}, default to 'normalized'
+                   The performance of 'modularity' is NOT good.
 
         Return
         ----------
         clusters: array of lists. Each list contains the nodes of a cluster
         """
         G = self.G.subgraph(nodes)
-        assert nx.is_connected(G)==True, "graph is not connected"
+        #assert nx.is_connected(G)==True, "graph is not connected"
         A = nx.adjacency_matrix(G, weight=weight)
 
         if algorithm=="normalized":
@@ -261,8 +270,28 @@ class UndirectedG(object):
             eigenvalue_n, eigenvector_n = eigsh(Ls * (-1), k=k,
                                                 sigma=1.0, which='LM',
                                                 tol=0.0)
-            n_nodes=len(nodes)
-            eigenvector_n[:,-1] = np.full( n_nodes , 1.0/math.sqrt(n_nodes) ) # eigenvector for eigenvalue zero
+
+            # eigenvector for eigenvalue zero
+            components = nx.connected_components(G)
+            i_comp = 0
+            while True:
+                try:
+                    component = components.next()
+                    i_comp += 1
+                except:
+                    break
+                else:
+                    if i_comp>k:
+                        break
+                    else:
+                        sq_comp = 1.0/math.sqrt( len(component) )
+                        vec_comp = []
+                        for n in G.nodes():
+                            if n in component:
+                                vec_comp.append(sq_comp)
+                            else:
+                                vec_comp.append(0.0)
+                        eigenvector_n[:, -i_comp] = np.array(vec_comp)
 
 
         elif algorithm=="modularity":
@@ -282,7 +311,9 @@ class UndirectedG(object):
 
         # normalize row vector
         for i, v in enumerate(eigenvector_n):
-            eigenvector_n[i] = v / float(np.linalg.norm(v))
+            rownorm = float(np.linalg.norm(v))
+            if rownorm!=0:
+                eigenvector_n[i] = v / rownorm
 
         _, labels, _ = k_means(eigenvector_n, k, random_state=None,
                                n_init=10)
@@ -342,7 +373,10 @@ class UndirectedG(object):
 
         G=self.G.subgraph(nodes)
         A = nx.adjacency_matrix(G, weight=weight).todense()
+
+        # use np.fill_diagonal(A, 2*np.sum(A, axis=1) + 1.0) if you want to quickly divde smaller clusters
         np.fill_diagonal(A, np.sum(A, axis=1) + 1.0)
+
         M=normalize_matrix(A)
 
         while True:

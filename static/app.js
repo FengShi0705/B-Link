@@ -158,8 +158,8 @@ function node_left_click_on(){
           var preNode =  FOCUSING_NODE;
           FOCUSING_NODE = d.wid;
 
-          if( d3.select('#line').style('display')=='block' ){
-              if(preNode == clicked_data.wid){
+          if( d3.select('#line').style('display')=='block'){
+              if(preNode == clicked_data.wid || d3.select('input#pathstart_textinput').data()[0] == d3.select('input#pathend_textinput').data()[0]){
                   //highlight
                   var highlights = {'nodes':[clicked_data.wid],'paths':[],'paths1':[]};
                   highlight_nodespaths(highlights);
@@ -181,7 +181,7 @@ function node_left_click_on(){
                   Show_FuncPanel('pathstart_textinput');
               };
 
-          }else{
+          }else if( d3.select('#point').style('display')=='block' || d3.select('#mainSearchBox').style('display')=='block' ){
               // highlight the clicked node
               var highlights = {'nodes':[d.wid],'paths':[],'paths1':[]};
               highlight_nodespaths(highlights);
@@ -192,6 +192,28 @@ function node_left_click_on(){
               d3.select('input#'+searchid).node().value = d.label;
               //attach data
               d3.select('input#'+searchid).data([d.wid]);
+          } else if( d3.select('#cluster_level_2').style('display')=='block' ){
+              var color = d3.select(this).select('circle').style('fill');
+              var preCluster=FOCUSING_CLUSTER;
+              FOCUSING_CLUSTER = clicked_data.icluster;
+              if( preCluster==FOCUSING_CLUSTER ||  d3.select('select[name="selectCluster1"]').node().value==d3.select('select[name="selectCluster2"]').node().value){
+                  //color
+                  d3.select('select[name="selectCluster1"]').style('background-color', color);
+                  d3.select('select[name="selectCluster2"]').style('background-color','white');
+                  //value
+                  d3.select('select[name="selectCluster1"]').node().value = FOCUSING_CLUSTER;
+                  d3.select('select[name="selectCluster2"]').node().value = "";
+
+              }else{
+                  d3.selectAll('select[name="selectCluster1"],select[name="selectCluster2"]')
+                    .filter(function(d){return parseInt(this.value)!=preCluster;})
+                    .each(function(d,i){
+                        if(i==0){
+                            d3.select(this).style('background-color',color) //color
+                            this.value = FOCUSING_CLUSTER; //value
+                        };
+                    });
+              };
           };
    });
 };
