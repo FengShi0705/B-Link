@@ -290,11 +290,11 @@ div.info-display div.row:after {
   stroke: #aaa;
 }
 .edge.hltE {
-  stroke: #FF0000;
+  stroke: #ff7f0e;
 }
 .edge.hltE1 {
-  stroke: #FF6800;
-  opacity: 0.5;
+  stroke: #ff7f0e;
+  stroke-opacity: 0.4;
 }
 
 .gnode circle {
@@ -304,25 +304,23 @@ div.info-display div.row:after {
 }
 
 .gnode circle.hltP{
-   fill: #FF0000;
-   stroke: #fff;
-   stroke-width: 2px;
+   stroke: #ff7f0e;
+   stroke-width: 3px;
 }
 .gnode circle.hltP1{
-   fill: #FF6800;
-   stroke: #fff;
-   stroke-width: 2px;
-   opacity: 0.5;
+   stroke: #ff7f0e;
+   stroke-width: 3px;
+   stroke-opacity: 0.4;
 }
 .gnode circle.hltA{
    fill: #fff;
-   stroke: #FF0000;
+   stroke: #ff7f0e;
    stroke-width: 5px;
 }
 .gnode circle.hltA1{
    fill: #fff;
-   stroke: #FF6800;
-   stroke-opacity: 0.5;
+   stroke: #ff7f0e;
+   stroke-opacity: 0.4;
    stroke-width: 5px;
 }
 .neighbor_track{

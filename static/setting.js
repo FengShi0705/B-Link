@@ -125,24 +125,7 @@ SIMULATION = d3.forceSimulation()
 
 
 /////////////////////////////////////////-----  HTML DESIGN ONLY below -----///////////////////////////////////////////
-//reset color and highlight
-function AllColorReset(){
-    //reset circle
-    d3.selectAll(".gnode circle").style('fill',null).attr('class','');
-    //reset edges
-    d3.selectAll(".edge").attr('class','edge');
-};
-//cancel highlight
-function cancelHighlight(){
-    d3.selectAll(".gnode circle").attr('class','');
-    d3.selectAll(".edge").attr('class','edge');
-};
-//resume cluster color
-function resumeClusterColor(){
-    d3.selectAll(".gnode circle").style('fill',function(d){
-        return d.color;
-    });
-};
+
 // hide information panel
 function Hide_InfoPanel(){
     document.getElementById("info_panel").style.display = "none";
@@ -268,10 +251,10 @@ function show_panel(panelname){
         d3.select('input#pathend_textinput').data([null]);
     };
 
-    /*if(panelname == "cluster"){
-        //reset minhop and local or global
-        reset_hops_switcher('cluster');
-    };*/
+    if(panelname == "cluster"){
+        //cancel highlight
+        cancelHighlight();
+    };
 
 }
 
@@ -299,7 +282,9 @@ function show_info(panelname){
 function closePanel(panelname){
     Hide_InfoPanel();
     Hide_FuncPanel();
-    AllColorReset();
+    if(panelname=='cluster') {
+        cancelClusterColor();
+    };
     document.getElementById("mainSearchBox").style.display = "block";
     document.getElementById(panelname).style.display = "none";
 }
@@ -329,11 +314,12 @@ function backClusterLevel1(){
     reset_hops_switcher('cluster');
     Hide_InfoPanel();
     resumeClusterColor();
-}
+};
 // go to cluster level 2 page
 function showClusterLevel2(){
     document.getElementById("cluster_level_1").style.display = "none";
     document.getElementById("cluster_level_2").style.display = "block";
+    clusterPan("findPath");
     generate_Clusters();
 }
 
@@ -375,7 +361,7 @@ $(document).ready(function(){
 });
 
 //show cluster func-panel
-clusterPan("findPath");
+
 function clusterPan(clusterPanel){
     var i;
     var x = document.getElementsByClassName("cluster-panel");

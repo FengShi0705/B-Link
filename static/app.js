@@ -237,7 +237,7 @@ function node_left_click_on(){
                             //update search box
                             this.value = clicked_data.label;
                             //data attach
-                            d3.select(this).data([clicked_data.wid])
+                            d3.select(this).data([clicked_data.wid]);
                         };
                     });
 
@@ -273,10 +273,10 @@ function node_left_click_on(){
                   d3.selectAll('select[name="selectCluster1"],select[name="selectCluster2"]')
                     .filter(function(d){return parseInt(this.value)!=preCluster;})
                     .each(function(d,i){
-                        if(i==0){
-                            d3.select(this).style('background-color',color) //color
+                            assert(i!=1, 'precluster not in cluster selection box');
+                            d3.select(this).style('background-color',color); //color
                             this.value = FOCUSING_CLUSTER; //value
-                        };
+
                     });
               };
           };

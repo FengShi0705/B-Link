@@ -215,52 +215,51 @@ function circle_layout_neighbor(dataset){
    TITLECOLOR_CHANGE();
 };
 
-// highlight dataset.paths and dataset.paths1 in different style, and dataset.nodes which are highlighted in a different style as well.
-// dataset.nodes is a list of nodes
-// Both dataset.paths and dataset.paths1 are list of paths
+//dataset.nodes are the nodes the queries
+//dataset.paths are the paths to be focused
+//dataset.paths1 are the unfocused paths which are highligthed
+ //hltA = dataset.nodes + (start,end) of dataset.paths
+ //hltP = middle part of dataset.paths
+ //hltA1 = (start,end) of dataset.paths1
+ //hltP1 = middle part of dataset.paths1
 function highlight_nodespaths(dataset){
     //is it in cluster panel?
     var clusterpanel = (d3.select('#cluster_level_2').style('display')=='block');
     if (clusterpanel){
-        var cluster1 = d3.select('select[name="selectCluster1"]')
-                     .selectAll('option.optionCluster')
-                     .filter(function(d){return d3.select(this).attr('value')==d3.select('select[name="selectCluster1"]').node().value;})
-                     .data()[0];
-        var cluster2 = d3.select('select[name="selectCluster2"]')
-                     .selectAll('option.optionCluster')
-                     .filter(function(d){return d3.select(this).attr('value') == d3.select('select[name="selectCluster2"]').node().value;})
-                     .data()[0];
-        var clusters = _.union(cluster1,cluster2);
+        var icluster1 = d3.select('select[name="selectCluster1"]').node().value;
+        var icluster2 = d3.select('select[name="selectCluster2"]').node().value;
+        var targetClusters = [parseInt(icluster1),parseInt(icluster2)];
     };
 
     // generate a highlighted graph based on dataset.paths
+    var hltA= dataset.nodes.slice();
     var hltG = new jsnx.Graph();
     for (var i = 0; i < dataset.paths.length; i++){
         hltG.addPath(dataset.paths[i]);
+        hltA.push(dataset.paths[i][0]);
+        hltA.push( dataset.paths[i].slice(-1)[0] );
     };
     var hltA1 = [];
     var hltG1=new jsnx.Graph();
     for (var i = 0; i < dataset.paths1.length; i++){
         hltG1.addPath(dataset.paths1[i]);
-        console.log('dataset.paths1[i]:')
-        console.log(dataset.paths1[i]);
         hltA1.push(dataset.paths1[i][0]);
-        hltA1.push(dataset.paths1[i][dataset.paths1[i].length-1]);
+        hltA1.push(dataset.paths1[i].slice(-1)[0]);
     };
 
     // all nodes color
     if(clusterpanel){
         d3.selectAll(".gnode").selectAll("circle").each(function(d){
-            if( _.contains(dataset.nodes, d.wid) ){
+            if( _.contains(hltA, d.wid) ){
                 d3.select(this).attr('class','hltA');
-            }else if(_.contains(hltA1,d.wid)){
-                d3.select(this).attr('class','hltA1');
             }else if( hltG.hasNode(d.wid) ){
                 d3.select(this).attr('class','hltP').style('fill',null);
+            }else if( _.contains(hltA1, d.wid) ){
+                d3.select(this).attr('class','hltA1');
             }else if( hltG1.hasNode(d.wid) ){
                 d3.select(this).attr('class','hltP1').style('fill',null);
             }else{
-                if(_.contains(clusters,d.wid)){
+                if(_.contains(targetClusters,d.icluster)){
                     d3.select(this).attr('class','');
                 }else{
                     d3.select(this).attr('class','').style('fill',null);
@@ -269,12 +268,12 @@ function highlight_nodespaths(dataset){
         });
     }else{
         d3.selectAll(".gnode").selectAll("circle").each(function(d){
-            if( _.contains(dataset.nodes, d.wid) ){
+            if( _.contains(hltA, d.wid) ){
                 d3.select(this).attr('class','hltA');
-            }else if(_.contains(hltA1,d.wid)){
-                d3.select(this).attr('class','hltA1');
             }else if( hltG.hasNode(d.wid) ){
                 d3.select(this).attr('class','hltP');
+            }else if( _.contains(hltA1, d.wid) ){
+                d3.select(this).attr('class','hltA1');
             }else if( hltG1.hasNode(d.wid) ){
                 d3.select(this).attr('class','hltP1');
             }else{
@@ -409,7 +408,7 @@ function Explore_Nearby(LorG,start,minhops,N,query,born){
     var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==born;})[0];
     var bornplace = {x:bornnode.x, y:bornnode.y, vx:bornnode.vx, vy: bornnode.vy};
 
-    generator_update_graphAndPanel(info,bornplace,[query]);
+    generator_update_graphAndPanel(info,bornplace,[query],[query]);
 
 };
 
@@ -434,7 +433,7 @@ function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
     var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==node2;})[0];
     var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
 
-    generator_update_graphAndPanel(info, bornplace, [node1,node2]);
+    generator_update_graphAndPanel(info, bornplace, [node1,node2], [node1,node2]);
 };
 
 //find paths between two clusters
@@ -455,15 +454,16 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
     var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==cluster2[0];})[0];
     var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
 
-    generator_update_graphAndPanel(info, bornplace, _.union(cluster1,cluster2));
+    generator_update_graphAndPanel(info, bornplace, _.union(cluster1,cluster2),[]);
 };
 
 
 // Access generator url, update force graph and information panel
 // info for the generator server
 // bornplace is the x,y,vx,vy for the newly added nodes
-// znodes are the nodes to be zoomed
-function generator_update_graphAndPanel(info,bornplace,znodes){
+// znodes are the nodes should be zoomed
+// queries are the query nodes
+function generator_update_graphAndPanel(info,bornplace,znodes,queries){
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
         if(data.AddNew==true){
             SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
@@ -472,18 +472,17 @@ function generator_update_graphAndPanel(info,bornplace,znodes){
 
         var hlpath=[];
         var hlpath1 = [];
-        var hlA = [];
         var z_nodes =znodes.slice();
         data.paths.forEach(function(d,i){
             if (i==0){
                 hlpath.push(d.ids);
-                hlA = [d.ids[0], d.ids[d.ids.length-1]];
-            }else{ hlpath1.push(d.ids); };
-            //hlpath1.push(d.ids)
+            }else{
+                hlpath1.push(d.ids);
+            };
             z_nodes = _.union(z_nodes,d.ids);
         });
 
-        var highlights={'nodes':hlA,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
+        var highlights={'nodes':queries,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
         highlight_nodespaths(highlights);
         ZoomToNodes(z_nodes); // zoom to the node
         //update the information panel here
@@ -548,7 +547,7 @@ function update_informationPanel(paths,position){
                 hltP1.push(p.ids);
             };
         });
-        var highlights={'nodes':[d.ids[0], d.ids[d.ids.length-1]],'paths':[d.ids],'paths1':hltP1};
+        var highlights={'nodes':[],'paths':[d.ids],'paths1':hltP1};
         highlight_nodespaths(highlights);
         ZoomToNodes(d.ids);
     });
@@ -621,7 +620,7 @@ function Colorized_Clusters(clusters){
     var n_clusters = clusters.length
     // not more than 10 clusters
     if (n_clusters<=10) {
-        var colors=d3.schemeCategory10;
+        var colors = ["#1f77b4", "#ff0", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#d6616b", "#bcbd22", "#17becf"];
         colors = _.shuffle(colors)
         colors = colors.slice(0,n_clusters)
     } else {
@@ -640,10 +639,38 @@ function Colorized_Clusters(clusters){
                 //var scaleColor_s = d3.scaleLinear().domain( [0, cluster.length-1] ).range([0.5,1.0]);
                 d.icluster = i;
                 d.color = colors[i];
-                d3.select(this).style('fill', colors[i] ).classed('hltA',false);
+                d3.select(this).style( 'fill' , colors[i] ).classed('hltA',false);
                 break;
             };
         };
     });
+
+    d3.selectAll(".edge").each(function(d){
+        if(d.source.icluster == d.target.icluster ){
+            d3.select(this).style('stroke',d.source.color);
+        }else{
+            d3.select(this).style('stroke',null);
+        };
+    });
+
     return colors;
+};
+
+//cancel cluster color
+function cancelClusterColor(){
+    d3.selectAll(".gnode circle").style('fill',null);
+    d3.selectAll('.edge').style('stroke',null);
+};
+
+//cancel highlight
+function cancelHighlight(){
+    d3.selectAll(".gnode circle").attr('class','');
+    d3.selectAll(".edge").attr('class','edge');
+};
+//resume cluster color
+function resumeClusterColor(){
+    //During find Bpaths, only node fill is changed, edge fill is not changed.
+    d3.selectAll(".gnode circle").style('fill',function(d){
+        return d.color;
+    });
 };
