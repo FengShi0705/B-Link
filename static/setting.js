@@ -125,10 +125,29 @@ SIMULATION = d3.forceSimulation()
 
 
 /////////////////////////////////////////-----  HTML DESIGN ONLY below -----///////////////////////////////////////////
+//reset color and highlight
+function AllColorReset(){
+    //reset circle
+    d3.selectAll(".gnode circle").style('fill',null).attr('class','');
+    //reset edges
+    d3.selectAll(".edge").attr('class','edge');
+};
+//cancel highlight
+function cancelHighlight(){
+    d3.selectAll(".gnode circle").attr('class','');
+    d3.selectAll(".edge").attr('class','edge');
+};
+//resume cluster color
+function resumeClusterColor(){
+    d3.selectAll(".gnode circle").style('fill',function(d){
+        return d.color;
+    });
+};
 // hide information panel
 function Hide_InfoPanel(){
     document.getElementById("info_panel").style.display = "none";
     d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
+    cancelHighlight();
 };
 
 function Hide_FuncPanel(){
@@ -270,6 +289,7 @@ function show_info(panelname){
     }
     else if (panelname == "cluster"){
         document.getElementById("info_panel").style.top ="347px";
+        BpathsClusters_showResult();
     };
     document.getElementById("info_panel").style.display = "block";
 
@@ -279,6 +299,7 @@ function show_info(panelname){
 function closePanel(panelname){
     Hide_InfoPanel();
     Hide_FuncPanel();
+    AllColorReset();
     document.getElementById("mainSearchBox").style.display = "block";
     document.getElementById(panelname).style.display = "none";
 }
@@ -306,6 +327,8 @@ function backClusterLevel1(){
               this.value = "";
           });
     reset_hops_switcher('cluster');
+    Hide_InfoPanel();
+    resumeClusterColor();
 }
 // go to cluster level 2 page
 function showClusterLevel2(){
@@ -382,6 +405,7 @@ function clusterPan(clusterPanel){
 //change the select of cluster
 function ChangeSelectCluster(node){
     Hide_InfoPanel();
+    resumeClusterColor();
     var option = d3.select(node).selectAll('option.optionCluster').filter(function(d){return node.value==d3.select(this).attr('value');});
     d3.select(node).style('background-color',option.style('background-color'));
     FOCUSING_CLUSTER = node.value;

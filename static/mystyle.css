@@ -319,7 +319,12 @@ div.info-display div.row:after {
    stroke: #FF0000;
    stroke-width: 5px;
 }
-
+.gnode circle.hltA1{
+   fill: #fff;
+   stroke: #FF6800;
+   stroke-opacity: 0.5;
+   stroke-width: 5px;
+}
 .neighbor_track{
   stroke: blue;
   stroke-dasharray:5, 10;
