@@ -218,7 +218,8 @@ function circle_layout_neighbor(dataset){
 //dataset.nodes are the nodes the queries
 //dataset.paths are the paths to be focused
 //dataset.paths1 are the unfocused paths which are highligthed
- //hltA = dataset.nodes + (start,end) of dataset.paths
+ //hltQ = dataset.nodes
+ //hltA = (start,end) of dataset.paths
  //hltP = middle part of dataset.paths
  //hltA1 = (start,end) of dataset.paths1
  //hltP1 = middle part of dataset.paths1
@@ -232,12 +233,12 @@ function highlight_nodespaths(dataset){
     };
 
     // generate a highlighted graph based on dataset.paths
-    var hltA= dataset.nodes.slice();
+    var hltQ= dataset.nodes.slice();
+    var hltA=[];
     var hltG = new jsnx.Graph();
     for (var i = 0; i < dataset.paths.length; i++){
         hltG.addPath(dataset.paths[i]);
-        hltA.push(dataset.paths[i][0]);
-        hltA.push( dataset.paths[i].slice(-1)[0] );
+        hltA = _.union( hltA , [dataset.paths[i][0], dataset.paths[i].slice(-1)[0] ] );
     };
     var hltA1 = [];
     var hltG1=new jsnx.Graph();
@@ -247,10 +248,13 @@ function highlight_nodespaths(dataset){
         hltA1.push(dataset.paths1[i].slice(-1)[0]);
     };
 
-    // all nodes color
+
     if(clusterpanel){
+        // all nodes color
         d3.selectAll(".gnode").selectAll("circle").each(function(d){
-            if( _.contains(hltA, d.wid) ){
+            if( _.contains(hltQ, d.wid) ){
+                d3.select(this).attr('class','hltQ');
+            }else if( _.contains(hltA, d.wid) ){
                 d3.select(this).attr('class','hltA');
             }else if( hltG.hasNode(d.wid) ){
                 d3.select(this).attr('class','hltP').style('fill',null);
@@ -266,9 +270,25 @@ function highlight_nodespaths(dataset){
                 };
             };
         });
+        //all edges color
+        d3.selectAll(".edge").each(function(d){
+            if( hltG.hasEdge(d.source.wid,d.target.wid) ){
+                d3.select(this).attr('class','edge hltE').style('stroke',null);
+            }else if( hltG1.hasEdge(d.source.wid,d.target.wid) ){
+                d3.select(this).attr('class','edge hltE1').style('stroke',null);
+            }else{
+                if( !(d.source.icluster == d.target.icluster && _.contains(targetClusters,d.source.icluster)) ){
+                    d3.select(this).attr('class','edge').style('stroke',null);
+                };
+            };
+        });
+
     }else{
+        // all nodes color
         d3.selectAll(".gnode").selectAll("circle").each(function(d){
-            if( _.contains(hltA, d.wid) ){
+            if( _.contains(hltQ, d.wid) ){
+                d3.select(this).attr('class','hltQ');
+            }else if( _.contains(hltA, d.wid) ){
                 d3.select(this).attr('class','hltA');
             }else if( hltG.hasNode(d.wid) ){
                 d3.select(this).attr('class','hltP');
@@ -280,19 +300,19 @@ function highlight_nodespaths(dataset){
                 d3.select(this).attr('class','');
             };
         });
+        //all edges color
+        d3.selectAll(".edge").each(function(d){
+            if( hltG.hasEdge(d.source.wid,d.target.wid) ){
+                d3.select(this).attr('class','edge hltE');
+            }else if( hltG1.hasEdge(d.source.wid,d.target.wid) ){
+                d3.select(this).attr('class','edge hltE1');
+            }else{
+                d3.select(this).attr('class','edge');
+            };
+        });
     };
 
 
-    //all edges color
-    d3.selectAll(".edge").each(function(d){
-        if( hltG.hasEdge(d.source.wid,d.target.wid) ){
-            d3.select(this).attr('class','edge hltE');
-        }else if( hltG1.hasEdge(d.source.wid,d.target.wid) ){
-            d3.select(this).attr('class','edge hltE1');
-        }else{
-            d3.select(this).attr('class','edge');
-        };
-    });
     //change title color
     TITLECOLOR_CHANGE();
 };
@@ -639,7 +659,7 @@ function Colorized_Clusters(clusters){
                 //var scaleColor_s = d3.scaleLinear().domain( [0, cluster.length-1] ).range([0.5,1.0]);
                 d.icluster = i;
                 d.color = colors[i];
-                d3.select(this).style( 'fill' , colors[i] ).classed('hltA',false);
+                d3.select(this).style( 'fill' , colors[i] );
                 break;
             };
         };
@@ -661,16 +681,27 @@ function cancelClusterColor(){
     d3.selectAll(".gnode circle").style('fill',null);
     d3.selectAll('.edge').style('stroke',null);
 };
-
-//cancel highlight
-function cancelHighlight(){
-    d3.selectAll(".gnode circle").attr('class','');
+//cancel query highlight
+function cancelQyHighlight(){
+    d3.selectAll(".gnode circle").classed('hltQ',null);
+};
+//cancel information highlight
+function cancelInfoHighlight(){
+    d3.selectAll(".gnode circle").classed('hltA hltA1 hltP hltP1',null);
     d3.selectAll(".edge").attr('class','edge');
 };
 //resume cluster color
 function resumeClusterColor(){
-    //During find Bpaths, only node fill is changed, edge fill is not changed.
+    // nodes
     d3.selectAll(".gnode circle").style('fill',function(d){
         return d.color;
+    });
+    // edges
+    d3.selectAll(".edge").each(function(d){
+        if(d.source.icluster == d.target.icluster ){
+            d3.select(this).style('stroke',d.source.color);
+        }else{
+            d3.select(this).style('stroke',null);
+        };
     });
 };

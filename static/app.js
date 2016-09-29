@@ -256,7 +256,7 @@ function node_left_click_on(){
               //attach data
               d3.select('input#'+searchid).data([d.wid]);
           } else if( d3.select('#cluster_level_2').style('display')=='block' ){
-              cancelHighlight();
+              cancelInfoHighlight();
               resumeClusterColor();
               var color = d3.select(this).select('circle').datum().color;
               var preCluster=FOCUSING_CLUSTER;

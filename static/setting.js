@@ -130,7 +130,7 @@ SIMULATION = d3.forceSimulation()
 function Hide_InfoPanel(){
     document.getElementById("info_panel").style.display = "none";
     d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
-    cancelHighlight();
+    cancelInfoHighlight();
 };
 
 function Hide_FuncPanel(){
@@ -195,6 +195,10 @@ var clear_button=d3.select('input[name="clear"]');
 // CSS - Global-local switch control
 d3.selectAll('#switch-1,#switch-2,#switch-3').on('click',function(d){
     Hide_InfoPanel();
+    if(this.id=='switch-3'){
+        console.log('switch-3');
+        resumeClusterColor();
+    };
     d3.select(this.parentNode.parentNode.parentNode).select('.t-global').classed('t-global-toggle',function(d){return !d3.select(this).classed('t-global-toggle');});
     d3.select(this.parentNode.parentNode.parentNode).select('.t-local').classed('t-local-toggle',function(d){return !d3.select(this).classed('t-local-toggle');});
 });
@@ -252,8 +256,8 @@ function show_panel(panelname){
     };
 
     if(panelname == "cluster"){
-        //cancel highlight
-        cancelHighlight();
+        //cancel query highlight
+        cancelQyHighlight();
     };
 
 }
@@ -282,6 +286,7 @@ function show_info(panelname){
 function closePanel(panelname){
     Hide_InfoPanel();
     Hide_FuncPanel();
+    cancelQyHighlight();
     if(panelname=='cluster') {
         cancelClusterColor();
     };

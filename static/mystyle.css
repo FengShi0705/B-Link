@@ -317,6 +317,11 @@ div.info-display div.row:after {
    stroke: #ff7f0e;
    stroke-width: 5px;
 }
+.gnode circle.hltQ{
+   fill: #fff;
+   stroke: #ff7f0e;
+   stroke-width: 5px;
+}
 .gnode circle.hltA1{
    fill: #fff;
    stroke: #ff7f0e;
