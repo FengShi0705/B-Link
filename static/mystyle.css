@@ -54,11 +54,11 @@ input[name="search"]:hover{
 }
 
 div.header{
-   height:50px;
    position: fixed;
-   left:360px;
+   left:350px;
    top:5px;
-   right:0;
+   right:200px;
+   height:50px;
    font-size:40px;
    font-family:cursive;
    pointer-events:none;
@@ -195,6 +195,19 @@ input[name="endpoint"]{
   cursor:pointer;
 }
 
+/* cluster-panel text blink animation */
+.blink_text{
+    animation:1s blinker linear 10;
+    -webkit-animation:1s blinker linear 10;
+    color: red;
+}
+
+@keyframes blinker {
+     0% { opacity: 1.0; }
+     50% { opacity: 0.0; }
+     100% { opacity: 1.0; }
+}
+
 /* info display panel */
 #info_panel{
     position:fixed;
@@ -281,6 +294,15 @@ div.info-display div.row:after {
     width:300px;
 }
 
+/* copy right declaration */
+.copyright{
+    position:fixed;
+    bottom:40px;
+    height:40px;
+    left:0;
+    right:0;
+    pointer-events:none;
+}
 
 
 
