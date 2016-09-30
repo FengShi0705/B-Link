@@ -125,10 +125,12 @@ SIMULATION = d3.forceSimulation()
 
 
 /////////////////////////////////////////-----  HTML DESIGN ONLY below -----///////////////////////////////////////////
+
 // hide information panel
 function Hide_InfoPanel(){
     document.getElementById("info_panel").style.display = "none";
     d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
+    cancelInfoHighlight();
 };
 
 function Hide_FuncPanel(){
@@ -193,6 +195,10 @@ var clear_button=d3.select('input[name="clear"]');
 // CSS - Global-local switch control
 d3.selectAll('#switch-1,#switch-2,#switch-3').on('click',function(d){
     Hide_InfoPanel();
+    if(this.id=='switch-3'){
+        console.log('switch-3');
+        resumeClusterColor();
+    };
     d3.select(this.parentNode.parentNode.parentNode).select('.t-global').classed('t-global-toggle',function(d){return !d3.select(this).classed('t-global-toggle');});
     d3.select(this.parentNode.parentNode.parentNode).select('.t-local').classed('t-local-toggle',function(d){return !d3.select(this).classed('t-local-toggle');});
 });
@@ -249,10 +255,10 @@ function show_panel(panelname){
         d3.select('input#pathend_textinput').data([null]);
     };
 
-    /*if(panelname == "cluster"){
-        //reset minhop and local or global
-        reset_hops_switcher('cluster');
-    };*/
+    if(panelname == "cluster"){
+        //cancel query highlight
+        cancelQyHighlight();
+    };
 
 }
 
@@ -270,6 +276,7 @@ function show_info(panelname){
     }
     else if (panelname == "cluster"){
         document.getElementById("info_panel").style.top ="347px";
+        BpathsClusters_showResult();
     };
     document.getElementById("info_panel").style.display = "block";
 
@@ -279,6 +286,10 @@ function show_info(panelname){
 function closePanel(panelname){
     Hide_InfoPanel();
     Hide_FuncPanel();
+    cancelQyHighlight();
+    if(panelname=='cluster') {
+        cancelClusterColor();
+    };
     document.getElementById("mainSearchBox").style.display = "block";
     document.getElementById(panelname).style.display = "none";
 }
@@ -306,11 +317,14 @@ function backClusterLevel1(){
               this.value = "";
           });
     reset_hops_switcher('cluster');
-}
+    Hide_InfoPanel();
+    resumeClusterColor();
+};
 // go to cluster level 2 page
 function showClusterLevel2(){
     document.getElementById("cluster_level_1").style.display = "none";
     document.getElementById("cluster_level_2").style.display = "block";
+    clusterPan("findPath");
     generate_Clusters();
 }
 
@@ -352,7 +366,7 @@ $(document).ready(function(){
 });
 
 //show cluster func-panel
-clusterPan("findPath");
+
 function clusterPan(clusterPanel){
     var i;
     var x = document.getElementsByClassName("cluster-panel");
@@ -382,6 +396,7 @@ function clusterPan(clusterPanel){
 //change the select of cluster
 function ChangeSelectCluster(node){
     Hide_InfoPanel();
+    resumeClusterColor();
     var option = d3.select(node).selectAll('option.optionCluster').filter(function(d){return node.value==d3.select(this).attr('value');});
     d3.select(node).style('background-color',option.style('background-color'));
     FOCUSING_CLUSTER = node.value;

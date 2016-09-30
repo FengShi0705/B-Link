@@ -133,6 +133,59 @@ function FindPath_previous(){
     findPaths_betweenNodes(check_explore_LG('switch-2'), false, minhops, -N_SearchButton, node1, node2);
 };
 
+//B-paths show results
+function BpathsClusters_showResult(){
+    var value1 = d3.select('select[name="selectCluster1"]').node().value;
+    var cluster1 = d3.select('select[name="selectCluster1"]')
+                     .selectAll('option.optionCluster')
+                     .filter(function(d){return d3.select(this).attr('value')==value1;})
+                     .data()[0];
+
+    var value2 = d3.select('select[name="selectCluster2"]').node().value;
+    var cluster2 = d3.select('select[name="selectCluster2"]')
+                     .selectAll('option.optionCluster')
+                     .filter(function(d){return d3.select(this).attr('value') == value2;})
+                     .data()[0];
+
+    findBpaths_betweenClusters(check_explore_LG('switch-3'), true, N_SearchButton, cluster1, cluster2);
+
+    //onclick next and previous
+    d3.select('#info_panel #pageup').on('click', Bpaths_Previous);
+    d3.select('#info_panel #pagedown').on('click', Bpaths_Next);
+};
+//B-paths next
+function Bpaths_Next(){
+    var value1 = d3.select('select[name="selectCluster1"]').node().value;
+    var cluster1 = d3.select('select[name="selectCluster1"]')
+                     .selectAll('option.optionCluster')
+                     .filter(function(d){return d3.select(this).attr('value')==value1;})
+                     .data()[0];
+
+    var value2 = d3.select('select[name="selectCluster2"]').node().value;
+    var cluster2 = d3.select('select[name="selectCluster2"]')
+                     .selectAll('option.optionCluster')
+                     .filter(function(d){return d3.select(this).attr('value') == value2;})
+                     .data()[0];
+
+    findBpaths_betweenClusters(check_explore_LG('switch-3'), false, N_SearchButton, cluster1, cluster2);
+};
+//B-paths previous
+function Bpaths_Previous(){
+    var value1 = d3.select('select[name="selectCluster1"]').node().value;
+    var cluster1 = d3.select('select[name="selectCluster1"]')
+                     .selectAll('option.optionCluster')
+                     .filter(function(d){return d3.select(this).attr('value')==value1;})
+                     .data()[0];
+
+    var value2 = d3.select('select[name="selectCluster2"]').node().value;
+    var cluster2 = d3.select('select[name="selectCluster2"]')
+                     .selectAll('option.optionCluster')
+                     .filter(function(d){return d3.select(this).attr('value') == value2;})
+                     .data()[0];
+
+    findBpaths_betweenClusters(check_explore_LG('switch-3'), false, -N_SearchButton, cluster1, cluster2);
+};
+
 // node click behavior
 function node_right_click_on(){
       GRAPH.selectAll('.gnode').on('contextmenu',function(d){
@@ -156,6 +209,7 @@ function node_left_click_on(){
       GRAPH.selectAll('.gnode').on('click',function(d){
           var clicked_data = d;
           var preNode =  FOCUSING_NODE;
+          var preLabel = NODE_IdToObj(preNode).label;
           FOCUSING_NODE = d.wid;
 
           if( d3.select('#line').style('display')=='block'){
@@ -173,11 +227,20 @@ function node_left_click_on(){
                   //highlight
                   var highlights = {'nodes':[clicked_data.wid,preNode],'paths':[],'paths1':[]};
                   highlight_nodespaths(highlights);
-                  //update search box
+
                   d3.selectAll('input#pathstart_textinput,input#pathend_textinput')
-                    .filter(function(d){return d!=preNode;})
-                    .data([clicked_data.wid]) //data attach
-                    .each(function(d){this.value = clicked_data.label;});
+                    .each(function(d){
+                        if(d==preNode){
+                            //update search box
+                            this.value = preLabel;
+                        }else{
+                            //update search box
+                            this.value = clicked_data.label;
+                            //data attach
+                            d3.select(this).data([clicked_data.wid]);
+                        };
+                    });
+
                   Show_FuncPanel('pathstart_textinput');
               };
 
@@ -193,7 +256,9 @@ function node_left_click_on(){
               //attach data
               d3.select('input#'+searchid).data([d.wid]);
           } else if( d3.select('#cluster_level_2').style('display')=='block' ){
-              var color = d3.select(this).select('circle').style('fill');
+              cancelInfoHighlight();
+              resumeClusterColor();
+              var color = d3.select(this).select('circle').datum().color;
               var preCluster=FOCUSING_CLUSTER;
               FOCUSING_CLUSTER = clicked_data.icluster;
               if( preCluster==FOCUSING_CLUSTER ||  d3.select('select[name="selectCluster1"]').node().value==d3.select('select[name="selectCluster2"]').node().value){
@@ -208,10 +273,10 @@ function node_left_click_on(){
                   d3.selectAll('select[name="selectCluster1"],select[name="selectCluster2"]')
                     .filter(function(d){return parseInt(this.value)!=preCluster;})
                     .each(function(d,i){
-                        if(i==0){
-                            d3.select(this).style('background-color',color) //color
+                            assert(i!=1, 'precluster not in cluster selection box');
+                            d3.select(this).style('background-color',color); //color
                             this.value = FOCUSING_CLUSTER; //value
-                        };
+
                     });
               };
           };
