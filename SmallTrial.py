@@ -199,66 +199,59 @@ def test_normalizedCluster():
 
     R = Retrievor.UndirectedG(G, 'fortest')
 
-    """print 'For connected graph, cutgraph_sp:'
-    for k in [1,2,3,4,5]:
-        clusters = R.cutgraph_sp([1,2,3,4,5], k)
-        print clusters
-
-    print 'For connected graph, cutgraph_fr:'
-    for k in [1, 2, 3, 4]:
-        clusters = R.cutgraph_fr([1,2,3,4,5], k)
-        print clusters
-
-    print 'For whole graph, cutgraph_sp:'
-    for k in [1, 2, 3, 4, 5, 6]:
-        clusters = R.cutgraph_sp([1,2,3,4,5,6], k)
-        print clusters"""
-
-    """print 'fr, 5 nodes'
-    for k in [1, 2, 3, 4]:
-        clusters = R.cutgraph_fr([1,2,3,4,5], k)
-        print clusters
-
-    print 'fr, 6 nodes'
-    for k in [1, 2, 3, 4, 5]:
-        clusters = R.cutgraph_fr([1, 2, 3, 4, 5,6], k)
-        print clusters
-
-    print 'fr, 7 nodes'
-    for k in [1, 2, 3, 4, 5,6]:
-        clusters = R.cutgraph_fr([1, 2, 3, 4, 5,6,7], k)
-        print clusters
-
-    print 'fr, 8 nodes'
-    for k in [1, 2, 3, 4, 5,6,7]:
-        clusters = R.cutgraph_fr([1, 2, 3, 4, 5,6,7,8], k)
-        print clusters"""
-
     print '5 nodes'
-    for k in [1, 2, 3, 4]:
-        clusters = R.cutgraph(['a', 'b', 'c', 'd', 'e'], k)
-        print clusters
+    for k in [1,2,3,4]:
+        clustersLs = R.cutgraph(['a', 'b', 'c', 'd', 'e'], k, Mx='Ls')
+        clustersLa = R.cutgraph(['a', 'b', 'c', 'd', 'e'], k, Mx='La')
+        clustersLsLa = R.cutgraph(['a', 'b', 'c', 'd', 'e'], k, Mx='LsLa')
+        print 'clustersLs'
+        print clustersLs
+        print 'clustersLa'
+        print clustersLa
+        print 'clustersLsLa'
+        print clustersLsLa
 
     print ' 6 nodes'
-    for k in [1, 2, 3, 4, 5]:
-        clusters = R.cutgraph(['a', 'b', 'c', 'd', 'e','f'], k)
-        print clusters
+    for k in [1,2, 3, 4, 5]:
+        clustersLs = R.cutgraph(['a', 'b', 'c', 'd', 'e', 'f'], k, Mx='Ls')
+        clustersLa = R.cutgraph(['a', 'b', 'c', 'd', 'e', 'f'], k, Mx='La')
+        clustersLsLa = R.cutgraph(['a', 'b', 'c', 'd', 'e','f'], k, Mx='LsLa')
+        print 'clustersLs'
+        print clustersLs
+        print 'clustersLa'
+        print clustersLa
+        print 'clustersLsLa'
+        print clustersLsLa
 
     print '7 nodes'
-    for k in [1, 2, 3, 4, 5, 6]:
-        clusters = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g'], k)
-        print clusters
+    for k in [1,2, 3, 4, 5, 6]:
+        clustersLs = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g'], k, Mx='Ls')
+        clustersLa = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g'], k, Mx='La')
+        clustersLsLa = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g'], k, Mx='LsLa')
+        print 'clustersLs'
+        print clustersLs
+        print 'clustersLa'
+        print clustersLa
+        print 'clustersLsLa'
+        print clustersLsLa
 
     print ' 8 nodes'
-    for k in [1, 2, 3, 4, 5, 6, 7]:
-        clusters = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g','h'], k)
-        print clusters
+    for k in [1,2, 3, 4, 5, 6, 7]:
+        clustersLs = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g','h'], k, Mx='Ls')
+        clustersLa = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g','h'], k, Mx='La')
+        clustersLsLa = R.cutgraph(['a', 'b', 'c', 'd', 'e','f','g','h'], k, Mx='LsLa')
+        print 'clustersLs'
+        print clustersLs
+        print 'clustersLa'
+        print clustersLa
+        print 'clustersLsLa'
+        print clustersLsLa
 
 
-    print 'mcl'
+    """print 'mcl'
     for r in np.linspace(1,15,num=45):
         M,clusters = R.mcl_cluster(['a','b','c','d','e','f','g','h'],r)
-        print r,':',clusters
+        print r,':',clusters"""
 
     return
 
@@ -295,7 +288,34 @@ def see_variable():
     return a
 
 
+def testCluster():
+    G = nx.Graph()
 
+    G.add_edge('a','b',weight = 6.0)
+    G.add_edge('b', 'c', weight=5.0)
+    G.add_edge('c', 'd', weight=4.0)
+    R = Retrievor.UndirectedG(G, 'fortest')
+    clustersLs, clustersLa = R.cutgraph(['a', 'b', 'c', 'd'], 3)
+    return  clustersLs,clustersLa
+
+def test1():
+    G = nx.Graph()
+    G.add_edge(1, 2, weight=1.0)
+    G.add_edge(2, 3, weight=1.0)
+    G.add_edge(3, 4, weight=1.0)
+    G.add_edge(4, 1, weight=1.0)
+    G.add_edge(2, 4, weight=1.0)
+    G.add_edge(1, 6, weight=1.0)
+    G.add_edge(4, 5, weight=1.0)
+    G.add_edge(3, 7, weight=1.0)
+    G.add_edge(5, 6, weight=1.0)
+    G.add_edge(5, 7, weight=1.0)
+    G.add_edge(6, 7, weight=1.0)
+
+    R = Retrievor.UndirectedG(G, 'fortest')
+    clustersLs, clustersLa = R.cutgraph([1,2,3,4,5,6,7],2)
+
+    return clustersLs, clustersLa
 
 
 
