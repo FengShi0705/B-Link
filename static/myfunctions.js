@@ -335,8 +335,8 @@ function ZoomToNodes(nodes){
             var min_y=d3.min(obj_nodes,function(d){return d.y});
             var x = (max_x+min_x)/2;
             var y = (max_y+min_y)/2;
-            var kx = w/(max_x-min_x+4*maxNodeRadius);
-            var ky = h/(max_y-min_y+4*maxNodeRadius);
+            var kx = 0.6*w/(max_x-min_x+4*maxNodeRadius);
+            var ky = 0.6*h/(max_y-min_y+4*maxNodeRadius);
             var k = Math.min(kx,ky);
             console.log(k);
         };

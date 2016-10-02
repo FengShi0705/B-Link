@@ -109,7 +109,7 @@ function FindPath_showResult(){
       var label2 = NODE_IdToObj(node2).label;
 
       var minhops = get_minhops('minhop_line');
-      findPaths_betweenNodes(check_explore_LG('switch-2'), true, minhops, N_SearchButton, node1, node2);
+      findPaths_betweenNodes(check_explore_LG('switch-2'), true, minhops, N_forPath, node1, node2);
       // update search box of start and end point
       d3.select('input#pathstart_textinput').node().value = label1;
       d3.select('input#pathend_textinput').node().value = label2;
@@ -123,14 +123,14 @@ function FindPath_next(){
     var node1 = d3.select('input#pathstart_textinput').data()[0];
     var node2 = d3.select('input#pathend_textinput').data()[0];
     var minhops = get_minhops('minhop_line');
-    findPaths_betweenNodes(check_explore_LG('switch-2'), false, minhops, N_SearchButton, node1, node2);
+    findPaths_betweenNodes(check_explore_LG('switch-2'), false, minhops, N_forPath, node1, node2);
 };
 //find path previous
 function FindPath_previous(){
     var node1 = d3.select('input#pathstart_textinput').data()[0];
     var node2 = d3.select('input#pathend_textinput').data()[0];
     var minhops = get_minhops('minhop_line');
-    findPaths_betweenNodes(check_explore_LG('switch-2'), false, minhops, -N_SearchButton, node1, node2);
+    findPaths_betweenNodes(check_explore_LG('switch-2'), false, minhops, -N_forPath, node1, node2);
 };
 
 //B-paths show results
@@ -147,7 +147,7 @@ function BpathsClusters_showResult(){
                      .filter(function(d){return d3.select(this).attr('value') == value2;})
                      .data()[0];
 
-    findBpaths_betweenClusters(check_explore_LG('switch-3'), true, N_SearchButton, cluster1, cluster2);
+    findBpaths_betweenClusters(check_explore_LG('switch-3'), true, N_forPath, cluster1, cluster2);
 
     //onclick next and previous
     d3.select('#info_panel #pageup').on('click', Bpaths_Previous);
@@ -167,7 +167,7 @@ function Bpaths_Next(){
                      .filter(function(d){return d3.select(this).attr('value') == value2;})
                      .data()[0];
 
-    findBpaths_betweenClusters(check_explore_LG('switch-3'), false, N_SearchButton, cluster1, cluster2);
+    findBpaths_betweenClusters(check_explore_LG('switch-3'), false, N_forPath, cluster1, cluster2);
 };
 //B-paths previous
 function Bpaths_Previous(){
@@ -183,7 +183,7 @@ function Bpaths_Previous(){
                      .filter(function(d){return d3.select(this).attr('value') == value2;})
                      .data()[0];
 
-    findBpaths_betweenClusters(check_explore_LG('switch-3'), false, -N_SearchButton, cluster1, cluster2);
+    findBpaths_betweenClusters(check_explore_LG('switch-3'), false, -N_forPath, cluster1, cluster2);
 };
 
 // node click behavior
@@ -207,6 +207,7 @@ function node_left_click_on(){
       });
 
       GRAPH.selectAll('.gnode').on('click',function(d){
+          Hide_InfoPanel();
           var clicked_data = d;
           var preNode =  FOCUSING_NODE;
           var preLabel = NODE_IdToObj(preNode).label;

@@ -9,7 +9,7 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG(nx.read_gpickle('data/undirected(fortest).gpickle'),'fortest')
+myRtr=Retrievor.UndirectedG(nx.read_gpickle('../undirected(abcdeijm_test).gpickle'),'abcdeijm_test')
 
 # sign up
 @app.route('/signup')
