@@ -95,7 +95,8 @@ def reduceGraph(read_g, write_g, minEdgeWeight, minNodeDegree):
     for (a, b, w) in G.edges_iter(data='weight'):
         unweight(G, a, b, w)
 
-        nx.write_gpickle(G, write_g)
+    print 'update weight ok'
+    nx.write_gpickle(G, write_g)
 
     return
 
