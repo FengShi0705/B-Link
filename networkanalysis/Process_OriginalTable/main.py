@@ -1,4 +1,4 @@
-from Private.PubFunctions import unweight
+from Private.PubFunctions import unweight_allocation
 from Private import PubFunctions
 import networkx as nx
 import datetime
@@ -68,7 +68,7 @@ def main(schema,reltable,labtable,tp):
     return
 
 
-def reduceGraph(read_g, write_g, minEdgeWeight, minNodeDegree):
+def reduceGraph(read_g, write_g, minEdgeWeight, minNodeDegree, Lp, Sp):
     """
     Simplify the undirected graph and then update the 3 undirected weight properties.
     :param read_g: is the graph pickle to read
@@ -93,7 +93,7 @@ def reduceGraph(read_g, write_g, minEdgeWeight, minNodeDegree):
     print 'number of new edges: ', nx.number_of_edges(G)
 
     for (a, b, w) in G.edges_iter(data='weight'):
-        unweight(G, a, b, w)
+        unweight_allocation(G, a, b, w,Lp,Sp)
 
     print 'update weight ok'
     nx.write_gpickle(G, write_g)
