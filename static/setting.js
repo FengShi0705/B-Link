@@ -28,19 +28,20 @@ var TITLECOLOR_CHANGE = function(){
 
 var w=window.innerWidth || document.body.clientWidth;
 var h=window.innerHeight || document.body.clientHeight;
-var maxlinkdistance=100;
-var minlinkdistance=20;
-var maxlinkwidth=5;
+var maxlinkdistance=300;
+var minlinkdistance=100;
+var maxlinkwidth=3;
 var minlinkwidth=1;
 var maxNodeRadius=20;
-var minNodeRadius=5;
+var minNodeRadius=8;
 var tran = d3.transition()
              .duration(5000)
              .ease(d3.easeLinear);
 
 var HltNodesNumber=20;
 var POSITIONFORCE_STRENGTH=0.8;
-var N_SearchButton=3;
+var N_SearchButton=10;
+var N_forPath = 5;
 var Type_distance = 'Fw';
 var Kernal_Weight = 'weight';
 var N_ExploreFunctionpanel=20;

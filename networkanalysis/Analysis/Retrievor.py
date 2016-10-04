@@ -240,7 +240,7 @@ class UndirectedG(object):
 
 
 
-    def cutgraph(self,nodes,k,weight='weight',algorithm='normalized'):
+    def cutgraph(self,nodes,k,weight='weight',algorithm='normalized', Mx = 'LsLa'):
         """
         applying clustering on the subgraph consisting of the input nodes
         This method may be faster than np.linalg.eigh( )
@@ -257,6 +257,8 @@ class UndirectedG(object):
         algorithm: {'normalized', 'modularity'}, default to 'normalized'
                    The performance of 'modularity' is NOT good.
 
+        Mx: the matrix whose eigenvectors are used for the k-mean algorithm.
+
         Return
         ----------
         clusters: array of lists. Each list contains the nodes of a cluster
@@ -271,27 +273,42 @@ class UndirectedG(object):
                                                 sigma=1.0, which='LM',
                                                 tol=0.0)
 
-            # eigenvector for eigenvalue zero
-            components = nx.connected_components(G)
-            i_comp = 0
-            while True:
-                try:
-                    component = components.next()
-                    i_comp += 1
-                except:
-                    break
-                else:
-                    if i_comp>k:
+            if Mx == 'La':
+                Trisq = np.sqrt(np.array(A.sum(axis=1)).transpose()[0])
+                for ti, t in enumerate(Trisq):
+                    if t == 0:
+                        Trisq[ti] = 1.0
+                for j in xrange(0, eigenvector_n.shape[1]):
+                    eigenvector_n[:, j] = eigenvector_n[:, j] / Trisq
+                    colnorm = np.linalg.norm(eigenvector_n[:, j])
+                    eigenvector_n[:, j] = eigenvector_n[:, j] / colnorm
+
+            elif Mx == 'LsLa':
+                # eigenvector for eigenvalue zero
+                components = nx.connected_components(G)
+                i_comp = 0
+                while True:
+                    try:
+                        component = components.next()
+                        i_comp += 1
+                    except:
                         break
                     else:
-                        sq_comp = 1.0/math.sqrt( len(component) )
-                        vec_comp = []
-                        for n in G.nodes():
-                            if n in component:
-                                vec_comp.append(sq_comp)
-                            else:
-                                vec_comp.append(0.0)
-                        eigenvector_n[:, -i_comp] = np.array(vec_comp)
+                        if i_comp>k:
+                            break
+                        else:
+                            sq_comp = 1.0/math.sqrt( len(component) )
+                            vec_comp = []
+                            for n in G.nodes():
+                                if n in component:
+                                    vec_comp.append(sq_comp)
+                                else:
+                                    vec_comp.append(0.0)
+                            eigenvector_n[:, -i_comp] = np.array(vec_comp)
+
+            else:
+                assert Mx=='Ls', 'type of matrix is not known'
+
 
 
         elif algorithm=="modularity":

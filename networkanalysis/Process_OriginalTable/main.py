@@ -1,13 +1,8 @@
-from FengPrivate import PubFunctions
+from Private.PubFunctions import unweight_allocation
+from Private import PubFunctions
 import networkx as nx
 import datetime
 
-# The main function use original keywords table and relations table of a schema.
-# And create three forms of graph:
-# 1. undirected graph with undirected weights and domian dissimilarity
-# 2. one-directed graph with undirected weights, domian dissimilarity, and G2S direction
-# 3. bi-directed graph with forwards and backwards directed weights
-# Finally, write these three graphs into gpickle
 
 def write_undirected(schema,reltable,labtable):
     uG=PubFunctions.loadw2wdict(schema,reltable,'undirected')
@@ -55,7 +50,12 @@ def write_bidirected(schema,reltable,labtable,tp):
     return
 
 
-
+# The main function use original keywords table and relations table of a schema.
+# And create three forms of graph:
+# 1. undirected graph with undirected weights and domian dissimilarity
+# 2. one-directed graph with undirected weights, domian dissimilarity, and G2S direction
+# 3. bi-directed graph with forwards and backwards directed weights
+# Finally, write these three graphs into gpickle
 #Checked OK
 def main(schema,reltable,labtable,tp):
 
@@ -66,5 +66,39 @@ def main(schema,reltable,labtable,tp):
     print 'All finished'
 
     return
+
+
+def reduceGraph(read_g, write_g, minEdgeWeight, minNodeDegree, Lp, Sp):
+    """
+    Simplify the undirected graph and then update the 3 undirected weight properties.
+    :param read_g: is the graph pickle to read
+    :param write_g: is the updated graph pickle to write
+    :param minEdgeWeight: the original weight of each edge should be >= minEdgeWeight
+    :param minNodeDegree: the degree of each node should be >= minNodeDegree. the degree here is G.degree(node), NOT G.degree(node,weight='weight)
+    :return: None
+    """
+    G=nx.read_gpickle(read_g)
+    print 'number of original nodes: ', nx.number_of_nodes(G)
+    print 'number of original edges: ', nx.number_of_edges(G)
+
+    for (u,v,w) in G.edges(data='weight'):
+        if w < minEdgeWeight:
+            G.remove_edge(u,v)
+
+    for n in G.nodes():
+        if G.degree(n)<minNodeDegree:
+            G.remove_node(n)
+
+    print 'number of new nodes: ', nx.number_of_nodes(G)
+    print 'number of new edges: ', nx.number_of_edges(G)
+
+    for (a, b, w) in G.edges_iter(data='weight'):
+        unweight_allocation(G, a, b, w,Lp,Sp)
+
+    print 'update weight ok'
+    nx.write_gpickle(G, write_g)
+
+    return
+
 
 

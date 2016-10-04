@@ -97,14 +97,14 @@ function SHOW_UPDATE_FORCE(dataset,born){
                .attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
           edges.exit().remove();
 
-  var edgelabels=GRAPH.selectAll(".edgelabel")
+  /*var edgelabels=GRAPH.selectAll(".edgelabel")
                     .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
           edgelabels.enter()
                     .append("text")
                     .attr("class","edgelabel")
                     .text(function(d){return d.Fw;});
-          edgelabels.exit().remove();
+          edgelabels.exit().remove();*/
 
   var gnodes = GRAPH.selectAll(".gnode")
                .data(SIMULATION.nodes(),function(d){return d.wid;});
@@ -335,8 +335,8 @@ function ZoomToNodes(nodes){
             var min_y=d3.min(obj_nodes,function(d){return d.y});
             var x = (max_x+min_x)/2;
             var y = (max_y+min_y)/2;
-            var kx = w/(max_x-min_x+4*maxNodeRadius);
-            var ky = h/(max_y-min_y+4*maxNodeRadius);
+            var kx = 0.7*w/(max_x-min_x+4*maxNodeRadius);
+            var ky = 0.7*h/(max_y-min_y+4*maxNodeRadius);
             var k = Math.min(kx,ky);
             console.log(k);
         };
@@ -543,7 +543,7 @@ function update_informationPanel(paths,position){
     }else{
         var pathinfo = inforow.append('p').attr('class','infoHead');
         pathinfo.append('span').text(function(d){return d.labels[0];});
-        pathinfo.append('span').style('color','#839192').style('font-size', '14px')
+        pathinfo.append('span').style('color','#839192').style('font-size', '12px')
                 .text(function(d){
                     if ( d.labels.slice(1,-1).length==0 ){
                         return ' --> ';
