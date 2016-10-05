@@ -6,7 +6,7 @@ from sklearn.utils.arpack import eigsh
 from sklearn.cluster.k_means_ import k_means
 import math
 from heapq import heappush, heappop
-import networkx as nx
+
 from networkanalysis.Analysis import Retrievor
 
 class tri(object):
@@ -317,9 +317,46 @@ def test1():
 
     return clustersLs, clustersLa
 
+def testshortestpath():
+    G = nx.Graph()
+    G.add_edges_from([('a','e'),('a','d'),('d','e'),('b','d'),('b','c'),('c','e'),('c','d'),('b','e')])
+    gen = nx.shortest_simple_paths(G,'a','b')
+    for n in gen:
+        print n
+    print G.nodes()
+    print '-----'
+    G1 = nx.Graph()
+    G1.add_edges_from([('a', 'e'), ('a', 'd'), ('d', 'e'), ('b', 'd'), ('b', 'c'), ('c', 'e'), ('c', 'd'), ('b', 'e'),('d', 'f'),('d', 'g'),('g','f')])
+    gen1 = nx.shortest_simple_paths(G1, 'a', 'b')
+    for n in gen1:
+        print n
+    print G1.nodes()
 
 
+    print '-------'
+    G3=nx.read_gpickle('try.gpickle')
+    for (a,b) in G3.edges():
+        G3[a][b]['Fw'] = int(G3[a][b]['Fw']*10000)
 
+    gen3=nx.shortest_simple_paths(G3,230349,542752,weight='Fw')
+    for path in gen3:
+        l=0
+        for n1,n2 in zip(path,path[1:]):
+            l += G3[n1][n2]['Fw']
+        print l,path
+
+    print '-------'
+
+    gen3 = nx.shortest_simple_paths(G3, 230349, 542752)
+    allp=[]
+    for path in gen3:
+        l = 0
+        for n1, n2 in zip(path, path[1:]):
+            l += G3[n1][n2]['Fw']
+        allp.append((l,path))
+    allp=sorted(allp, key=lambda x:x[0])
+    for p in allp:
+        print p
 
 
 
