@@ -28,6 +28,7 @@ var TITLECOLOR_CHANGE = function(){
 
 var w=window.innerWidth || document.body.clientWidth;
 var h=window.innerHeight || document.body.clientHeight;
+var Width_infoPanel = 360;
 var maxlinkdistance=200;
 var minlinkdistance=50;
 var maxlinkwidth=3;
