@@ -59,7 +59,7 @@ div.header{
    top:5px;
    right:200px;
    height:50px;
-   font-size:40px;
+   font-size:45px;
    font-family:cursive;
    pointer-events:none;
 }
@@ -199,7 +199,7 @@ input[name="endpoint"]{
 .blink_text{
     animation:1s blinker linear 10;
     -webkit-animation:1s blinker linear 10;
-    color: red;
+
 }
 
 @keyframes blinker {

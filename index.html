@@ -22,8 +22,9 @@
           <input type="reset" name="clear" value="">
       </div>
 
-      <div class="w3-container w3-center header w3-text-blue">
-          Data-Drive Creativity
+      <div class="w3-container w3-center header">
+          <img src="/static/blinker.jpg" alt="BLinker" style="height:80%;">
+          <span style="color:#a1cb4d;">B</span><span style="color:black;">-</span><span style="color:#00adef;">Link</span>
       </div>
 
       <div id="func-nav" class="panel w3-container w3-border w3-border-cyan w3-round-large w3-white" style="top:60px;">
@@ -52,7 +53,7 @@
                    onclick="Handle_Search_Button('point_textinput')" style="opacity:0.3;margin-top:8px;cursor:pointer;" >search</div>
           </div>
       </div>
-      <div id="point_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:60px;">
+      <div id="point_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:60px;background-color:#e6ffe6;">
           <div class="w3-row " style="margin:15px 0;">
               <div class="w3-container w3-col w3-center" style="width:160px;">
                   <div class="w3-center w3-large" style="padding-top:10px;">Min Hop:</div>
@@ -98,7 +99,7 @@
               </div>
           </div>
       </div>
-      <div id="line_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:100px; height:160px;">
+      <div id="line_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:100px; height:160px;background-color:#e6ffe6;">
           <div class="w3-row" style="margin-top:10px;">
               <div class="w3-container w3-col w3-center" style="width:160px;">
                   <div class="w3-center w3-large" style="padding-top:10px;">Min Hop:</div>
@@ -129,9 +130,6 @@
 
       <div id="cluster" class="panel " style="top:10px;">
           <div id="cluster_level_1" class="" >
-              <i class="material-icons w3-xxxlarge w3-blue" style="width:50px;cursor:pointer;" onclick="closePanel('cluster')">
-                      arrow_back
-              </i>
               <div class="w3-white" style="padding-bottom:20px;">
                   <div class="w3-container w3-blue">
                       <h2>Setting</h2>
@@ -156,19 +154,25 @@
                       </ul>
                   </div>
               </div>
-              <div class="w3-section">
-                  <button class="w3-btn w3-blue w3-large" onclick="showClusterLevel2()">Generate clusters</button>
+
+              <div class="w3-navbar w3-margin-top">
+                  <i class="material-icons w3-xxxlarge w3-blue" style="width:50px;cursor:pointer;" onclick="closePanel('cluster')">
+                      arrow_back
+                  </i>
+                  <button class="w3-btn w3-blue w3-large w3-right" style="height:48px;" onclick="showClusterLevel2()">Generate clusters</button>
               </div>
           </div>
 
           <div id="cluster_level_2" class="" style="display:none;">
-              <div class="w3-row">
+              <div class="w3-row" style="height:48px;">
                   <i class="w3-col material-icons w3-xxxlarge w3-blue" style="width:50px;cursor:pointer;" onclick="backClusterLevel1()">
                       arrow_back
                   </i>
-                  <div class="w3-rest w3-container w3-center" id="numberOfClusters" style="height:50px;"><h4 class="blink_text"> Clustering Failed !</h4></div>
+                  <div class="w3-rest w3-container w3-center w3-blue" id="numberOfClusters" style="height:50px;"><h4 class="blink_text"> Clustering Failed !</h4></div>
               </div>
+              <div class="w3-container w3-white" style="height:2px;"></div>
 
+              <!--
               <ul class="w3-navbar  w3-row">
                   <li id="clusterBtnPath" class="w3-half w3-center " style="cursor:pointer; ">
                       <div class="w3-align-center" style="cursor:pointer;" onclick="clusterPan('findPath')"><h5 id="textPath">Find Path</h5></div>
@@ -177,6 +181,8 @@
                       <div class="w3-align-center" style="cursor:pointer;" onclick="clusterPan('generateMore')"><h5 id="textNode">More Nodes</h5></div>
                   </li>
               </ul>
+              -->
+              <div class="w3-container w3-center w3-blue" style="height:47px;"><h5 style="font-weight:bold;">Find &nbsp Path</h5></div>
 
               <div id="findPath" class="w3-white cluster-panel w3-container w3-center w3-center" style="height:240px;">
                   <ul class="w3-navbar w3-row w3-section w3-center">
@@ -225,8 +231,8 @@
           <div class="w3-container info-display w3-center" style="padding:10px 2px 0px 2px;">
           </div>
           <ul class="w3-pagination page-button" >
-              <li><a href="#" class="w3-left w3-text-blue" id="pageup">&#10094; Previous</a></li>
-              <li><a href="#" class="w3-right w3-text-blue" id="pagedown">Next &#10095;</a></li>
+              <li><a href="#" class="w3-left w3-text-blue" id="pageup" style="cursor:pointer;">&#10094; Previous</a></li>
+              <li><a href="#" class="w3-right w3-text-blue" id="pagedown" style="cursor:pointer;">Next &#10095;</a></li>
           </ul>
       </div>
 
@@ -239,7 +245,7 @@
       <div class="copyright w3-display-container">
           <ul class="w3-navbar w3-display-middle">
               <li class="material-icons ">copyright</li>
-              <li style="font-weight:bold;">&nbsp By F.Shi & L.Chen</li>
+              <li style="font-weight:bold;">&nbsp B-Link team (F. Shi & L. Chen)</li>
           </ul>
       </div>
 
