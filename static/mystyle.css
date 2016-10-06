@@ -229,7 +229,12 @@ input[name="endpoint"]{
     overflow-y:scroll;
     word-wrap:break-word;
 }
-
+#pleasewait{
+    top: 60% ;
+    left: 25% ;
+    position: absolute;
+    display: block;
+}
 
 div.row p.list{
     width: 10%;
