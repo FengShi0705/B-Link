@@ -1,41 +1,129 @@
-from flask import Flask, render_template, make_response, request
+from flask import Flask, render_template, make_response, request,session,redirect
 import json
 import networkx as nx
-from networkanalysis.Analysis import Retrievor,PF
+from networkanalysis.Analysis import Retrievor
+from time import gmtime, strftime
 
-app=Flask(__name__)
+app = Flask(__name__)
+app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d\xb3+\xbe>\xd2'
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG(nx.read_gpickle('data/undirected(fortest).gpickle'),'fortest')
-# local retrievor, use search result as its own graph
-my_localRtr=Retrievor.UndirectedG(nx.Graph(),'fortest')
+myRtr=Retrievor.UndirectedG(nx.read_gpickle('../undirected(abcdeijm_test)MinE2_MinN1_Lp70_Sp30.gpickle'),'abcdeijm_test')
 
-# return local graph of input text
-def get_localgraph(text):
-    ipts=[word.strip() for word in text.split(';')]
-    myRtr.input_ids(ipts)
-    myRtr.get_Rel('Fw',100)
-    my_localRtr.G = myRtr.G.subgraph(myRtr.RL_Allipts) # local
+# sign up
+@app.route('/signup')
+def signup():
+    user = request.args.get('email','')
+    session['user'] = user
+    fusers = open('allusers.txt', mode='a')
+    fusers.write(user+'\n')
+    fusers.close()
+    return redirect('/')
 
-    return my_localRtr.G
 
 # Main Page
 @app.route('/')
 def index():
-    return make_response(open('index.html').read())
+    if 'user' in session:
+        print session['user']
+        return make_response(open('index.html').read())
+    else:
+        return make_response(open('signup.html').read())
 
-# Produce data of the localgraph for the search text
-@app.route('/gdata/<searchtext>')
-def gdata(searchtext):
-    searchtext=searchtext.encode('utf-8')
-    localgraph=get_localgraph(searchtext)
-    nodes=[{"wid":n, "label":localgraph.node[n]["label"],"N":localgraph.degree(n,weight="weight"), "n":localgraph.degree(n)} for n in localgraph.nodes()]
-    edges=[{"source":source, "target":target, "Fw":Fw} for (source,target,Fw) in localgraph.edges(data="Fw")]
 
-    dataset={"nodes":nodes, "edges":edges}
-    datajson=json.dumps(dataset)
-    return make_response(datajson)
+# get text return nodes number
+@app.route('/texttowid/<searchtext>')
+def texttowid(searchtext):
+    searchtext = searchtext.encode('utf-8')
+    ipts = [word.strip() for word in searchtext.split(';')]
+    wids=myRtr.input_ids(ipts)
+    response=json.dumps(wids[0])
+    return make_response(response)
+
+# search button, add one node
+@app.route('/searchbutton/<info>')
+def search(info):
+    info = json.loads(info)
+    localG = myRtr.G.subgraph(set(info['currentnodes']+[info['query']]))
+    allnodes = [
+        {"wid": n, "label": localG.node[n]["label"], "N": localG.degree(n, weight="weight"), "n": localG.degree(n)} for
+        n in localG.nodes()]
+    alledges = [{"source": source, "target": target, "Fw": Fw} for (source, target, Fw) in localG.edges(data="Fw")]
+    sorted_paths = sorted(localG.edges(nbunch=[info['query']],data='Fw'), key=lambda x:x[2])
+    add_paths = [path[:-1] for path in sorted_paths]
+    try:
+        bornnode = sorted_paths[0][1]
+    except:
+        bornnode = None
+
+    dataset = {"allnodes": allnodes, "alledges": alledges, "paths": add_paths,'bornnode':bornnode}
+    response = json.dumps(dataset)
+    return make_response(response)
+
+# find the nearest node of the current nodes to the query node
+@app.route('/findnear/<info>')
+def findnear(info):
+    info = json.loads(info)
+    query = info['query']
+    localG = myRtr.G.subgraph(set(info['currentnodes'] + [query]))
+    sorted_neighbors = sorted([(n,localG[query][n]['Fw']) for n in localG.neighbors(query)] , key=lambda x:x[1])
+    try:
+        bornnode = sorted_neighbors[0][0]
+    except:
+        bornnode = None
+
+    response = json.dumps(bornnode)
+    return make_response(response)
+
+
+
+# Generate clusters based on current nodes
+@app.route('/generateClusters/<info>')
+def generateClusters(info):
+    info = json.loads(info)
+    nodes = info['nodes']
+    method = info['method']
+    weight = info['weight']
+    if method=='normalized':
+        k = info['k']
+        clusters = myRtr.cutgraph(nodes,k,weight=weight)
+
+    elif method=='mcl':
+        r = info['r']
+        M, clusters = myRtr.mcl_cluster(nodes,r,weight=weight)
+    else:
+        raise TypeError('unknown clustering method')
+
+    #sort clusters by centrality
+    distance = info['distance']
+    clusters = myRtr.sort_clustersCentrality(clusters,distance)
+    response = json.dumps(clusters)
+    return make_response(response)
+
+
+
+
+# query generator in the server
+@app.route('/generator/<info>')
+def generator(info):
+    info=json.loads(info)
+    info['parameters']['user'] =  session['user']
+    if info['explorelocal']==True:
+        info['localnodes'] = info['parameters']['parameters']['localnodes']
+
+    explorenodes,explorepaths, position= myRtr.my_Gen(**info['parameters'])
+
+    if set(explorenodes).issubset(info['localnodes']):
+        response = json.dumps({'AddNew':False,'paths':explorepaths,"position":position})
+    else:
+        localG = myRtr.G.subgraph(set(info['localnodes']) | set(explorenodes))  # local
+        allnodes = [{"wid":n, "label":localG.node[n]["label"],"N":localG.degree(n,weight="weight"), "n":localG.degree(n)} for n in localG.nodes()]
+        alledges=[{"source":source, "target":target, "Fw":Fw} for (source,target,Fw) in localG.edges(data="Fw")]
+        dataset={'AddNew':True,"allnodes":allnodes, "alledges":alledges,"paths":explorepaths,"position":position}
+        response=json.dumps(dataset)
+
+    return make_response(response)
 
 # get NeighborLevel for a node
 @app.route('/neighbor_level/<int:node>')
@@ -54,7 +142,7 @@ def neighbor_level(node):
 # Get relevant word list and corresponding path list for a word
 @app.route('/wordrank/<int:node>')
 def wordrank(node):
-    response = my_localRtr.get_Rel_one(node,"Fw", len(nx.node_connected_component(my_localRtr.G, node)) )
+    response = my_localRtr.get_Rel_one(node,"Fw", None )
     nodesandpaths=[]
     for n,p in response.iteritems():
         path=p[1]
@@ -63,3 +151,5 @@ def wordrank(node):
     return make_response(response)
 
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', threaded=True, port=5000)

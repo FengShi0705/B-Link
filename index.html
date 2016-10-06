@@ -5,34 +5,249 @@
     <title>Data drive creativity</title>
     <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
-      <script src="static/jsnetworkx.js"></script>
+    <script src="static/jsnetworkx.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/mystyle.css">
+    <link rel="stylesheet" type="text/css" href="static/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href="https://fonts.googleapis.com/css?family=Archivo+Narrow|Fjalla+One|Open+Sans+Condensed:300|Oswald|PT+Sans+Narrow|Roboto+Condensed" rel="stylesheet">
   </head>
 
-  <body>
+  <body onresize="SVG_change_size()">
 
-      <svg id="Mainback" width="100vw" height="100vh">
-        <g transform="translate(10,10)">
-           <foreignObject width="100vw" height="50">
-             <div class="input">
-                 <input type="text" name="keywords" value="">
-                 <input type="button" name="search" value="">
-             </div>
-             <div class="header">
-               <h1 id="title">
-                 Data-Drive Creativity
-               </h1>
-             </div>
-          </foreignObject>
-        </g>
-      </svg>
+      <div id="mainSearchBox">
+          <input class="w3-hover-border-blue" type="text" id="keywords" name="keywords" placeholder="Search..."
+                 onkeyup="checkTextField(this)">
+          <input id="point_search" type="button" name="search" value="" onclick="Handle_Search_Button('keywords')">
+          <input type="reset" name="clear" value="">
+      </div>
 
+      <div class="w3-container w3-center header">
+          <img src="/static/blinker.jpg" alt="BLinker" style="height:80%;">
+          <span style="color:#a1cb4d;">B</span><span style="color:black;">-</span><span style="color:#00adef;">Link</span>
+      </div>
+
+      <div id="func-nav" class="panel w3-container w3-border w3-border-cyan w3-round-large w3-white" style="top:60px;">
+          <div class="w3-white w3-btn w3-third " onclick="show_panel('point')">
+              <img class="w3-border w3-border-blue w3-round" src="static/point.png" style="width:50px;">
+              <div class="w3-small w3-text-cyan">Explore</div>
+          </div>
+          <div class="w3-white w3-btn w3-third  " onclick="show_panel('line')">
+              <img class="w3-border w3-border-blue w3-round" src="static/line.png" style="width:50px;">
+              <div class="w3-small w3-text-cyan">Find Path</div>
+          </div>
+          <div class="w3-white w3-btn w3-third " onclick="show_panel('cluster')">
+              <img class="w3-border w3-border-blue w3-round" src="static/cluster.png" style="width:50px;">
+              <div class="w3-small w3-text-cyan">CLUSTER</div>
+          </div>
+      </div>
+
+      <div id="point" class="panel w3-row" style="top:10px;">
+          <i class="w3-col w3-xxxlarge material-icons w3-blue" onclick="closePanel('point')" style="width:50px; height:50px; cursor:pointer;">
+              arrow_back
+          </i>
+          <div class="w3-rest w3-display-container" style="margin-right:3px;">
+              <input id="point_textinput" class="w3-input w3-border w3-round w3-hover-border-blue" style="height:50px; font-size:20px;"
+                     placeholder="Explore Nearby..." autocomplete="on">
+              <div id="point_input_search" class="w3-display-topright material-icons w3-xxlarge"
+                   onclick="Handle_Search_Button('point_textinput')" style="opacity:0.3;margin-top:8px;cursor:pointer;" >search</div>
+          </div>
+      </div>
+      <div id="point_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:60px;background-color:#e6ffe6;">
+          <div class="w3-row " style="margin:15px 0;">
+              <div class="w3-container w3-col w3-center" style="width:160px;">
+                  <div class="w3-center w3-large" style="padding-top:10px;">Min Hop:</div>
+                  <br>
+                  <select class="minhop" id="minhop_point" onchange="change_exploreMinhop()">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                  </select>
+              </div>
+              <div class="w3-container w3-rest w3-border-left w3-border-cyan" >
+                <div class="w3-display-container" style="width:80px; height:100px; margin-right:20px; display:inline-block;">
+                    <div class="w3-display-topright t-global" >Global</div>
+                    <div class="w3-display-bottomright t-local" >Local</div>
+                </div>
+                <label class="switch switchLG">
+                    <input type="checkbox" name="switch-1" id="switch-1">
+                    <div class="slider round"></div>
+                </label>
+              </div>
+          </div>
+          <div class="w3-container w3-center">
+              <button class="w3-btn w3-blue" onclick="show_info('point')" >Show Results</button>
+          </div>
+      </div>
+
+      <div id="line" class="panel" style="top:10px;">
+          <div class="w3-row " style="width:350px;">
+              <i class="w3-col w3-xxxlarge material-icons w3-blue" onclick="closePanel('line')" style="width:50px; cursor:pointer;">
+                  arrow_back
+              </i>
+              <div class="w3-rest w3-display-container" style="margin-right:3px;">
+                  <input id="pathstart_textinput" class="w3-input w3-border w3-round w3-hover-border-blue" style="height:45px;"
+                         placeholder="Start Point..." autocomplete="on" >
+                  <input id="pathend_textinput" class="w3-input w3-border w3-round w3-hover-border-blue" style="height:45px;"
+                         placeholder="End   Point..." autocomplete="on" >
+                  <div id="pathstart_search" class="w3-display-topright material-icons w3-xxlarge"
+                       onclick="Handle_pathSearchbutton('pathstart_textinput')" style="opacity:0.3;margin-top:5px;cursor:pointer;" >search</div>
+                  <div id="pathend_search" class="w3-display-bottomright material-icons w3-xxlarge"
+                       onclick="Handle_pathSearchbutton('pathend_textinput')" style="opacity:0.3;margin-bottom:5px;cursor:pointer">search</div>
+              </div>
+          </div>
+      </div>
+      <div id="line_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:100px; height:160px;background-color:#e6ffe6;">
+          <div class="w3-row" style="margin-top:10px;">
+              <div class="w3-container w3-col w3-center" style="width:160px;">
+                  <div class="w3-center w3-large" style="padding-top:10px;">Min Hop:</div>
+                  <br>
+                  <select class="minhop" id="minhop_line" onchange="change_exploreMinhop()">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                  </select>
+              </div>
+              <div class="w3-container w3-rest w3-border-left w3-border-cyan" >
+                <div class="w3-display-container" style="width:80px; height:100px; margin-right:20px; display:inline-block;">
+                    <div class="w3-display-topright t-global" >Global</div>
+                    <div class="w3-display-bottomright t-local" >Local</div>
+                </div>
+                <label class="switch switchLG">
+                    <input type="checkbox" name="switch-2" id="switch-2">
+                    <div class="slider round"></div>
+                </label>
+              </div>
+          </div>
+          <div class="w3-container w3-center" style="margin-top:10px;">
+              <button class="w3-btn w3-blue" onclick="show_info('line')">Show Results</button>
+          </div>
+      </div>
+
+      <div id="cluster" class="panel " style="top:10px;">
+          <div id="cluster_level_1" class="" >
+              <div class="w3-white" style="padding-bottom:20px;">
+                  <div class="w3-container w3-blue">
+                      <h2>Setting</h2>
+                  </div>
+                  <div class="w3-panel">
+                      <select id="clusterMethod" class="w3-select w3-large" onchange="clusterSettingOption()" style="">
+                          <option value="" disabled selected> Choose One Method to Cluster</option>
+                          <option value="normalized" >Normalized algorithm</option>
+                          <option value="mcl" >MCL algorithm</option>
+                      </select>
+                  </div>
+                  <div id="clusterMethod1Setting" class="w3-container" style="display:none;">
+                      <span class="w3-label">Number of Clusters:   </span>
+                      <input type="number" class="w3-large w3-center-align" name="clusterNum" min="1" step="1" value="1" style="width:50px;">
+                  </div>
+                  <div id="clusterMethod2Setting" class="w3-container" style="display:none;">
+                      <div class="w3-label" style="padding-bottom:10px;">Set the Level:</div>
+                      <ul class="w3-navbar w3-row w3-center">
+                          <li>Low &nbsp</li>
+                          <li><input type="range" class="" name="clusterLevel" min="1" max="15" step="1" value="1"  style="width:236px;"></li>
+                          <li>&nbsp High</li>
+                      </ul>
+                  </div>
+              </div>
+
+              <div class="w3-navbar w3-margin-top">
+                  <i class="material-icons w3-xxxlarge w3-blue" style="width:50px;cursor:pointer;" onclick="closePanel('cluster')">
+                      arrow_back
+                  </i>
+                  <button class="w3-btn w3-blue w3-large w3-right" style="height:48px;" onclick="showClusterLevel2()">Generate clusters</button>
+              </div>
+          </div>
+
+          <div id="cluster_level_2" class="" style="display:none;">
+              <div class="w3-row" style="height:48px;">
+                  <i class="w3-col material-icons w3-xxxlarge w3-blue" style="width:50px;cursor:pointer;" onclick="backClusterLevel1()">
+                      arrow_back
+                  </i>
+                  <div class="w3-rest w3-container w3-center w3-blue" id="numberOfClusters" style="height:50px;"><h4 class="blink_text"> Clustering Failed !</h4></div>
+              </div>
+              <div class="w3-container w3-white" style="height:2px;"></div>
+
+              <!--
+              <ul class="w3-navbar  w3-row">
+                  <li id="clusterBtnPath" class="w3-half w3-center " style="cursor:pointer; ">
+                      <div class="w3-align-center" style="cursor:pointer;" onclick="clusterPan('findPath')"><h5 id="textPath">Find Path</h5></div>
+                  </li>
+                  <li id="clusterBtnNode" class="w3-half w3-center " style="cursor:pointer; ">
+                      <div class="w3-align-center" style="cursor:pointer;" onclick="clusterPan('generateMore')"><h5 id="textNode">More Nodes</h5></div>
+                  </li>
+              </ul>
+              -->
+              <div class="w3-container w3-center w3-blue" style="height:47px;"><h5 style="font-weight:bold;">Find &nbsp Path</h5></div>
+
+              <div id="findPath" class="w3-white cluster-panel w3-container w3-center w3-center" style="height:240px;">
+                  <ul class="w3-navbar w3-row w3-section w3-center">
+                      <li class="w3-container t-global"  style="width:109px;">Global</li>
+                      <li>
+                          <label class="switch-cluster switchLG">
+                            <input type="checkbox" name="switch-3" id="switch-3">
+                            <div class="slider round"></div>
+                          </label>
+                      </li>
+                      <li class="w3-container t-local" style="width:109px;">Local</li>
+                  </ul>
+                  <div class="w3-section w3-border-top w3-border-black" >
+                      <br>
+                      <select class="w3-select w3-large " name="selectCluster1" onchange="ChangeSelectCluster(this)">
+                          <option value="" disabled selected>Starting cluster of the path</option>
+                      </select>
+                      <select class="w3-select w3-large " name="selectCluster2" onchange="ChangeSelectCluster(this)">
+                          <option value="" disabled selected>Ending cluster of the path</option>
+                      </select>
+                  </div>
+
+
+                  <div class="w3-section"><div class="w3-btn w3-blue" onclick="show_info('cluster')"> Show Results</div></div>
+              </div>
+
+              <div id="generateMore" class="w3-display-container cluster-panel w3-white">
+                  <div style="height:10px;"></div>
+                  <input class="w3-input w3-border w3-round w3-hover-border-blue" style="height:45px;"
+                             placeholder="Point 1..." onkeydown="Hide_InfoPanel()">
+                  <div class="w3-display-topright material-icons w3-xxlarge cluster-searchicon" style="margin-top:15px;">search</div>
+                  <div id="field1" class="w3-center" style="position:relative; margin-top:5px;">
+                      <a id="addBtn" class="w3-btn-floating w3-teal">+</a>
+                      <a id="remBtn" class="w3-btn-floating w3-red">-</a>
+                  </div>
+                  <div class="w3-panel w3-center">
+                      <button class="w3-btn w3-blue">Generate</button>
+                  </div>
+              </div>
+          </div>
+
+
+      </div>
+
+      <div id="info_panel" class="w3-border w3-border-cyan w3-round-large" >
+          <div class="w3-container info-display w3-center" style="padding:10px 2px 0px 2px;">
+          </div>
+          <ul class="w3-pagination page-button" >
+              <li><a href="#" class="w3-left w3-text-blue" id="pageup" style="cursor:pointer;">&#10094; Previous</a></li>
+              <li><a href="#" class="w3-right w3-text-blue" id="pagedown" style="cursor:pointer;">Next &#10095;</a></li>
+          </ul>
+      </div>
 
 
 
       <script type="text/javascript" src="static/setting.js"></script>
       <script type="text/javascript" src="static/myfunctions.js"></script>
       <script type="text/javascript" src="static/app.js"></script>
+
+      <div class="copyright w3-display-container">
+          <ul class="w3-navbar w3-display-middle">
+              <li class="material-icons ">copyright</li>
+              <li style="font-weight:bold;">&nbsp B-Link team (F. Shi & L. Chen)</li>
+          </ul>
+      </div>
 
   </body>
 </html>

@@ -1,46 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+<html>
+  <head>
+    <meta charset="utf-8">
     <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
-</head>
+  </head>
 <body>
- <script>
- var pressTimer;
-     var svg = d3.select("body").append("svg");
-
-var data = [
-  { "name" : "Square 1", "x" : 10, "y" : 10, "height" : 100 , "width" : 100, "fill" : "green"},
-  { "name" : "Square 2", "x" : 25, "y" : 25, "height" : 70 , "width" : 70, "fill" : "yellow"}
-]
-
-var squares = svg.append("g")
-    .selectAll('rect')
-    .data(data)
-    .enter()
-  .append('rect')
-    .attr('x', function (d) { return d.x })
-    .attr('y', function (d) { return d.y })
-    .attr('height', function (d) { return d.height })
-    .attr('width', function (d) { return d.width })
-    .attr('fill', function (d) { return d.fill })
-    .attr('stroke','red')
-    .attr('stroke-width',0)
-    .on("mouseup",function(){
-  clearTimeout(pressTimer);
-    })
-     .on("mousedown",function(){
-     var pressedelement=d3.select(this);
-  pressTimer = window.setTimeout(function() {
-  pressedelement.transition()
-          .duration(500)
-          .attr('stroke-width',3);
-  },1000);
-})
- </script>
-
-
-
+   <article id="main"></article>
 </body>
 </html>
+
