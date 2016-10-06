@@ -97,14 +97,14 @@ function SHOW_UPDATE_FORCE(dataset,born){
                .attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
           edges.exit().remove();
 
-  var edgelabels=GRAPH.selectAll(".edgelabel")
+  /*var edgelabels=GRAPH.selectAll(".edgelabel")
                     .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
           edgelabels.enter()
                     .append("text")
                     .attr("class","edgelabel")
                     .text(function(d){return d.Fw;});
-          edgelabels.exit().remove();
+          edgelabels.exit().remove();*/
 
   var gnodes = GRAPH.selectAll(".gnode")
                .data(SIMULATION.nodes(),function(d){return d.wid;});
@@ -489,7 +489,7 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
     var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==cluster2[0];})[0];
     var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
 
-    generator_update_graphAndPanel(info, bornplace, _.union(cluster1,cluster2),[]);
+    generator_update_graphAndPanel(info, bornplace, [],[]);
 };
 
 
