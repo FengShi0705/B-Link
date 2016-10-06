@@ -356,7 +356,7 @@ function ZoomToNodes(nodes){
                      .scale(k)
                      .translate(-x,-y);
         };
-        BACKLAYER.transition('zoom').duration(1000).call(BACKLAYER_Zoom.transform, transform);
+        SVG.transition('zoom').duration(1000).call(User_Zoom.transform, transform);
     };
     if ( SIMULATION.alphaTarget()==0 ){
         begin_zoom();
@@ -499,6 +499,9 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
 // znodes are the nodes should be zoomed
 // queries are the query nodes
 function generator_update_graphAndPanel(info,bornplace,znodes,queries){
+    d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
+    Loading_Spinner.spin(d3.select('.info-display').node());
+    d3.select('#pleasewait').style('display','block');
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
         if(data.AddNew==true){
             SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
@@ -528,7 +531,10 @@ function generator_update_graphAndPanel(info,bornplace,znodes,queries){
 // paths are the information to be updated on the information panel
 // position is the position of the current paths
 function update_informationPanel(paths,position){
-    d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
+
+    Loading_Spinner.stop();
+    d3.select('#pleasewait').style('display','none');
+
     var inforow = d3.select('div#info_panel div.info-display')
                     .selectAll('div.row')
                     .data(paths)
