@@ -69,12 +69,12 @@ function SHOW_UPDATE_FORCE(dataset,born){
 
 
   //scale
-  scale_Fw2Distance = d3.scalePow().exponent(-2)
-                   .domain([ d3.min(CLIENT_EDGES,function(d){return d.Fw}), d3.max(CLIENT_EDGES,function(d){return d.Fw})  ])
+  scale_tp2Distance = d3.scalePow().exponent(-2)
+                   .domain([ d3.min(CLIENT_EDGES,function(d){return d[Type_distance]}), d3.max(CLIENT_EDGES,function(d){return d[Type_distance]})  ])
                    .range([minlinkdistance,maxlinkdistance]);
 
-  scale_Fw2Stokewidth = d3.scalePow().exponent(-2)
-                    .domain([ d3.min(CLIENT_EDGES,function(d){return d.Fw}), d3.max(CLIENT_EDGES,function(d){return d.Fw})  ])
+  scale_tp2Stokewidth = d3.scalePow().exponent(-2)
+                    .domain([ d3.min(CLIENT_EDGES,function(d){return d[Type_distance]}), d3.max(CLIENT_EDGES,function(d){return d[Type_distance]})  ])
                     .range([maxlinkwidth,minlinkwidth]);
 
   scale_NodeRadius = d3.scalePow().exponent(3)
@@ -82,7 +82,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                         .range([minNodeRadius,maxNodeRadius]);
 
   //update link distance
-  SIMULATION.force("link").distance(function(d){return scale_Fw2Distance(d.Fw);});
+  SIMULATION.force("link").distance(function(d){return scale_tp2Distance(d[Type_distance]);});
 
   //change title color
   TITLECOLOR_CHANGE();
@@ -90,11 +90,11 @@ function SHOW_UPDATE_FORCE(dataset,born){
   var edges=GRAPH.selectAll(".edge")
                .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
-          edges.attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
+          edges.attr("stroke-width",function(d){return scale_tp2Stokewidth(d[Type_distance]);});
           edges.enter()
                .insert("line",":first-child")
                .attr("class","edge")
-               .attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
+               .attr("stroke-width",function(d){return scale_tp2Stokewidth(d[Type_distance]);});
           edges.exit().remove();
 
   /*var edgelabels=GRAPH.selectAll(".edgelabel")
@@ -103,7 +103,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
           edgelabels.enter()
                     .append("text")
                     .attr("class","edgelabel")
-                    .text(function(d){return d.Fw;});
+                    .text(function(d){return d[Type_distance];});
           edgelabels.exit().remove();*/
 
   var gnodes = GRAPH.selectAll(".gnode")
@@ -501,7 +501,9 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
 function generator_update_graphAndPanel(info,bornplace,znodes,queries){
     d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
     Loading_Spinner.spin(d3.select('.info-display').node());
+    d3.selectAll('#mainSearchBox,#func-nav,#point,#point_show_results,#line,#line_show_results,#cluster,#info_panel').style("pointer-events", "none");
     d3.select('#pleasewait').style('display','block');
+
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
         if(data.AddNew==true){
             SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
@@ -533,6 +535,7 @@ function generator_update_graphAndPanel(info,bornplace,znodes,queries){
 function update_informationPanel(paths,position){
 
     Loading_Spinner.stop();
+    d3.selectAll('#mainSearchBox,#func-nav,#point,#point_show_results,#line,#line_show_results,#cluster,#info_panel').style("pointer-events", null);
     d3.select('#pleasewait').style('display','none');
 
     var inforow = d3.select('div#info_panel div.info-display')

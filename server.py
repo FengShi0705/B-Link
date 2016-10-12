@@ -2,6 +2,7 @@ from flask import Flask, render_template, make_response, request,session,redirec
 import json
 import networkx as nx
 from networkanalysis.Analysis import Retrievor
+from user_Feedback.recordUser import record_thread
 from time import gmtime, strftime
 
 app = Flask(__name__)
@@ -9,7 +10,7 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG(nx.read_gpickle('../undirected(abcdeijm_test)MinE2_MinN1_Lp70_Sp30.gpickle'),'abcdeijm_test')
+myRtr=Retrievor.UndirectedG('undirected(abcdeijm_test)MinE2_MinN1_Lp70_Sp30','abcdeijm_test','userdata')
 
 # sign up
 @app.route('/signup')
@@ -33,11 +34,21 @@ def index():
 
 
 # get text return nodes number
-@app.route('/texttowid/<searchtext>')
-def texttowid(searchtext):
+@app.route('/texttowid/<info>')
+def texttowid(info):
+    info = json.loads(info)
+    searchtext = info['searchtext']
+    distance = info['tp']
     searchtext = searchtext.encode('utf-8')
     ipts = [word.strip() for word in searchtext.split(';')]
     wids=myRtr.input_ids(ipts)
+    labels = [myRtr.G.node[wid]['label'] for wid in wids]
+
+    # record user activity
+    user = session['user']
+    rthread=record_thread(myRtr.userSchema,myRtr.data_version,distance,user,'search',wids,labels,1)
+    rthread.start()
+
     response=json.dumps(wids[0])
     return make_response(response)
 
@@ -45,12 +56,13 @@ def texttowid(searchtext):
 @app.route('/searchbutton/<info>')
 def search(info):
     info = json.loads(info)
+    distance = info['tp']
     localG = myRtr.G.subgraph(set(info['currentnodes']+[info['query']]))
     allnodes = [
         {"wid": n, "label": localG.node[n]["label"], "N": localG.degree(n, weight="weight"), "n": localG.degree(n)} for
         n in localG.nodes()]
-    alledges = [{"source": source, "target": target, "Fw": Fw} for (source, target, Fw) in localG.edges(data="Fw")]
-    sorted_paths = sorted(localG.edges(nbunch=[info['query']],data='Fw'), key=lambda x:x[2])
+    alledges = [{"source": source, "target": target, distance: dist} for (source, target, dist) in localG.edges(data=distance)]
+    sorted_paths = sorted(localG.edges(nbunch=[info['query']],data=distance), key=lambda x:x[2])
     add_paths = [path[:-1] for path in sorted_paths]
     try:
         bornnode = sorted_paths[0][1]
@@ -107,19 +119,29 @@ def generateClusters(info):
 # query generator in the server
 @app.route('/generator/<info>')
 def generator(info):
-    info=json.loads(info)
+    info = json.loads(info)
+    distance = info['parameters']['parameters']['tp']
+    query_type= info['parameters']['generator']
     info['parameters']['user'] =  session['user']
     if info['explorelocal']==True:
         info['localnodes'] = info['parameters']['parameters']['localnodes']
 
     explorenodes,explorepaths, position= myRtr.my_Gen(**info['parameters'])
 
+    #record user activities
+    if info['explorelocal']==False:
+        if len(explorepaths)>0:
+            record_wids = [path['ids'] for path in explorepaths]
+            record_labels = [path['labels'] for path in explorepaths]
+            rthread = record_thread(myRtr.userSchema,myRtr.data_version,distance,session['user'],query_type,record_wids,record_labels,position)
+            rthread.start()
+
     if set(explorenodes).issubset(info['localnodes']):
         response = json.dumps({'AddNew':False,'paths':explorepaths,"position":position})
     else:
         localG = myRtr.G.subgraph(set(info['localnodes']) | set(explorenodes))  # local
         allnodes = [{"wid":n, "label":localG.node[n]["label"],"N":localG.degree(n,weight="weight"), "n":localG.degree(n)} for n in localG.nodes()]
-        alledges=[{"source":source, "target":target, "Fw":Fw} for (source,target,Fw) in localG.edges(data="Fw")]
+        alledges=[{"source":source, "target":target, distance:dist} for (source,target,dist) in localG.edges(data=distance)]
         dataset={'AddNew':True,"allnodes":allnodes, "alledges":alledges,"paths":explorepaths,"position":position}
         response=json.dumps(dataset)
 
