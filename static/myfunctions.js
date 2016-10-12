@@ -319,15 +319,20 @@ function highlight_nodespaths(dataset){
 
 // zooming to multiple nodes so that the nodes fill up the screen.nodes is a list
 function ZoomToNodes(nodes){
-    if (  SIMULATION.alphaTarget()==0 ){
+    //if (  SIMULATION.alphaTarget()==0 ){
+    var begin_zoom = function(){
 
-        console.log('zoom begin:'+SIMULATION.alpha())
         var obj_nodes = d3.selectAll('.gnode').filter(function(d){return _.contains(nodes,d.wid);});
         obj_nodes = obj_nodes.data();
         if(obj_nodes.length == 1){
             var k = 1;
             var x=obj_nodes[0].x
             var y=obj_nodes[0].y
+            if( d3.select('#info_panel').style('display')=="none" ){
+                var movew = w/2;
+            }else{
+                var movew = (w+Width_infoPanel)/2;
+            };
         }else{
             var max_x=d3.max(obj_nodes,function(d){return d.x});
             var max_y=d3.max(obj_nodes,function(d){return d.y});
@@ -335,29 +340,39 @@ function ZoomToNodes(nodes){
             var min_y=d3.min(obj_nodes,function(d){return d.y});
             var x = (max_x+min_x)/2;
             var y = (max_y+min_y)/2;
-            var kx = 0.7*w/(max_x-min_x+4*maxNodeRadius);
+            if ( d3.select('#info_panel').style('display')=="none" ){
+                var kx = 0.7*w/(max_x-min_x+4*maxNodeRadius);
+                var movew = w/2;
+            }else{
+                var kx = 0.7*(w-Width_infoPanel)/(max_x-min_x+4*maxNodeRadius);
+                var movew = (w+Width_infoPanel)/2;
+            };
             var ky = 0.7*h/(max_y-min_y+4*maxNodeRadius);
             var k = Math.min(kx,ky);
-            console.log(k);
         };
         function transform(){
             return d3.zoomIdentity
-                     .translate(w/2,h/2)
+                     .translate(movew,h/2)
                      .scale(k)
                      .translate(-x,-y);
         };
-        BACKLAYER.transition('zoom').duration(3000).call(BACKLAYER_Zoom.transform, transform);
-
-        SIMULATION.on('tick.zoom',null);
-
+        BACKLAYER.transition('zoom').duration(1000).call(BACKLAYER_Zoom.transform, transform);
+    };
+    if ( SIMULATION.alphaTarget()==0 ){
+        begin_zoom();
     }else{
+        setTimeout(begin_zoom,1200);
+    };
+        //SIMULATION.on('tick.zoom',null);
+
+    /*}else{
         SIMULATION.on('tick.zoom', function(){
             var maxv = d3.max(d3.selectAll('.gnode circle').data(),function(d){return Math.sqrt(d.vx*d.vx+d.vy*d.vy);});
             if (  SIMULATION.alphaTarget()==0 && maxv<0.1 ){
                 ZoomToNodes(nodes);
             };
         });
-    };
+    };*/
 };
 
 // Back to force layout
@@ -474,7 +489,7 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
     var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==cluster2[0];})[0];
     var bornplace = {x:(bornnode1.x+bornnode2.x)/2, y:(bornnode1.y+bornnode2.y)/2, vx:(bornnode1.vx+bornnode2.vx)/2, vy: (bornnode1.vy+bornnode2.vy)/2 };
 
-    generator_update_graphAndPanel(info, bornplace, _.union(cluster1,cluster2),[]);
+    generator_update_graphAndPanel(info, bornplace, [],[]);
 };
 
 
@@ -593,6 +608,8 @@ function get_clusterSetting(){
 
 //generate clusters
 function generate_Clusters(){
+    // zoom all
+    ZoomToNodes(CLIENT_NODES_ids);
     var setting = get_clusterSetting();
     if (setting[0] == 'normalized'){
         var info = {'nodes':CLIENT_NODES_ids,'method':'normalized','weight':Kernal_Weight,'k':setting[1],'distance':Type_distance }

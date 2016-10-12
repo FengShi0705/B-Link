@@ -28,8 +28,9 @@ var TITLECOLOR_CHANGE = function(){
 
 var w=window.innerWidth || document.body.clientWidth;
 var h=window.innerHeight || document.body.clientHeight;
-var maxlinkdistance=300;
-var minlinkdistance=100;
+var Width_infoPanel = 360;
+var maxlinkdistance=200;
+var minlinkdistance=50;
 var maxlinkwidth=3;
 var minlinkwidth=1;
 var maxNodeRadius=20;
@@ -80,7 +81,7 @@ CLIENT_EDGES=[];
 SIMULATION = d3.forceSimulation()
                .force("link",d3.forceLink().id(function id(d){return d.wid;}).links(CLIENT_EDGES)) //add spring
                .force("charge", d3.forceManyBody().strength(-100)) //repel each other
-               .force("center", d3.forceCenter(w / 2, h / 2)) // force to center
+               //.force("center", d3.forceCenter(w / 2, h / 2)) // force to center
                .nodes(CLIENT_NODES);
 // tick on
   TICK = function(){

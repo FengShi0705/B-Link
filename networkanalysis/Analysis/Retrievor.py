@@ -175,19 +175,16 @@ class UndirectedG(object):
             self.user_generators[user] = {}
             self.user_generators[user]['generator'] = generator(**parameters)
             self.user_generators[user]['records'] = []
-            self.user_generators[user]['position'] = 0
+            self.user_generators[user]['Endpo'] = 0
             self.user_generators[user]['max'] = None
 
-        if self.user_generators[user]['position'] + N < 0:
-            raise ValueError("position should not be negative")
-        else:
-            startposition = self.user_generators[user]['position']
-            self.user_generators[user]['position'] += N
+        self.user_generators[user]['Endpo'] += N
+        startposition = self.user_generators[user]['Endpo'] - int(math.fabs(N))
 
         n_records = len(self.user_generators[user]['records'])
 
-        if self.user_generators[user]['position'] >= n_records:
-            for i in xrange(self.user_generators[user]['position'] - n_records +1):
+        if self.user_generators[user]['Endpo'] >= n_records:
+            for i in xrange(self.user_generators[user]['Endpo'] - n_records +1):
                 try:
                     length, path = self.user_generators[user]['generator'].next()
                 except:
@@ -196,12 +193,14 @@ class UndirectedG(object):
                 else:
                     self.user_generators[user]['records'].append(path)
 
-        if self.user_generators[user]['max'] is not None and self.user_generators[user]['position']>=self.user_generators[user]['max']:
-            self.user_generators[user]['position'] -= N
-        elif self.user_generators[user]['position']==0:
-            self.user_generators[user]['position'] -= N
+        if startposition<0:
+            startposition += int(math.fabs(N))
+            self.user_generators[user]['Endpo'] +=  int(math.fabs(N))
+        if self.user_generators[user]['max'] is not None and startposition>=self.user_generators[user]['max']:
+            startposition -= int(math.fabs(N))
+            self.user_generators[user]['Endpo'] -= int(math.fabs(N))
 
-        results['allpaths'] = self.user_generators[user]['records'][min(startposition,startposition+N):max(startposition,startposition+N)]
+        results['allpaths'] = self.user_generators[user]['records'][startposition:self.user_generators[user]['Endpo']]
         results['allnodes'] = set()
         finalpaths = []
         for path in results['allpaths']:
@@ -209,7 +208,7 @@ class UndirectedG(object):
             lapath = [self.G.node[n]['label'] for n in path]
             finalpaths.append({'ids':path,'labels':lapath})
 
-        return results['allnodes'],finalpaths,min(startposition,startposition+N)+1
+        return results['allnodes'],finalpaths,startposition+1
 
 
 
@@ -526,6 +525,12 @@ def shortest_simple_paths(G, source, target, weight=None):
 
 def bidirectional_dijkstra(G, source, target, weight='weight',
                                         ignore_nodes=None, ignore_edges=None):
+    if ignore_nodes:
+        ignore_nodes=set(ignore_nodes)
+        if source in ignore_nodes:
+            ignore_nodes.remove(source)
+        if target in ignore_nodes:
+            ignore_nodes.remove(target)
 
     if source == target:
         return (0, [source])
@@ -814,6 +819,13 @@ def bidirectional_dijkstra_forClusters(G, source, target,cluster1,cluster2, weig
     shortest_path
     shortest_path_length
     """
+    if ignore_nodes:
+        ignore_nodes = set(ignore_nodes)
+        if source in ignore_nodes:
+            ignore_nodes.remove(source)
+        if target in ignore_nodes:
+            ignore_nodes.remove(target)
+
     if source == target:
         return (0, [source])
 
