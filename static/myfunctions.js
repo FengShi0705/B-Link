@@ -356,7 +356,10 @@ function ZoomToNodes(nodes){
                      .scale(k)
                      .translate(-x,-y);
         };
-        SVG.transition('zoom').duration(1000).call(User_Zoom.transform, transform);
+        if(obj_nodes.length >= 1){
+            SVG.transition('zoom').duration(1000).call(User_Zoom.transform, transform);
+        };
+
     };
     if ( SIMULATION.alphaTarget()==0 ){
         begin_zoom();

@@ -3,6 +3,27 @@ import time
 from Private import PF
 import json
 
+def error_parameters(G,query_type,parameters):
+    if query_type == 'get_Rel_one':
+        start_id = parameters['ipt']
+        start_label = G.node[start_id]["label"]
+        end_id = 'null'
+        end_label = 'null'
+    elif query_type == 'find_paths':
+        start_id = min(parameters['source'],parameters['target'])
+        end_id = max(parameters['source'],parameters['target'])
+        start_label = G.node[start_id]["label"]
+        end_label = G.node[end_id]["label"]
+    elif query_type == 'find_paths_clusters':
+        start_id = parameters['cluster1']
+        end_id = parameters['cluster2']
+        start_label = [ G.node[n]['label'] for n in start_id ]
+        end_label = [ G.node[n]['label'] for n in end_id ]
+    else:
+        raise TypeError('unknown query_type')
+
+    return start_id,start_label,end_id,end_label
+
 
 def create_userInteractData_Table(schema):
     """
@@ -60,10 +81,10 @@ def create_userInteractData_Table(schema):
                 `distance_type` varchar(200) not null,
                 `eid` varchar(200) not null,
                 `query_type` varchar(200) not null,
-                `start_id` varchar(300) null,
+                `start_id` varchar(300) not null,
                 `start_label` varchar(1000) not null,
-                `end_id` varchar(300) null,
-                `end_label` varchar(1000) null,
+                `end_id` varchar(300) not null,
+                `end_label` varchar(1000) not null,
                 `count` int default 0 not null,
                 `datetime` DATETIME not null,
                 primary key (`data_version`(64),`distance_type`(64),`eid`(64),`query_type`(64),`start_id`(255),`start_label`(255),`end_id`(255)),
@@ -180,6 +201,32 @@ class record_thread(threading.Thread):
         """.format(position,self.data_version, self.distance_type, self.eid, self.query_type, json.dumps(record_wid)))
 
         self.cursor.execute(Qy)
+
+
+class error_thread(threading.Thread):
+    def __init__(self,userSchema,data_version,distance_type,eid,query_type,start_id,start_label,end_id,end_label):
+        threading.Thread.__init__(self)
+        self.userSchema = userSchema
+        self.cnx, self.cursor = PF.creatCursor(self.userSchema, 'W')
+        self.data_version = data_version
+        self.distance_type = distance_type
+        self.eid = eid
+        self.query_type = query_type
+        self.start_id = start_id
+        self.start_label = start_label
+        self.end_id = end_id
+        self.end_label = end_label
+
+    def run(self):
+        Qy = ("""
+            INSERT INTO `user_error` (`data_version`,`distance_type`,`eid`,`query_type`,`start_id`,`start_label`,`end_id`,`end_label`,`count`,`datetime`)
+            VALUES (\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\',1, \'{}\')
+            ON DUPLICATE KEY UPDATE `count`=`count`+1, `datetime`=\'{}\'
+        """.format(self.data_version, self.distance_type, self.eid, self.query_type, json.dumps(self.start_id), json.dumps(self.start_label), json.dumps(self.end_id),json.dumps(self.end_label), time.strftime('%Y-%m-%d %H:%M:%S'), time.strftime('%Y-%m-%d %H:%M:%S') )
+             )
+
+        self.cursor.execute(Qy)
+        self.cnx.commit()
 
 
 

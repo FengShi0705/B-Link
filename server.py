@@ -2,7 +2,7 @@ from flask import Flask, render_template, make_response, request,session,redirec
 import json
 import networkx as nx
 from networkanalysis.Analysis import Retrievor
-from user_Feedback.recordUser import record_thread
+from user_Feedback.recordUser import record_thread,error_thread
 from time import gmtime, strftime
 
 app = Flask(__name__)
@@ -41,7 +41,15 @@ def texttowid(info):
     distance = info['tp']
     searchtext = searchtext.encode('utf-8')
     ipts = [word.strip() for word in searchtext.split(';')]
-    wids=myRtr.input_ids(ipts)
+    try:
+        wids=myRtr.input_ids(ipts)
+    except:
+        #record the word which can't be found. error
+        errthread = error_thread(myRtr.userSchema,myRtr.data_version,distance,session['user'],'search','null',ipts[0],'null','null')
+        errthread.start()
+
+        raise ValueError("Input NOT Found")
+
     labels = [myRtr.G.node[wid]['label'] for wid in wids]
 
     # record user activity

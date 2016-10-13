@@ -10,6 +10,7 @@ from sklearn.cluster.k_means_ import k_means
 import itertools
 from heapq import heappush, heappop
 from itertools import count
+from user_Feedback import recordUser
 
 
 
@@ -173,6 +174,7 @@ class UndirectedG(object):
         """
 
         results={}
+        query_type = generator
         generator=self.gencode[generator]
 
         if start==True:
@@ -193,6 +195,14 @@ class UndirectedG(object):
                     length, path = self.user_generators[user]['generator'].next()
                 except:
                     self.user_generators[user]['max'] = len(self.user_generators[user]['records'])
+
+                    # Record user error
+                    if self.user_generators[user]['max'] == 0:
+                        distance_type = parameters['tp']
+                        start_id,start_label,end_id,end_label = recordUser.error_parameters(self.G,query_type,parameters)
+                        errthread = recordUser.error_thread(self.userSchema,self.data_version,distance_type,user,query_type,start_id,start_label,end_id,end_label)
+                        errthread.start()
+
                     break
                 else:
                     self.user_generators[user]['records'].append(path)
