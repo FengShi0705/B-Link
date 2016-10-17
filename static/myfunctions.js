@@ -603,17 +603,28 @@ function update_informationPanel(paths,position){
 
 // get the setting for cluster algorithm
 function get_clusterSetting(){
+    //alert if there is only one node.
+    if( CLIENT_NODES_ids.length<=1 ){
+        alert('The number of nodes should be more than one for clustering');
+        throw 'not enough nodes to be clustered';
+    };
+
     if( d3.select("#clusterMethod").node().value=='normalized'){
         var method = 'normalized';
         var parameter = parseInt( d3.select('div#clusterMethod1Setting input').node().value );
         // if the number of clusters is too large
         if ( parameter>= CLIENT_NODES_ids.length ){
-            parameter = CLIENT_NODES_ids.length-1;
-            d3.select('div#clusterMethod1Setting input').node().value = CLIENT_NODES_ids.length-1;
+            //parameter = CLIENT_NODES_ids.length-1;
+            //d3.select('div#clusterMethod1Setting input').node().value = CLIENT_NODES_ids.length-1;
+            alert('The number of clusters should be less than the number of nodes');
+            throw 'The number of clusters should be less than the number of nodes';
         };
-    }else{
+    }else if(d3.select("#clusterMethod").node().value=='mcl'){
         var method = 'mcl';
         var parameter = parseInt( d3.select('div#clusterMethod2Setting input').node().value );
+    }else{
+        alert('please select clustering method');
+        throw 'please select clustering method';
     };
     return [method,parameter];
 };
@@ -621,8 +632,9 @@ function get_clusterSetting(){
 //generate clusters
 function generate_Clusters(){
     // zoom all
-    ZoomToNodes(CLIENT_NODES_ids);
+
     var setting = get_clusterSetting();
+    ZoomToNodes(CLIENT_NODES_ids);
     if (setting[0] == 'normalized'){
         var info = {'nodes':CLIENT_NODES_ids,'method':'normalized','weight':Kernal_Weight,'k':setting[1],'distance':Type_distance }
     }else{

@@ -57,8 +57,8 @@ def create_userInteractData_Table(schema):
             `distance_type` varchar(200) not null,
             `eid` varchar(200) not null,
             `query_type` varchar(200) not null,
-            `record_wid` varchar(1000) not null,
-            `record_label` varchar(2000) not null,
+            `record_wid` varchar(18000) not null,
+            `record_label` varchar(3000) not null,
             `position` int unsigned not null,
             `count` int default 0 not null,
             `datetime` DATETIME not null,
@@ -118,7 +118,7 @@ class record_thread(threading.Thread):
 
     def run(self):
         for i,record in enumerate(self.record_wids):
-            if self.query_type == 'search' or self.query_type == 'get_Rel_one':
+            if self.query_type == 'search' or self.query_type == 'get_Rel_one' or self.query_type == 'generateClusters':
                 record_wid = record
                 record_label = self.record_labels[i]
                 current_position = self.get_position(record_wid)

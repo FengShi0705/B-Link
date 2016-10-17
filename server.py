@@ -105,6 +105,13 @@ def generateClusters(info):
     nodes = info['nodes']
     method = info['method']
     weight = info['weight']
+
+    # record clusters activities
+    user = session['user']
+    record_wid = sorted(nodes)
+    rthread = record_thread(myRtr.userSchema, myRtr.data_version, info['distance'], user, 'generateClusters', [record_wid], ["Omit"], 1)
+    rthread.start()
+
     if method=='normalized':
         k = info['k']
         clusters = myRtr.cutgraph(nodes,k,weight=weight)

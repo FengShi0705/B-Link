@@ -348,10 +348,12 @@ function backClusterLevel1(){
 };
 // go to cluster level 2 page
 function showClusterLevel2(){
+    generate_Clusters();
+
     document.getElementById("cluster_level_1").style.display = "none";
     document.getElementById("cluster_level_2").style.display = "block";
     clusterPan("findPath");
-    generate_Clusters();
+
 }
 
 // cluster input box control
