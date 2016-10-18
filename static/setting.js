@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
 if (isIE){
     alert("Sorry, Internet Explorer cannot support our website perfectly;\nFor best experience, please use other browsers, such as Chrome, Safari, Firefox, Edge, etc.");
 }
-=======
+
 var Spinner_Opts = {
   lines: 13 // The number of lines to draw
 , length: 18 // The length of each line
@@ -28,7 +27,7 @@ var Spinner_Opts = {
 , position: 'absolute' // Element positioning
 }
 var Loading_Spinner = new Spinner(Spinner_Opts).spin(d3.select('.info-display').node());
->>>>>>> refs/remotes/FengShi0705/new-features
+
 
 d3.selection.prototype.moveToFront = function() {
       return this.each(function(){
