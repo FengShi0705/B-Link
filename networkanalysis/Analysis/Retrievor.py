@@ -10,17 +10,19 @@ from sklearn.cluster.k_means_ import k_means
 import itertools
 from heapq import heappush, heappop
 from itertools import count
+from user_Feedback import recordUser
 
 
 
 class UndirectedG(object):
     # Read Graph, define schema
-    def __init__(self,G,schema):
-        self.G=G
+    def __init__(self,data_version,schema,userSchema):
+        self.G= nx.read_gpickle('../{}.gpickle'.format(data_version))
+        self.data_version = data_version
         print "----Read graph"
         self.schema=schema
+        self.userSchema=userSchema
         assert type(self.G)==nx.classes.graph.Graph, 'Not undirected graph'
-        self.cnx, self.cursor = PF.creatCursor(self.schema, 'R')
         print "----Connect mysql"
         self.user_generators={}
         self.gencode={'get_Rel_one':self.get_Rel_one,'find_paths':self.get_pathsBetween_twonodes,'find_paths_clusters':self.get_pathsBetween_twoClusters}
@@ -31,15 +33,18 @@ class UndirectedG(object):
     # return ids list of input words
     # Inputs is a list of words
     def input_ids(self,ipts):
-        try:
-            ipwids = PF.find_id(ipts, self.cursor)
-        except:
-            self.cnx, self.cursor = PF.creatCursor(self.schema, 'R')
+        #try:
+        #    ipwids = PF.find_id(ipts, self.cursor)
+        #except:
+        cnx, cursor = PF.creatCursor(self.schema, 'R')
 
-        ipwids = PF.find_id(ipts, self.cursor)
+        ipwids = PF.find_id(ipts, cursor)
         ipwids=list(set(ipwids))
         for n in ipwids:
             print n, self.G.node[n]['label']
+
+        cursor.close()
+        cnx.close()
         return ipwids
 
 
@@ -169,6 +174,7 @@ class UndirectedG(object):
         """
 
         results={}
+        query_type = generator
         generator=self.gencode[generator]
 
         if start==True:
@@ -189,6 +195,14 @@ class UndirectedG(object):
                     length, path = self.user_generators[user]['generator'].next()
                 except:
                     self.user_generators[user]['max'] = len(self.user_generators[user]['records'])
+
+                    # Record user error
+                    if self.user_generators[user]['max'] == 0:
+                        distance_type = parameters['tp']
+                        start_id,start_label,end_id,end_label = recordUser.error_parameters(self.G,query_type,parameters)
+                        errthread = recordUser.error_thread(self.userSchema,self.data_version,distance_type,user,query_type,start_id,start_label,end_id,end_label)
+                        errthread.start()
+
                     break
                 else:
                     self.user_generators[user]['records'].append(path)
@@ -208,7 +222,7 @@ class UndirectedG(object):
             lapath = [self.G.node[n]['label'] for n in path]
             finalpaths.append({'ids':path,'labels':lapath})
 
-        return results['allnodes'],finalpaths,startposition+1
+        return results['allnodes'], finalpaths, startposition+1
 
 
 

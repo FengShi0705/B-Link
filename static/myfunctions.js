@@ -69,12 +69,12 @@ function SHOW_UPDATE_FORCE(dataset,born){
 
 
   //scale
-  scale_Fw2Distance = d3.scalePow().exponent(-2)
-                   .domain([ d3.min(CLIENT_EDGES,function(d){return d.Fw}), d3.max(CLIENT_EDGES,function(d){return d.Fw})  ])
+  scale_tp2Distance = d3.scalePow().exponent(-2)
+                   .domain([ d3.min(CLIENT_EDGES,function(d){return d[Type_distance]}), d3.max(CLIENT_EDGES,function(d){return d[Type_distance]})  ])
                    .range([minlinkdistance,maxlinkdistance]);
 
-  scale_Fw2Stokewidth = d3.scalePow().exponent(-2)
-                    .domain([ d3.min(CLIENT_EDGES,function(d){return d.Fw}), d3.max(CLIENT_EDGES,function(d){return d.Fw})  ])
+  scale_tp2Stokewidth = d3.scalePow().exponent(-2)
+                    .domain([ d3.min(CLIENT_EDGES,function(d){return d[Type_distance]}), d3.max(CLIENT_EDGES,function(d){return d[Type_distance]})  ])
                     .range([maxlinkwidth,minlinkwidth]);
 
   scale_NodeRadius = d3.scalePow().exponent(3)
@@ -82,7 +82,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                         .range([minNodeRadius,maxNodeRadius]);
 
   //update link distance
-  SIMULATION.force("link").distance(function(d){return scale_Fw2Distance(d.Fw);});
+  SIMULATION.force("link").distance(function(d){return scale_tp2Distance(d[Type_distance]);});
 
   //change title color
   TITLECOLOR_CHANGE();
@@ -90,11 +90,11 @@ function SHOW_UPDATE_FORCE(dataset,born){
   var edges=GRAPH.selectAll(".edge")
                .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
-          edges.attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
+          edges.attr("stroke-width",function(d){return scale_tp2Stokewidth(d[Type_distance]);});
           edges.enter()
                .insert("line",":first-child")
                .attr("class","edge")
-               .attr("stroke-width",function(d){return scale_Fw2Stokewidth(d.Fw);});
+               .attr("stroke-width",function(d){return scale_tp2Stokewidth(d[Type_distance]);});
           edges.exit().remove();
 
   /*var edgelabels=GRAPH.selectAll(".edgelabel")
@@ -103,7 +103,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
           edgelabels.enter()
                     .append("text")
                     .attr("class","edgelabel")
-                    .text(function(d){return d.Fw;});
+                    .text(function(d){return d[Type_distance];});
           edgelabels.exit().remove();*/
 
   var gnodes = GRAPH.selectAll(".gnode")
@@ -356,7 +356,10 @@ function ZoomToNodes(nodes){
                      .scale(k)
                      .translate(-x,-y);
         };
-        BACKLAYER.transition('zoom').duration(1000).call(BACKLAYER_Zoom.transform, transform);
+        if(obj_nodes.length >= 1){
+            SVG.transition('zoom').duration(1000).call(User_Zoom.transform, transform);
+        };
+
     };
     if ( SIMULATION.alphaTarget()==0 ){
         begin_zoom();
@@ -499,6 +502,11 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
 // znodes are the nodes should be zoomed
 // queries are the query nodes
 function generator_update_graphAndPanel(info,bornplace,znodes,queries){
+    d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
+    Loading_Spinner.spin(d3.select('.info-display').node());
+    d3.selectAll('#mainSearchBox,#func-nav,#point,#point_show_results,#line,#line_show_results,#cluster,#info_panel').style("pointer-events", "none");
+    d3.select('#pleasewait').style('display','block');
+
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
         if(data.AddNew==true){
             SHOW_UPDATE_FORCE(data,bornplace); //add new node and update the graph displayed
@@ -528,7 +536,11 @@ function generator_update_graphAndPanel(info,bornplace,znodes,queries){
 // paths are the information to be updated on the information panel
 // position is the position of the current paths
 function update_informationPanel(paths,position){
-    d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
+
+    Loading_Spinner.stop();
+    d3.selectAll('#mainSearchBox,#func-nav,#point,#point_show_results,#line,#line_show_results,#cluster,#info_panel').style("pointer-events", null);
+    d3.select('#pleasewait').style('display','none');
+
     var inforow = d3.select('div#info_panel div.info-display')
                     .selectAll('div.row')
                     .data(paths)
@@ -591,17 +603,28 @@ function update_informationPanel(paths,position){
 
 // get the setting for cluster algorithm
 function get_clusterSetting(){
+    //alert if there is only one node.
+    if( CLIENT_NODES_ids.length<=1 ){
+        alert('The number of nodes should be more than one for clustering');
+        throw 'not enough nodes to be clustered';
+    };
+
     if( d3.select("#clusterMethod").node().value=='normalized'){
         var method = 'normalized';
         var parameter = parseInt( d3.select('div#clusterMethod1Setting input').node().value );
         // if the number of clusters is too large
         if ( parameter>= CLIENT_NODES_ids.length ){
-            parameter = CLIENT_NODES_ids.length-1;
-            d3.select('div#clusterMethod1Setting input').node().value = CLIENT_NODES_ids.length-1;
+            //parameter = CLIENT_NODES_ids.length-1;
+            //d3.select('div#clusterMethod1Setting input').node().value = CLIENT_NODES_ids.length-1;
+            alert('The number of clusters should be less than the number of nodes');
+            throw 'The number of clusters should be less than the number of nodes';
         };
-    }else{
+    }else if(d3.select("#clusterMethod").node().value=='mcl'){
         var method = 'mcl';
         var parameter = parseInt( d3.select('div#clusterMethod2Setting input').node().value );
+    }else{
+        alert('please select clustering method');
+        throw 'please select clustering method';
     };
     return [method,parameter];
 };
@@ -609,8 +632,9 @@ function get_clusterSetting(){
 //generate clusters
 function generate_Clusters(){
     // zoom all
-    ZoomToNodes(CLIENT_NODES_ids);
+
     var setting = get_clusterSetting();
+    ZoomToNodes(CLIENT_NODES_ids);
     if (setting[0] == 'normalized'){
         var info = {'nodes':CLIENT_NODES_ids,'method':'normalized','weight':Kernal_Weight,'k':setting[1],'distance':Type_distance }
     }else{

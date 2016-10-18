@@ -8,7 +8,7 @@ function updateGraph_searchButton(query,zh_nodes){
         highlight_nodespaths(highlights);
         ZoomToNodes(zh_nodes);
     }else{
-        var info={'currentnodes':currentnodes,'query':query};
+        var info={'currentnodes':currentnodes,'query':query, 'tp':Type_distance};
         d3.json('/searchbutton/'+JSON.stringify(info),function(error,data){
             if(data.bornnode){
                 var bornnode = CLIENT_NODES.filter(function(obj){return obj["wid"]==data.bornnode;})[0];
@@ -30,7 +30,8 @@ function updateGraph_searchButton(query,zh_nodes){
 
 // Handle search button
 function Handle_Search_Button(searchbutton_id){
-    d3.json('/texttowid/'+get_inputtext(searchbutton_id),function(error,data){
+    var info = {'searchtext':get_inputtext(searchbutton_id), 'tp':Type_distance};
+    d3.json('/texttowid/'+JSON.stringify(info),function(error,data){
         if (data){
             var zh_nodes=[data];
             d3.select('input#' + searchbutton_id ).data([data]);
@@ -46,14 +47,16 @@ function Handle_Search_Button(searchbutton_id){
 
 // handle search button of path
 function Handle_pathSearchbutton(searchbutton_id){
-     d3.json('/texttowid/'+get_inputtext(searchbutton_id),function(error,data){
+     var info = {'searchtext':get_inputtext(searchbutton_id), 'tp':Type_distance};
+     d3.json('/texttowid/'+JSON.stringify(info),function(error,data){
          if (data){
              var node1=data;
              var selector1='input#'+searchbutton_id;
              d3.select(selector1).data([node1]);
              var theother_id= _.difference( ['pathstart_textinput','pathend_textinput'] , [searchbutton_id])[0];
 
-             d3.json('/texttowid/'+get_inputtext(theother_id),function(error,data){
+             var info1 = {'searchtext':get_inputtext(theother_id), 'tp':Type_distance};
+             d3.json('/texttowid/'+JSON.stringify(info1),function(error,data){
                  if(data){
                      var node2=data;
                      var selector2='input#'+theother_id;
