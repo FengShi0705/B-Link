@@ -2,6 +2,7 @@ import threading
 import time
 from Private import PF
 import json
+from random import randint
 
 def error_parameters(G,query_type,parameters):
     if query_type == 'get_Rel_one':
@@ -227,6 +228,59 @@ class error_thread(threading.Thread):
 
         self.cursor.execute(Qy)
         self.cnx.commit()
+
+
+
+
+
+def userQuestion(schema,user,N):
+    """
+    generate questions from record schema for user to answer
+    :param user: the email id of a user
+    :param N: the number of questions to be generated for each function/feature
+    :param schema: the schema which records users' usage data
+
+    :return: dictionary of the generated questions
+    """
+
+    def divide_range(R,x):
+        rand_index = []
+        for i in xrange(0,x):
+            ns = int(round( float(R)/x*i ))
+            ne = int(round( float(R)/x*(i+1) ))-1
+            n = randint(ns,ne)
+            rand_index.append(n)
+        return rand_index
+
+
+    cnx,cursor = PF.creatCursor(schema,'R')
+    questions = {}
+
+    for query_type in ['get_Rel_one','find_paths','find_paths_clusters']:
+        Qy = ("""
+            select `record_label` from `user_record` where `eid`=\'{}\' and `query_type`=\'{}\' order by `position` asc, `count` desc;
+        """.format(user,query_type)
+              )
+        cursor.execute(Qy)
+        results = cursor.fetchall()
+        n_res = len(results)
+        if n_res==0:
+            continue
+        elif n_res<=N:
+            selected_index = [i for i in xrange(0,n_res)]
+        else:
+            selected_index = divide_range( n_res, N )
+
+        questions[query_type] = []
+
+        for ind in selected_index:
+            record = json.loads(results[ind][0])
+            record = ' -- '.join(record)
+            questions[query_type].append(record)
+
+    return questions
+
+
 
 
 
