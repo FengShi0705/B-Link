@@ -1,3 +1,9 @@
+
+var isIE = /*@cc_on!@*/false || !!document.documentMode;
+if (isIE){
+    alert("Sorry, Internet Explorer cannot support our website perfectly;\nFor best experience, please use other browsers, such as Chrome, Safari, Firefox, Edge, etc.");
+}
+
 d3.selection.prototype.moveToFront = function() {
       return this.each(function(){
         this.parentNode.appendChild(this);
@@ -136,7 +142,7 @@ function Hide_InfoPanel(){
 };
 
 function Hide_FuncPanel(){
-    document.getElementById("func-nav").style.display = "none";
+    // document.getElementById("func-nav").style.display = "none";
     document.getElementById("point_show_results").style.display = "none";
     document.getElementById("line_show_results").style.display = "none";
 };
@@ -293,6 +299,7 @@ function closePanel(panelname){
         cancelClusterColor();
     };
     document.getElementById("mainSearchBox").style.display = "block";
+    document.getElementById("func-nav").style.display = "block";
     document.getElementById(panelname).style.display = "none";
 }
 
