@@ -64,6 +64,27 @@ div.header{
    pointer-events:none;
 }
 
+/* tooltip design for func-nav panel */
+.tooltip .tip-style{
+    visibility:hidden;
+    width:350px;
+    position:fixed;
+    left:10px;
+    top:143px;
+    white-space:normal;
+    padding:5px 20px;
+    font-size:14px;
+    color:red;
+    background-color:white;
+    text-align:left;
+}
+
+.tooltip:hover .tip-style{
+    visibility:visible;
+    -webkit-transition-delay: 1s; /* Chrome and Safari */
+    transition-delay: 1s;
+}
+
 /* the whole panel control  */
 .panel{
   position:fixed;
@@ -229,6 +250,7 @@ input[name="endpoint"]{
     overflow-y:scroll;
     word-wrap:break-word;
 }
+
 #pleasewait{
     top: 60% ;
     left: 25% ;
@@ -297,20 +319,20 @@ div.info-display div.row:after {
 .page-button{
     position:absolute;
     bottom:15px;
-    left:25px;
-    width:300px;
+    left:16px;
+    width:316px;
 }
 
 /* copy right declaration */
 .copyright{
-    position:fixed;
-    bottom:40px;
-    height:40px;
-    left:0;
-    right:0;
+    position:absolute;
+    bottom:0px;
+    left:50%;
+    width:300;
+    margin-left:-150px;
+    height:26px;
     pointer-events:none;
 }
-
 
 
 
