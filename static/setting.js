@@ -1,7 +1,7 @@
 
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
 if (isIE){
-    alert("Sorry, Internet Explorer cannot support our website perfectly;\nFor best experience, please use other browsers, such as Chrome, Safari, Firefox, Edge, etc.");
+    alert("Sorry, Internet Explorer cannot perfectly support our website;\n\nFor best experience, please use other browsers like Chrome or Safari.");
 }
 
 var Spinner_Opts = {
@@ -398,6 +398,43 @@ $(document).ready(function(){
         if (count == 1){
             $('#remBtn').hide();
         };
+    });
+
+    /////////////////////// Fake drop-down list using jquery ///////////
+    //////start path//////
+    $('#clusterStartSelect').click(function(){
+        $('#clusterStartList').slideToggle(150);
+    });
+
+    $('#clusterStartList a').click(function(){
+        var listText = $(this).find('.listTxt').html();
+        $('#start_select_text').html(listText);
+    });
+
+    $('#clusterStartList').click(function(){
+        $(this).slideUp(150);
+    });
+
+    $('#mouseStart').mouseleave(function(){
+        $('#clusterStartList').slideUp(150);
+    });
+
+    //////End path////////
+    $('#clusterEndSelect').click(function(){
+        $('#clusterEndList').slideToggle(150);
+    });
+
+    $('#clusterEndList a').click(function(){
+        var listText = $(this).find('.listTxt').html();
+        $('#end_select_text').html(listText);
+    });
+
+    $('#clusterEndList').click(function(){
+        $(this).slideUp(150);
+    });
+
+    $('#mouseEnd').mouseleave(function(){
+        $('#clusterEndList').slideUp(150);
     });
 });
 
