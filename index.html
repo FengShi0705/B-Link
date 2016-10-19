@@ -256,18 +256,38 @@
                       </li>
                       <li class="w3-container t-local" style="width:109px;">Local</li>
                   </ul>
-                  <div class="w3-section w3-border-top w3-border-black" >
-                      <br>
-                      <select class="w3-select w3-large " name="selectCluster1" onchange="ChangeSelectCluster(this)">
-                          <option value="" disabled selected>Starting cluster of the path</option>
-                      </select>
-                      <select class="w3-select w3-large " name="selectCluster2" onchange="ChangeSelectCluster(this)">
-                          <option value="" disabled selected>Ending cluster of the path</option>
-                      </select>
+                  <div class="w3-border-top w3-border-black " >
+
+                      <div id="mouseStart" class="w3-dropdown-click w3-padding-12">
+                            <button id="clusterStartSelect" class="w3-btn w3-row" style="background-color:orange;width:310px;">
+                                <span id="start_select_text" class="w3-col" style="width:90%;">Choose START cluster of the path</span>
+                                <i class="material-icons w3-rest" style="vertical-align:-30%;">arrow_drop_down</i>
+                            </button>
+                            <div id="clusterStartList" class="w3-dropdown-content w3-card-4" style="width:310px;z-index:5;">
+                                <a href="#" style="background-color:red;"><span class="listTxt">option 1</span></a>
+                                <a href="#" style="background-color:blue;"><span class="listTxt">option 2</span></a>
+                                <a href="#" style="background-color:green;"><span class="listTxt">option 3</span></a>
+                                <a href="#"><span class="listTxt">option 4</span></a>
+                            </div>
+                      </div>
+
+                      <div id="mouseEnd" class="w3-dropdown-click ">
+                            <button id="clusterEndSelect" class="w3-btn w3-row" style="background-color:orange;width:310px;">
+                                <span id="end_select_text" class="w3-col" style="width:90%;">Choose END cluster of the path</span>
+                                <i class="material-icons w3-rest" style="vertical-align:-30%;">arrow_drop_down</i>
+                            </button>
+                            <div id="clusterEndList" class="w3-dropdown-content w3-card-4" style="width:310px;z-index:6;">
+                                <a href="#" style="background-color:red;"><span class="listTxt">option 1</span></a>
+                                <a href="#" style="background-color:blue;"><span class="listTxt">option 2</span></a>
+                                <a href="#" style="background-color:green;"><span class="listTxt">option 3</span></a>
+                                <a href="#"><span class="listTxt">option 4</span></a>
+                            </div>
+                      </div>
+
                   </div>
 
 
-                  <div class="w3-section"><div class="w3-btn w3-blue" onclick="show_info('cluster')"> Show Results</div></div>
+                  <div style="margin-top:16px;"><div class="w3-btn w3-blue" onclick="show_info('cluster')"> Show Results</div></div>
               </div>
 
               <div id="generateMore" class="w3-display-container cluster-panel w3-white">
