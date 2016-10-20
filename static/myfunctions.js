@@ -227,8 +227,8 @@ function highlight_nodespaths(dataset){
     //is it in cluster panel?
     var clusterpanel = (d3.select('#cluster_level_2').style('display')=='block');
     if (clusterpanel){
-        var icluster1 = d3.select('select[name="selectCluster1"]').node().value;
-        var icluster2 = d3.select('select[name="selectCluster2"]').node().value;
+        var icluster1 = d3.select('#clusterStartSelect').node().value;
+        var icluster2 = d3.select('#clusterEndSelect').node().value;
         var targetClusters = [parseInt(icluster1),parseInt(icluster2)];
     };
 
@@ -649,8 +649,8 @@ function generate_Clusters(){
             return 'Get '+clusters.length+' Clusters!';
         });
         // set options
-        var options = d3.select('#findPath').selectAll('select')
-                                            .selectAll('option.optionCluster')
+        var options = d3.select('#findPath').selectAll('#clusterStartList, #clusterEndList')
+                                            .selectAll('a')
                                             .data(clusters)
                                             .attr('value',function(d,i){
                                                 return i;
@@ -659,19 +659,40 @@ function generate_Clusters(){
                                                 return colors[i];
                                             });
         options.enter()
-               .append('option')
-               .classed('optionCluster',true)
+               .append('a')
+               .attr('href',"#")
                .attr('value',function(d,i){
                     return i;
                })
                .style('background-color',function(d,i){
                    return colors[i];
                })
+               .attr('class','listTxt')
                /* show text of option
                .text(function(d){
                    return 'cluster centering at: '+NODE_IdToObj(d[0]).label;
                })*/;
         options.exit().remove();
+
+        //option click on
+        d3.selectAll('#clusterStartList a').on('click',function(d,i){
+            var color = d3.select(this).style('background-color');
+            var value = d3.select(this).attr('value');
+            d3.select('#clusterStartSelect')
+            .style('background-color',color)
+            .attr('value',value);
+            ChangeSelectCluster('clusterStartSelect');
+         });
+        d3.selectAll('#clusterEndList a').on('click',function(d,i){
+            console.log('haha');
+            var value = d3.select(this).attr('value');
+            var color = d3.select(this).style('background-color')
+            d3.select('#clusterEndSelect')
+              .style('background-color',color)
+              .attr('value',value);
+             ChangeSelectCluster('clusterEndSelect');
+        });
+
     });
 
 };
