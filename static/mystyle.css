@@ -217,6 +217,10 @@ input[name="endpoint"]{
   cursor:pointer;
 }
 
+.listTxt{
+    height: 35px;
+}
+
 /* cluster-panel text blink animation */
 .blink_text{
     animation:1s blinker linear 10;

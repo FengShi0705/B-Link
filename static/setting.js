@@ -201,7 +201,17 @@ var clear_button=d3.select('input[name="clear"]');
     });
 
 // main search box setting //
- d3.selectAll("input#keywords, input#point_textinput").on('keydown',function(){
+ d3.selectAll("input#keywords").on('keydown',function(){
+  var searchid=this.id;
+  if (d3.event.keyCode==13){
+      Handle_Search_Button(searchid);
+  }else{
+      document.getElementById("func-nav").style.display = "none";
+  };
+});
+
+// exploreBox
+ d3.selectAll("input#point_textinput").on('keydown',function(){
   var searchid=this.id;
   if (d3.event.keyCode==13){
       Handle_Search_Button(searchid);
@@ -317,7 +327,12 @@ function show_info(panelname){
 function closePanel(panelname){
     Hide_InfoPanel();
     Hide_FuncPanel();
-    cancelQyHighlight();
+    //cancelQyHighlight();
+    var Qy = d3.select('input#keywords').data()[0];
+    FOCUSING_NODE = Qy;
+    var highlights = {'nodes':[Qy],'paths':[],'paths1':[]};
+    highlight_nodespaths(highlights);
+
     if(panelname=='cluster') {
         cancelClusterColor();
     };
@@ -343,9 +358,9 @@ function backClusterLevel1(){
     document.getElementById("cluster_level_1").style.display = "block"
     document.getElementById("cluster_level_2").style.display = "none";
     //reset setting for Bpath panel
-    d3.selectAll('select[name="selectCluster1"],select[name="selectCluster2"]')
+    d3.selectAll('#clusterStartSelect,#clusterEndSelect')
           .style('background-color','white')
-          .each(function(){
+          .each(function(d,i){
               this.value = "";
           });
     reset_hops_switcher('cluster');
@@ -404,16 +419,12 @@ $(document).ready(function(){
         $('#clusterStartList').slideToggle(150);
     });
 
-    $('#clusterStartList a').click(function(){
-        var listText = $(this).find('.listTxt').html();
-        $('#start_select_text').html(listText);
-    });
 
     $('#clusterStartList').click(function(){
         $(this).slideUp(150);
     });
 
-    $('#mouseStart').mouseleave(function(){
+    $('#BpathStart').mouseleave(function(){
         $('#clusterStartList').slideUp(150);
     });
 
@@ -422,16 +433,12 @@ $(document).ready(function(){
         $('#clusterEndList').slideToggle(150);
     });
 
-    $('#clusterEndList a').click(function(){
-        var listText = $(this).find('.listTxt').html();
-        $('#end_select_text').html(listText);
-    });
 
     $('#clusterEndList').click(function(){
         $(this).slideUp(150);
     });
 
-    $('#mouseEnd').mouseleave(function(){
+    $('#BpathEnd').mouseleave(function(){
         $('#clusterEndList').slideUp(150);
     });
 });
@@ -465,10 +472,8 @@ function clusterPan(clusterPanel){
 };
 
 //change the select of cluster
-function ChangeSelectCluster(node){
+function ChangeSelectCluster(id){
     Hide_InfoPanel();
     resumeClusterColor();
-    var option = d3.select(node).selectAll('option.optionCluster').filter(function(d){return node.value==d3.select(this).attr('value');});
-    d3.select(node).style('background-color',option.style('background-color'));
-    FOCUSING_CLUSTER = node.value;
+    FOCUSING_CLUSTER = d3.select('#'+id).attr('value');
 };

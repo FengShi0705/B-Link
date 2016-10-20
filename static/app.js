@@ -138,15 +138,15 @@ function FindPath_previous(){
 
 //B-paths show results
 function BpathsClusters_showResult(){
-    var value1 = d3.select('select[name="selectCluster1"]').node().value;
-    var cluster1 = d3.select('select[name="selectCluster1"]')
-                     .selectAll('option.optionCluster')
+    var value1 = d3.select('#clusterStartSelect').node().value;
+    var cluster1 = d3.select('#clusterStartList')
+                     .selectAll('a')
                      .filter(function(d){return d3.select(this).attr('value')==value1;})
                      .data()[0];
 
-    var value2 = d3.select('select[name="selectCluster2"]').node().value;
-    var cluster2 = d3.select('select[name="selectCluster2"]')
-                     .selectAll('option.optionCluster')
+    var value2 = d3.select('#clusterEndSelect').node().value;
+    var cluster2 = d3.select('#clusterEndList')
+                     .selectAll('a')
                      .filter(function(d){return d3.select(this).attr('value') == value2;})
                      .data()[0];
 
@@ -158,15 +158,15 @@ function BpathsClusters_showResult(){
 };
 //B-paths next
 function Bpaths_Next(){
-    var value1 = d3.select('select[name="selectCluster1"]').node().value;
-    var cluster1 = d3.select('select[name="selectCluster1"]')
-                     .selectAll('option.optionCluster')
+    var value1 = d3.select('#clusterStartSelect').node().value;
+    var cluster1 = d3.select('#clusterStartList')
+                     .selectAll('a')
                      .filter(function(d){return d3.select(this).attr('value')==value1;})
                      .data()[0];
 
-    var value2 = d3.select('select[name="selectCluster2"]').node().value;
-    var cluster2 = d3.select('select[name="selectCluster2"]')
-                     .selectAll('option.optionCluster')
+    var value2 = d3.select('#clusterEndSelect').node().value;
+    var cluster2 = d3.select('#clusterEndList')
+                     .selectAll('a')
                      .filter(function(d){return d3.select(this).attr('value') == value2;})
                      .data()[0];
 
@@ -174,15 +174,15 @@ function Bpaths_Next(){
 };
 //B-paths previous
 function Bpaths_Previous(){
-    var value1 = d3.select('select[name="selectCluster1"]').node().value;
-    var cluster1 = d3.select('select[name="selectCluster1"]')
-                     .selectAll('option.optionCluster')
+    var value1 = d3.select('#clusterStartSelect').node().value;
+    var cluster1 = d3.select('#clusterStartList')
+                     .selectAll('a')
                      .filter(function(d){return d3.select(this).attr('value')==value1;})
                      .data()[0];
 
-    var value2 = d3.select('select[name="selectCluster2"]').node().value;
-    var cluster2 = d3.select('select[name="selectCluster2"]')
-                     .selectAll('option.optionCluster')
+    var value2 = d3.select('#clusterEndSelect').node().value;
+    var cluster2 = d3.select('#clusterEndList')
+                     .selectAll('a')
                      .filter(function(d){return d3.select(this).attr('value') == value2;})
                      .data()[0];
 
@@ -263,26 +263,30 @@ function node_left_click_on(){
               cancelInfoHighlight();
               resumeClusterColor();
               var color = d3.select(this).select('circle').datum().color;
-              var preCluster=FOCUSING_CLUSTER;
-              FOCUSING_CLUSTER = clicked_data.icluster;
-              if( preCluster==FOCUSING_CLUSTER ||  d3.select('select[name="selectCluster1"]').node().value==d3.select('select[name="selectCluster2"]').node().value){
-                  //color
-                  d3.select('select[name="selectCluster1"]').style('background-color', color);
-                  d3.select('select[name="selectCluster2"]').style('background-color','white');
-                  //value
-                  d3.select('select[name="selectCluster1"]').node().value = FOCUSING_CLUSTER;
-                  d3.select('select[name="selectCluster2"]').node().value = "";
 
-              }else{
-                  d3.selectAll('select[name="selectCluster1"],select[name="selectCluster2"]')
-                    .filter(function(d){return parseInt(this.value)!=preCluster;})
-                    .each(function(d,i){
-                            assert(i!=1, 'precluster not in cluster selection box');
-                            d3.select(this).style('background-color',color); //color
-                            this.value = FOCUSING_CLUSTER; //value
+              if(color){
+                  var preCluster=FOCUSING_CLUSTER;
+                  FOCUSING_CLUSTER = clicked_data.icluster;
 
-                    });
-              };
+                  if( preCluster==FOCUSING_CLUSTER ||  d3.select('#clusterStartSelect').node().value==d3.select('#clusterEndSelect').node().value){
+                      //color
+                      d3.select('#clusterStartSelect').style('background-color', color);
+                      d3.select('#clusterEndSelect').style('background-color','white');
+                      //value
+                      d3.select('#clusterStartSelect').node().value = FOCUSING_CLUSTER;
+                      d3.select('#clusterEndSelect').node().value = "";
+
+                  }else{
+                      d3.selectAll('#clusterStartSelect,#clusterEndSelect')
+                        .filter(function(d){return parseInt(this.value)!=preCluster;})
+                        .each(function(d,i){
+                                assert(i!=1, 'precluster not in cluster selection box');
+                                d3.select(this).style('background-color',color); //color
+                                this.value = FOCUSING_CLUSTER; //value
+
+                        });
+                  };
+              }
           };
    });
 };
