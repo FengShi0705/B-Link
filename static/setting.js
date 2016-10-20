@@ -1,8 +1,4 @@
 
-var isIE = /*@cc_on!@*/false || !!document.documentMode;
-if (isIE){
-    alert("Sorry, Internet Explorer cannot perfectly support our website;\n\nFor best experience, please use other browsers like Chrome or Safari.");
-}
 
 var Spinner_Opts = {
   lines: 13 // The number of lines to draw
@@ -185,10 +181,12 @@ function Show_FuncPanel(searchId){
 // CSS - search-box control
   function checkTextField(field) {
     if (field.value != '') {
-        d3.select('input[name="clear"]').style("visibility","visible");
+        //d3.select('input[name="clear"]').style("visibility","visible");
+        d3.select('input[name="search"]').style("opacity","0.8");
     }
     else{
-        d3.select('input[name="clear"]').style("visibility","hidden");
+        //d3.select('input[name="clear"]').style("visibility","hidden");
+        d3.select('input[name="search"]').style("opacity","0.1");
         document.getElementById("func-nav").style.display = "none";
         Hide_FuncPanel();
         Hide_InfoPanel();
