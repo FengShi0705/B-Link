@@ -6,6 +6,8 @@ from sklearn.utils.arpack import eigsh
 from sklearn.cluster.k_means_ import k_means
 import math
 from heapq import heappush, heappop
+import time
+import networkx as nx
 
 from networkanalysis.Analysis import Retrievor
 
@@ -363,6 +365,25 @@ def testshortestpath():
         print p
 
 
+def fast_shortestpath(R):
+    ta1=time.time()
+    length, path=nx.bidirectional_dijkstra(R.G,1,1000,weight='Fw')
+    ta2=time.time()
+    print 'bidirectional: ',ta2-ta1
+    print path
+
+    ta1 = time.time()
+    path=nx.dijkstra_path(R.G, 1, 1000, weight='Fw')
+    ta2 = time.time()
+    print 'single dijkstra_path: ', ta2 - ta1
+    print path
+
+    ta1 = time.time()
+    gen=R.get_pathsBetween_twonodes(1,1000,'Fw',1)
+    (length, path)=gen.next()
+    ta2 = time.time()
+    print 'my dijkstra_path: ', ta2 - ta1
+    print path
 
 
 
