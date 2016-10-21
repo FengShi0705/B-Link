@@ -74,7 +74,7 @@
                    onclick="Handle_Search_Button('point_textinput')" style="opacity:0.3;margin-top:8px;cursor:pointer;" >search</div>
           </div>
       </div>
-      <div id="point_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:60px;background-color:#e6ffe6;">
+      <div id="point_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:60px;background-color:#e6ffe6;z-index:9;">
           <div class="w3-row " style="margin:15px 0;">
               <div class="w3-container w3-col w3-center" style="width:160px;">
                   <div class="w3-display-container w3-center w3-large" style="padding-top:10px;">Min. Hop:
@@ -103,12 +103,12 @@
                 <div class="w3-display-container" style="display:inline-block;height:100px;width:18px;">
                     <span class="w3-tooltip w3-display-topmiddle">
                         <image src="/static/question.png" style="cursor:pointer;"></image>
-                        <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:absolute;top:35px;left:-95px;width:170px;height:70px;z-index:5;">
+                        <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:absolute;top:35px;left:-95px;width:170px;height:70px;z-index:10;">
                             "Global" means all data from database are involved</div>
                     </span>
                     <span class="w3-tooltip w3-display-bottommiddle" style="padding-bottom:15px;">
                         <image src="/static/question.png" style="cursor:pointer;"></image>
-                        <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:180px;left:175px;width:185px;height:70px;z-index:5;">
+                        <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:180px;left:175px;width:185px;height:70px;z-index:10;">
                             "Local" means only the data in current network map are involved</div>
                     </span>
                 </div>
@@ -140,7 +140,7 @@
               </div>
           </div>
       </div>
-      <div id="line_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:100px; height:160px;background-color:#e6ffe6;">
+      <div id="line_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:100px; height:160px;background-color:#e6ffe6;z-index:9;">
           <div class="w3-row" style="margin-top:10px;">
               <div class="w3-container w3-col w3-center" style="width:160px;">
                   <div class="w3-display-container w3-center w3-large" style="padding-top:10px;">Min. Hop:
@@ -302,7 +302,7 @@
 
       </div>
 
-      <div id="info_panel" class="w3-border w3-border-cyan w3-round-large" >
+      <div id="info_panel" class="w3-border w3-border-cyan w3-round-large" style="z-index:5;">
           <div class="w3-container info-display w3-center" style="padding:10px 2px 0px 2px;">
               <div id="pleasewait">Just a few seconds...</div>
           </div>
