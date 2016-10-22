@@ -28,13 +28,14 @@ input[name="search"]{
   right:5px;
   top:5px;
   border:2px;
-  background-image:url('/static/search icon.png');
+  background-image:url('/static/search.svg');
   background-color:white;
   background-size:100%;
+  opacity:0.1;
   cursor: pointer;
 }
 
-input[name="clear"]{
+/*input[name="clear"]{
   width:20px;
   height:20px;
   position:absolute;
@@ -47,7 +48,7 @@ input[name="clear"]{
   background-size:100%;
   cursor:pointer;
   visibility:hidden;
-}
+}*/
 
 input[name="search"]:hover{
   background-size:110%;

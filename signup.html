@@ -2,15 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Welcome to B-Link !</title>
+    <link rel="shortcut icon" href="static/favicon.png">
+    <link rel="stylesheet" type="text/css" href="static/w3.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        var isIE = /*@cc_on!@*/false || !!document.documentMode;
+        if (isIE){
+            alert("Sorry, Internet Explorer cannot perfectly support our website;\n\nFor best experience, please use other browsers like Chrome or Safari.");
+        }
+    </script>
 </head>
 
 <body>
-<form action="/signup">
-  Email:<br>
-  <input type="text" name="email" value=""><br><br>
-  <input type="submit" value="Submit">
-</form>
+
+    <div style="padding-top:140px;">
+        <div class="w3-center" style="height:164px;;">
+            <img src="static/logo.png" style="height:40px;" class=""/>
+            <br>
+            <img src="static/blink.png" alt="B-Link" style="height:60px;margin-top:30px;">
+            <h6><i>A Data-driven Creativity Engine</i></h6>
+        </div>
+
+        <div class="w3-center" style="height:128px;;">
+            <form action="/signup" class="" style="margin-top:80px;">
+                <input type="email" name="email" value="" class="w3-input" style="width:370px;;display:inline-block;"
+                       placeholder="Please type in your EMAIL address, thank you !">
+                <br>
+                <button type="submit" class="w3-btn w3-large w3-blue w3-ripple" style="margin-top:50px; width:150px;">Enter</button>
+            </form>
+        </div>
+    </div>
+
+    <ul class="w3-navbar" style="position:absolute;bottom:5px;left:50%;margin-left:-142.5px;">
+          <img src="static/copyright.svg" style="height:22px;"/>
+          <span style="font-weight:bold;"> B-Link team (F. Shi & L. Chen)</span>
+    </ul>
 
 </body>
 </html>
