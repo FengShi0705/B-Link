@@ -10,25 +10,30 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG('undirected(abcdeijm_test)MinE2_MinN1_Lp70_Sp30','abcdeijm_test','userdata')
+myRtr=Retrievor.UndirectedG('undirected(fortest)','abcdeijm_test','userdata')
 
 # sign up
 @app.route('/signup')
 def signup():
     user = request.args.get('email','')
+    w = request.args.get('w','')
     session['user'] = user
     fusers = open('allusers.txt', mode='a')
     fusers.write(user+'\n')
     fusers.close()
-    return redirect('/')
+    return redirect('/?w={}'.format(w))
 
 
 # Main Page
 @app.route('/')
 def index():
     if 'user' in session:
+        w = request.args.get('w','')
         print session['user']
-        return make_response(open('index.html').read())
+        if int(w)<=750:
+            print 'moble'
+        else:
+            return make_response(open('index.html').read())
     else:
         return make_response(open('signup.html').read())
 
