@@ -2,6 +2,8 @@ from Private.PubFunctions import unweight_allocation
 from Private import PubFunctions
 import networkx as nx
 import datetime
+import math
+import time
 
 
 def write_undirected(schema,reltable,labtable):
@@ -100,5 +102,93 @@ def reduceGraph(read_g, write_g, minEdgeWeight, minNodeDegree, Lp, Sp):
 
     return
 
+
+
+
+def disparity_graph(schema,reltable,labtable,alpha_thred,nodeDegree_thred,Graph_type='undirected'):
+    """
+    Network reduction by disparity filter algorithm.
+    ALso update the relationship direction as 'general --> specifi' if the graph is directed.
+    Finally, write the gpickle
+    :param schema: the mysql schema storing the data
+    :param reltable: the name of edge table
+    :param labtable: the name of keywords lable table
+    :param alpha_thred: the threshold of alpha for disparity filter algorithm
+    :param nodeDegree_thred: the threshold of minimum node degree
+    :param Graph_type: the graph type: 'undirected' or 'one-directed'
+    :return: none, write the gpickle
+    """
+    def get_maxAlpha(G,i,j,w):
+        Si = G.degree(i,weight='weight')
+        Pij = w/Si
+        Ki = float(G.degree(i))
+        if Ki>1:
+            alpha_i = 1.0 - math.pow( (1.0 - Pij) , (Ki-1) )
+        else:
+            alpha_i = 1.0
+
+        Sj = G.degree(j,weight='weight')
+        Pji = w/Sj
+        Kj = float(G.degree(j))
+        if Kj>1:
+            alpha_j = 1.0 - math.pow( (1.0 - Pji) ,( Kj-1 ) )
+        else:
+            alpha_j = 1.0
+
+        return  max(alpha_i,alpha_j)
+
+
+    #load graph by edge table
+    G = PubFunctions.loadw2wdict(schema, reltable, Graph_type)
+    print 'finish loading raw data',time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()),'\n'
+
+
+    # calculate alpha
+    for (a, b, w) in G.edges(data='weight'):
+        alpha = get_maxAlpha(G,a,b,w)
+        G[a][b]['maxAlpha'] = alpha
+    print 'finish calculate alpha',time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()),'\n'
+
+    # disparity_filter
+    for (a,b) in G.edges():
+        if G[a][b]['maxAlpha'] < alpha_thred:
+            G.remove_edge(a, b)
+    print 'finish filter',time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()),'\n'
+
+    # update direction General-->Specific
+    if Graph_type == 'one-directed':
+        for (a, b) in G.edges():
+            if G.degree(a,weight='weight') < G.degree(b,weight='weight'):
+                G.add_edge(b, a, G[a][b])
+                G.remove_edge(a, b)
+        print 'finish update direction',time.strftime('%Y-%m-%d %H:%M:%S')
+        print 'edges: ', len(G.edges())
+        print 'nodes: ', len(G.nodes()),'\n'
+    else:
+        assert Graph_type=='undirected', 'unknown graph type: {}'.format(Graph_type)
+
+    #add node label
+    G = PubFunctions.load_nodelabel(G, schema, labtable)
+    print 'add node label',time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()),'\n'
+
+    #remove node based on node degree threshold
+    for n in G.nodes():
+        if G.degree(n) < nodeDegree_thred:
+            G.remove_node(n)
+    print 'finish remove node: ',time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()),'\n'
+
+    nx.write_gpickle(G, '../DispReduced_{}_{}_alpha{}.gpickle'.format(schema,Graph_type,alpha_thred))
+
+    return
 
 
