@@ -1,6 +1,7 @@
 import PubFunctions
 import networkx as nx
 from time import time
+import main
 
 def test_ReadNeighborsFromMysql():
     cnx,rcursor=PubFunctions.creatCursor('abcdeijm_test','R')
@@ -40,3 +41,17 @@ def test_allweight():
     return
 
 
+def rawGraph_withAlpha():
+    """
+    load raw data and add disparity alpha value
+    :return:
+    """
+    schema = 'total_v3_csvneo4j'
+    reltable = 'all_w2w'
+    labtable = 'all_keywords'
+    Graph_type = 'undirected'
+
+    G = main.load_rawGraph(schema,reltable,labtable,Graph_type=Graph_type)
+    G = main.disparity_alpha(G)
+    nx.write_gpickle(G, '../RawGraph_DisparityAlpha_{}_{}'.format(schema, Graph_type))
+    return
