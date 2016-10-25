@@ -1,27 +1,26 @@
-import PubFunctions
 import networkx as nx
-from time import time
+import time
 import main
 
 def test_ReadNeighborsFromMysql():
     cnx,rcursor=PubFunctions.creatCursor('abcdeijm_test','R')
 
     sG1=nx.Graph()
-    t1s=time()
+    t1s=time.time()
     PubFunctions.DFS_recursive_LevelNeighbor(500,sG1,rcursor,'all_w2w',maxlevel=1)
-    t1e=time()
+    t1e=time.time()
 
 
     sG2=nx.Graph()
-    t2s=time()
+    t2s=time.time()
     PubFunctions.BFS_LevelNeighbor(500,sG2,rcursor,'all_w2w',maxlevel=1)
-    t2e=time()
+    t2e=time.time()
 
 
     sG3=nx.Graph()
-    t3s=time()
+    t3s=time.time()
     PubFunctions.Complex_DFS_LevelNeighbor(500,sG3,rcursor,'all_w2w',1)
-    t3e=time()
+    t3e=time.time()
 
 
     print len(sG1.edges()),len(sG1.nodes()),t1e-t1s
@@ -53,5 +52,33 @@ def rawGraph_withAlpha():
 
     G = main.load_rawGraph(schema,reltable,labtable,Graph_type=Graph_type)
     G = main.disparity_alpha(G)
-    nx.write_gpickle(G, '../RawGraph_DisparityAlpha_{}_{}'.format(schema, Graph_type))
+    nx.write_gpickle(G, '../RawGraphWithDisparityAlpha_{}_{}.gpickle'.format(Graph_type,schema))
     return
+
+
+def filter_edgeandNode():
+    """
+    filter edge based on disparity alpha.
+    filter node based on node degree
+    :return:
+    """
+    rawGraph_withAlpha()
+    time.sleep(60)
+
+    schema = 'total_v3_csvneo4j'
+    Graph_type = 'undirected'
+    alpha_thred =0.5
+    nodeDegree_thred = 1.0
+
+
+    while alpha_thred<1.0:
+        G = nx.read_gpickle('../RawGraphWithDisparityAlpha_{}_{}.gpickle'.format(Graph_type,schema))
+        G = main.disparity_filter(G,alpha_thred)
+        G = main.nodeDegree_filter(G,nodeDegree_thred)
+        nx.write_gpickle(G,'filteredG_{}_alpha{}_nodeD{}_{}'.format(Graph_type,alpha_thred,nodeDegree_thred,schema))
+        print '-----',alpha_thred,'----------'
+        alpha_thred += 0.05
+    return
+
+
+

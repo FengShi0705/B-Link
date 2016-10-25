@@ -4,6 +4,7 @@ import networkx as nx
 import datetime
 import math
 import time
+from math import fabs,log,sqrt
 
 
 def write_undirected(schema,reltable,labtable):
@@ -182,24 +183,19 @@ def disparity_filter(G,alpha_thred):
 
     return G
 
-def G2S_direction(G):
+
+def globalEdge_filter(G,minorgEdgeWeight):
     """
-    update the relationship direction as 'general --> specifi' if the graph is directed.
-    :param G: networkx Graph
+    filter the graph based on minimum original weight
+    :param G: networkx graph
+    :param minorgEdgeWeight: minimum original weight
     :return: G
     """
-    # update direction General-->Specific
-    if nx.is_directed(G):
-        for (a, b) in G.edges():
-            if G.degree(a, weight='weight') < G.degree(b, weight='weight'):
-                G.add_edge(b, a, G[a][b])
-                G.remove_edge(a, b)
-        print 'finish update direction', time.strftime('%Y-%m-%d %H:%M:%S')
-        print 'edges: ', len(G.edges())
-        print 'nodes: ', len(G.nodes()), '\n'
-    else:
-        print 'Not directed Graph. No need to update direction'
+    for (u, v, w) in G.edges(data='weight'):
+        if w < minorgEdgeWeight:
+            G.remove_edge(u,v)
     return G
+
 
 def nodeDegree_filter(G, nodeDegree_thred):
     """
@@ -217,5 +213,39 @@ def nodeDegree_filter(G, nodeDegree_thred):
     print 'nodes: ', len(G.nodes()), '\n'
 
     return G
+
+
+def addNode_strength_degree(G):
+    """
+    Add the strength and degree for each node
+    :param G: networkx graph
+    :return: G
+    """
+    for n in G.nodes():
+        G.node[n]['N'] = G.degree(n,weight='weight')
+        G.node[n]['n'] = float(G.degree(n))
+
+    return G
+
+
+def G2S_direction(G):
+    """
+    update the relationship direction as 'general --> specifi' if the graph is directed.
+    :param G: networkx Graph
+    :return: G
+    """
+    # update direction General-->Specific
+    if nx.is_directed(G):
+        for (a, b) in G.edges():
+            if G.node[a]['N'] < G.node[b]['N']:
+                G.add_edge(b, a, G[a][b])
+                G.remove_edge(a, b)
+        print 'finish update direction', time.strftime('%Y-%m-%d %H:%M:%S')
+        print 'edges: ', len(G.edges())
+        print 'nodes: ', len(G.nodes()), '\n'
+    else:
+        print 'Not directed Graph. No need to update direction'
+    return G
+
 
 
