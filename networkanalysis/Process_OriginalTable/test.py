@@ -56,28 +56,23 @@ def rawGraph_withAlpha():
     return
 
 
-def filter_edgeandNode():
+def filter_edgeandNode(alpha_thred,nodeDegree_thred):
     """
     filter edge based on disparity alpha.
     filter node based on node degree
+    :param alpha_thred: threshold of alpha
+    :param nodeDegree_thred: threshold of node degree
     :return:
     """
-    rawGraph_withAlpha()
-    time.sleep(60)
-
     schema = 'total_v3_csvneo4j'
     Graph_type = 'undirected'
-    alpha_thred =0.5
-    nodeDegree_thred = 1.0
 
+    G = nx.read_gpickle('../RawGraphWithDisparityAlpha_{}_{}.gpickle'.format(Graph_type,schema))
+    G = main.disparity_filter(G,alpha_thred)
+    G = main.nodeDegree_filter(G,nodeDegree_thred)
+    nx.write_gpickle(G,'../filteredG_{}_alpha{}_nodeD{}_{}.gpickle'.format(Graph_type,alpha_thred,nodeDegree_thred,schema))
+    print '-----',alpha_thred,'----------'
 
-    while alpha_thred<1.0:
-        G = nx.read_gpickle('../RawGraphWithDisparityAlpha_{}_{}.gpickle'.format(Graph_type,schema))
-        G = main.disparity_filter(G,alpha_thred)
-        G = main.nodeDegree_filter(G,nodeDegree_thred)
-        nx.write_gpickle(G,'filteredG_{}_alpha{}_nodeD{}_{}'.format(Graph_type,alpha_thred,nodeDegree_thred,schema))
-        print '-----',alpha_thred,'----------'
-        alpha_thred += 0.05
     return
 
 
