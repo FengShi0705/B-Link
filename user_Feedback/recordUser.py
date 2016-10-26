@@ -256,7 +256,7 @@ def userQuestion(schema,user,N):
     cnx,cursor = PF.creatCursor(schema,'R')
     questions = {}
 
-    for query_type in ['get_Rel_one','find_paths','find_paths_clusters']:
+    for query_type in ['get_Rel_one','find_paths','find_paths_clusters','generateClusters']:
         Qy = ("""
             select `record_label` from `user_record` where `eid`=\'{}\' and `query_type`=\'{}\' order by `position` asc, `count` desc;
         """.format(user,query_type)
