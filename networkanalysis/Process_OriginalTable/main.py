@@ -2,6 +2,9 @@ from Private.PubFunctions import unweight_allocation
 from Private import PubFunctions
 import networkx as nx
 import datetime
+import math
+import time
+from math import fabs,log,sqrt
 
 
 def write_undirected(schema,reltable,labtable):
@@ -99,6 +102,150 @@ def reduceGraph(read_g, write_g, minEdgeWeight, minNodeDegree, Lp, Sp):
     nx.write_gpickle(G, write_g)
 
     return
+
+
+
+def load_rawGraph(schema,reltable,labtable,Graph_type='undirected'):
+    """
+    load raw graph from a schema
+    :param schema: the mysql schema storing the data
+    :param reltable: the name of edge table
+    :param labtable: the name of keywords lable table
+    :param Graph_type: the graph type: 'undirected' or 'one-directed'
+    :return: networkx Graph
+    """
+    # load graph by edge table
+    G = PubFunctions.loadw2wdict(schema, reltable, Graph_type)
+    print 'finish loading raw edges', time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()), '\n'
+    # add node label
+    G = PubFunctions.load_nodelabel(G, schema, labtable)
+    print 'add node label', time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()), '\n'
+
+    return  G
+
+
+def disparity_alpha(G):
+    """
+    calculate the disparity maxalpha and minalpha value for each edges
+    :param G: networkx Graph
+    :return: G
+    """
+    def get_maxAlpha(G,i,j,w):
+        Si = G.degree(i,weight='weight')
+        Pij = w/Si
+        Ki = float(G.degree(i))
+        if Ki>1:
+            alpha_i = 1.0 - math.pow( (1.0 - Pij) , (Ki-1) )
+        else:
+            alpha_i = 1.0
+
+        Sj = G.degree(j,weight='weight')
+        Pji = w/Sj
+        Kj = float(G.degree(j))
+        if Kj>1:
+            alpha_j = 1.0 - math.pow( (1.0 - Pji) ,( Kj-1 ) )
+        else:
+            alpha_j = 1.0
+
+        return  max(alpha_i,alpha_j), min(alpha_i,alpha_j)
+
+
+    # calculate alpha
+    for (a, b, w) in G.edges(data='weight'):
+        maxalpha, minalpha = get_maxAlpha(G,a,b,w)
+        G[a][b]['maxAlpha'] = maxalpha
+        G[a][b]['minAlpha'] = minalpha
+    print 'finish calculate alpha',time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()),'\n'
+
+    return G
+
+
+def disparity_filter(G,alpha_thred):
+    """
+    Network reduction by disparity filter.
+    :param G: networkx graph to be reduced
+    :param alpha_thred: the edges with maxAlpha >= alpha_thred will be preserved
+    :return: G
+    """
+    # disparity_filter
+    for (a, b) in G.edges():
+        if G[a][b]['maxAlpha'] < alpha_thred:
+            G.remove_edge(a, b)
+    print 'finish filter', time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()), '\n'
+
+    return G
+
+
+def globalEdge_filter(G,minorgEdgeWeight):
+    """
+    filter the graph based on minimum original weight
+    :param G: networkx graph
+    :param minorgEdgeWeight: minimum original weight
+    :return: G
+    """
+    for (u, v, w) in G.edges(data='weight'):
+        if w < minorgEdgeWeight:
+            G.remove_edge(u,v)
+    return G
+
+
+def nodeDegree_filter(G, nodeDegree_thred):
+    """
+    node with degree below nodeDegree_thred will be removed
+    :param G: networkx G
+    :param nodeDegree_thred: minimum node degree
+    :return: G
+    """
+    # remove node based on node degree threshold
+    for n in G.nodes():
+        if G.degree(n) < nodeDegree_thred:
+            G.remove_node(n)
+    print 'finish remove node: ', time.strftime('%Y-%m-%d %H:%M:%S')
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()), '\n'
+
+    return G
+
+
+def addNode_strength_degree(G):
+    """
+    Add the strength and degree for each node
+    :param G: networkx graph
+    :return: G
+    """
+    for n in G.nodes():
+        G.node[n]['N'] = G.degree(n,weight='weight')
+        G.node[n]['n'] = float(G.degree(n))
+
+    return G
+
+
+def G2S_direction(G):
+    """
+    update the relationship direction as 'general --> specifi' if the graph is directed.
+    :param G: networkx Graph
+    :return: G
+    """
+    # update direction General-->Specific
+    if nx.is_directed(G):
+        for (a, b) in G.edges():
+            if G.node[a]['N'] < G.node[b]['N']:
+                G.add_edge(b, a, G[a][b])
+                G.remove_edge(a, b)
+        print 'finish update direction', time.strftime('%Y-%m-%d %H:%M:%S')
+        print 'edges: ', len(G.edges())
+        print 'nodes: ', len(G.nodes()), '\n'
+    else:
+        print 'Not directed Graph. No need to update direction'
+    return G
 
 
 

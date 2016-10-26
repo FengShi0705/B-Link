@@ -7,6 +7,7 @@
     <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
     <link rel="shortcut icon" href="static/favicon.png">
     <link rel="stylesheet" type="text/css" href="static/w3.css">
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
         var isIE = /*@cc_on!@*/false || !!document.documentMode;
@@ -26,6 +27,7 @@
         <h6><i>A Data-driven Creativity Engine</i></h6>
     </div>
 
+<<<<<<< HEAD
     <div class="w3-hide-small" style="height:50px;"></div>
     <div class="w3-center" style="height:128px;">
         <!--form action="/signup" class="" style="margin-top:50px;">
@@ -38,6 +40,17 @@
                    placeholder="     Please type in your EMAIL">
             <br>
             <button id="submit" class="w3-btn w3-large w3-blue w3-ripple" style="margin-top:50px; width:150px;">Enter</button>
+=======
+        <div class="w3-center" style="height:128px;;">
+            <form action="/signup" class="" style="margin-top:80px;">
+                <input type="email" name="email" value="" class="w3-input" style="width:370px;;display:inline-block;"
+                       placeholder="Please type in your EMAIL address, thank you !">
+                <br>
+                <input type="hidden" name="w" id="width" value="" class="w3-input">
+                <button type="submit" class="w3-btn w3-large w3-blue w3-ripple" style="margin-top:50px; width:150px;">Enter</button>
+            </form>
+        </div>
+>>>>>>> refs/remotes/FengShi0705/new-features
     </div>
 
     <script>
@@ -50,6 +63,13 @@
                 console.log('signup');
             });
         });
+
+    </script>
+
+    <script>
+
+    var w=window.innerWidth || document.body.clientWidth;
+    d3.select('input[name="w"]').attr('value',w);
 
     </script>
 
