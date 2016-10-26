@@ -275,8 +275,22 @@ def userQuestion(schema,user,N):
 
         for ind in selected_index:
             record = json.loads(results[ind][0])
-            record = ' -- '.join(record)
-            questions[query_type].append(record)
+            if query_type == 'get_Rel_one' and len(record)>2:
+                records = zip(record[0:-1],record[1:])
+                for rd in records:
+                    Rd='[' + '] -- ['.join(rd) + ']'
+                    questions[query_type].append(Rd)
+            else:
+                record = '[' + '] -- ['.join(record) + ']'
+                questions[query_type].append(record)
+
+    ## remove duplicate element from 'get_Rel_one'
+    explist = []
+    for en in questions['get_Rel_one']:
+        if en not in explist:
+            explist.append(en)
+    questions['get_Rel_one'] = explist
+
 
     return questions
 
