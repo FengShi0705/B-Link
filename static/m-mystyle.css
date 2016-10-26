@@ -8,22 +8,22 @@ html, body { margin:0; padding:0; overflow:hidden }
 #mainSearchBox {
   position:fixed;
   left:10px;
-  top:10px;
+  right:10px;
+  top:5px;
 }
 
 input[name="keywords"]{
-  width: 350px;
-  height:50px;
+  height:40px;
   box-sizing:border-box;
   border:2px solid #ccc;
   border-radius:10px;
-  font-size: 20px;
-  padding:12px 70px 12px 12px;
+  font-size: 18px;
+  padding:10px 70px 10px 12px;
 }
 
 input[name="search"]{
-  width:40px;
-  height:40px;
+  width:30px;
+  height:30px;
   position:absolute;
   right:5px;
   top:5px;
@@ -35,44 +35,8 @@ input[name="search"]{
   cursor: pointer;
 }
 
-/*input[name="clear"]{
-  width:20px;
-  height:20px;
-  position:absolute;
-  right:50px;
-  top:15px;
-  border:2px;
-  background-color:white;
-  background-image:url('/static/clear.png');
-  opacity:0.4;
-  background-size:100%;
-  cursor:pointer;
-  visibility:hidden;
-}*/
-
 input[name="search"]:hover{
   background-size:110%;
-}
-
-.feedback{
-    position:fixed;
-    top:10px;
-    left:360px;
-    width:85px;
-    height:50px;
-    cursor:pointer;
-    background-color:#4daaf6;
-}
-
-div.header{
-   position: fixed;
-   left:350px;
-   top:5px;
-   right:200px;
-   height:50px;
-   font-size:45px;
-   font-family:cursive;
-   pointer-events:none;
 }
 
 /* tooltip design for func-nav panel */
@@ -92,23 +56,23 @@ div.header{
 
 .tooltip:hover .tip-style{
     visibility:visible;
-    -webkit-transition-delay: 1s; /* Chrome and Safari */
-    transition-delay: 1s;
+    -webkit-transition-delay: 0.5s; /* Chrome and Safari */
+    transition-delay: 0.5s;
 }
 
 /* the whole panel control  */
 .panel{
   position:fixed;
   left:10px;
-  width:350px;
+  right:10px;
   display:none;
 }
 
-/* the drawing of toggle switch */
 
+/*/////////////// the drawing of toggle switch //////////////////*/
 .t-global {
     font-family:arial;
-    font-size:22px;
+    font-size:18px;
     color:#2196F3;
     font-weight: bold;
     display:inline-block;
@@ -121,7 +85,7 @@ div.header{
 
 .t-local {
     font-family:arial;
-    font-size:22px;
+    font-size:18px;
     font-weight:normal;
     display:inline-block;
 }
@@ -135,15 +99,15 @@ div.header{
 label.switch {
   position: relative;
   display: inline-block;
-  width: 34px;
-  height: 100px;
+  width: 20px;
+  height: 60px;
 }
 
 label.switch-cluster {
   position: relative;
   display: inline-block;
-  width: 100px;
-  height: 34px;
+  width: 70px;
+  height: 20px;
 }
 
 label.switch input {display:none;}
@@ -162,10 +126,10 @@ div.slider, .slider-cluster {
 div.slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  top: 4px;
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  top: 3px;
   background-color: white;
 }
 
@@ -182,32 +146,33 @@ input[name="switch-3"]:checked + .slider {
 }
 
 input[name="switch-1"]:checked + .slider:before {
-  transform: translateY(66px);
+  transform: translateY(40px);
 }
 
 input[name="switch-2"]:checked + .slider:before {
-  transform: translateY(66px);
+  transform: translateY(40px);
 }
 
 input[name="switch-3"]:checked + .slider:before {
-  transform: translateX(66px);
+  transform: translateX(50px);
 }
 
 /* Rounded sliders */
 div.slider.round {
-  border-radius: 34px;
+  border-radius: 20px;
 }
 
 div.slider.round:before {
   border-radius: 50%;
 }
+/* ///////////////////  end  ////////////////////////*/
 
 /* Min Hop Panel  */
 select.minhop{
-    width:80px;
-    height:30px;
-    font-size:20px;
-    padding-left:26px;
+    width:60px;
+    height:26px;
+    font-size:16px;
+    padding-left:20px;
 }
 
 /* Line-panel text input box */
@@ -247,21 +212,62 @@ input[name="endpoint"]{
 /* info display panel */
 #info_panel{
     position:fixed;
-    left:10px;
-    bottom:0px;
-    width:350px;
+    left:0px;
+    right:0px;
     display:none;
+}
+.info_panel_height{
+    height:33vh;
+    bottom:0px;
+}
+.info_panel_down{
+    height:33vh;
+    bottom:calc(-33vh + 35px);
+}
+.info_panel_full{
+    height: calc(100vh - 115px);
+    bottom:0px;
+    background
+}
+/*.info_panel_full_safari{
+    height: calc(100vh - 113px);
+    bottom:0px;
+}*/
+.fullInfo{
+    background-image:url('/static/zoom_in.svg');
+    background-repeat: no-repeat;
+    background-size: 25px 25px;
+    background-position:center;
+}
+
+.fullInfo_toggle{
+    background-image:url('/static/zoom_out.svg');
+}
+
+.img-rotate{
+}
+.img-rotate-toggle{
+    transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+}
+
+.info-result{
+    position:absolute;
+    top:0;
+    width:100%;
+    height:40px;
+    display:inline-flex;
+    vertical-align:-30%;
 }
 
 .info-display{
     background-color:white;
-    border:1px solid black;
-    border-radius:2px;
+    border-radius:3px;
     position:absolute;
-    top:10px;
-    left:14px;
-    bottom:60px;
-    width:320px;
+    left:40px;
+    right:40px;
+    top:40px;
+    bottom:0;
     overflow-y:scroll;
     word-wrap:break-word;
 }
@@ -333,19 +339,29 @@ div.info-display div.row:after {
 
 .page-button{
     position:absolute;
-    bottom:15px;
-    left:16px;
-    width:316px;
+    top:40px;
+    bottom:0;
+    width:40px;
+    background-color:white;
+}
+
+.feedback{
+    position:absolute;
+    bottom:30px;
+    left:10px;
+    width:60px;
+
 }
 
 /* copy right declaration */
 .copyright{
     position:absolute;
-    bottom:0px;
+    bottom:3px;
+    width:300px;
     left:50%;
-    width:300;
-    margin-left:-150px;
-    height:26px;
+    margin-left:-145px;
+    height:20px;
+    font-size:13px;
     pointer-events:none;
 }
 
