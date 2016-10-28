@@ -57,7 +57,7 @@ input[name="search"]:hover{
 .feedback{
     position:fixed;
     top:10px;
-    left:360px;
+    right:10px;
     width:85px;
     height:50px;
     cursor:pointer;

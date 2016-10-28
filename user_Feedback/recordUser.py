@@ -285,11 +285,12 @@ def userQuestion(schema,user,N):
                 questions[query_type].append(record)
 
     ## remove duplicate element from 'get_Rel_one'
-    explist = []
-    for en in questions['get_Rel_one']:
-        if en not in explist:
-            explist.append(en)
-    questions['get_Rel_one'] = explist
+    if questions.has_key('get_Rel_one'):
+        explist = []
+        for en in questions['get_Rel_one']:
+            if en not in explist:
+                explist.append(en)
+        questions['get_Rel_one'] = explist
 
 
     return questions

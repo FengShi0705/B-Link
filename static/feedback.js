@@ -1,4 +1,16 @@
 $(document).ready(function(){
+
+    //////////// Check Null question title from FB3 ////////////
+    if ($('.checkNullTitle').is(':empty')){
+        console.log('find null span')
+        alert('find null span')
+        $(this).parentsUntil('.rating-layout')
+            .hide();
+        console.log('hide done')
+        alert('hide done')
+    };
+
+
     ///////////  Rating system design  ////////////
     $('circle[stroke="#8600b3"]').click(function(){
         var inputName = $(this).attr("class");
@@ -7,16 +19,17 @@ $(document).ready(function(){
         var inputValue = $('input[name='+inputName+']').attr('value');
         $(this).siblings().attr('fill','white');
         $(this).attr('fill','#8600b3');
-        alert('inputValue is '+ inputValue +'; value is '+ value +' !' )
+        console.log(value)
+
     });
-    $('circle[stroke="#e6e6e6"]').click(function(){
+    $('circle[stroke="#cccccc"]').click(function(){
         var inputName = $(this).attr("class");
         var value = $(this).attr('value');
         $('input[name='+ inputName +']').attr('value',value);
         var inputValue = $('input[name='+inputName+']').attr('value');
         $(this).siblings().attr('fill','white');
-        $(this).attr('fill','#e6e6e6');
-        alert('inputValue is '+ inputValue +'; value is '+ value +' !' )
+        $(this).attr('fill','#cccccc');
+
     });
     $('circle[stroke="#4CAF50"]').click(function(){
         var inputName = $(this).attr("class");
@@ -25,7 +38,7 @@ $(document).ready(function(){
         var inputValue = $('input[name='+inputName+']').attr('value');
         $(this).siblings().attr('fill','white');
         $(this).attr('fill','#4CAF50');
-        alert('inputValue is '+ inputValue +'; value is '+ value +' !' )
+
     });
 
     ////////////  OPTION 'OTHER' DESIGN /////////////////
@@ -45,6 +58,37 @@ $(document).ready(function(){
         else{
             $('#FE5reason').hide();
         }
+    });
+
+    ////////////  Required form submission CHECK /////////////////
+    $('form').submit(function(){
+
+        var required = $('[required]');
+        var error = false;
+
+        for(var i = 0; i <= (required.length - 1);i++)
+        {
+            if(required[i].value == '') // tests that each required value does not equal blank, you could put in more stringent checks here if you wish.
+            {
+                required[i].style.backgroundColor = 'rgb(255,155,155)';
+                error = true; // if any inputs fail validation then the error variable will be set to true;
+            }
+            else if(required[i].type == 'radio')
+            {   group = required[i].name
+                if ($('input[name='+group+']').is(':checked')){
+                }
+                else{
+                    error = true;
+                    required[i].style.backgroundColor = 'rgb(255,155,155)';
+                }
+            }
+        };
+
+        if(error) // if error is true;
+        {
+            alert('Please answer the required questions, thanks !')
+            return false;  // stop the form from being submitted.
+        };
     });
 
 });

@@ -21,19 +21,19 @@
 
         <p>
           <label class="w3-label">1. Your email address*</label>
-          <input class="w3-input" type="text" name="BI1" required>
+          <input class="w3-input" type="text" name="BI1" value="{{ email }}" required>
         </p>
 
         <p>
           <label class="w3-label">2. Your gender</label><br>
-          <input class="w3-radio w3-margin-right" type="radio" name="gender" value="BI2"><label>Male</label>
+          <input class="w3-radio w3-margin-right" type="radio" name="BI2" value="male" required /><label>Male</label>
           <br>
-          <input class="w3-radio w3-margin-right" type="radio" name="gender" value="BI2"><label>Female</label>
+          <input class="w3-radio w3-margin-right" type="radio" name="BI2" value="female" /><label>Female</label>
         </p>
 
         <p>
           <label class="w3-label">3. Your social role</label><br>
-          <select class="w3-select" name="BI3" id="job" onchange="otherJob()" style="">
+          <select class="w3-select" name="BI3" id="job" style="" required />
             <option value="" disabled selected>Choose your social role</option>
             <option value="academic">Academic professional</option>
             <option value="student">Student</option>
@@ -45,7 +45,7 @@
 
         <p>
           <label class="w3-label">4. Your current education level</label><br>
-          <select class="w3-select" name="BI4" id="degree" style="">
+          <select class="w3-select" name="BI4" id="degree" style="" required>
             <option value="" disabled selected>Choose your education level</option>
             <option value="bachelor">Bachlor</option>
             <option value="master">Master</option>
@@ -55,7 +55,7 @@
 
         <p>
           <label class="w3-label">5. Your academic background</label><br>
-          <select class="w3-select" name="BI5" id="subject" style="" onchange="otherSubj()">
+          <select class="w3-select" name="BI5" id="subject" style="" required>
             <option value="" disabled selected>Choose your subject</option>
             <option value="art">Art</option>
             <option value="business">Business</option>
@@ -76,8 +76,8 @@
           <input class="w3-check " type="checkbox" value="4" name="BI6"><label class="w3-validate">None of the above</label><br>
         </p>
 
-        <p>
-        <button type="submit" class="w3-btn w3-section w3-blue w3-ripple" >Save & Next</button>
+        <p class="page-button" style="margin-top:25px;">
+        <button type="submit" class="w3-btn w3-blue w3-large" >Save & Next</button>
         </p>
 
       </form>
