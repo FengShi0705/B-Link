@@ -3,6 +3,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Feedback: B-Link </title>
+  <link rel="shortcut icon" href="static/favicon.png">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script type="text/javascript" src="static/feedback.js"></script>
   <link rel="stylesheet" type="text/css" href="static/w3.css">
@@ -86,6 +87,24 @@
             <button type="submit" class="w3-btn w3-blue w3-large" >Save & Next</button>
         </p>
 
+      <script>
+            $('button[type="submit"]').on('click',function(){
+                var required = $('[required]');
+                var error = false;
+                for(var i = 0; i <= (required.length - 1);i++)
+                {
+                    if(required[i].value == '') // tests that each required value does not equal blank, you could put in more stringent checks here if you wish.
+                    {
+                        error = true; // if any inputs fail validation then the error variable will be set to true;
+                    }
+                };
+                if(error) // if error is true;
+                {
+                    alert('Please answer all rating questions !')
+                    return false;  // stop the form from being submitted.
+                };
+            });
+      </script>
 
       </form>
 

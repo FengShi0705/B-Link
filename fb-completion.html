@@ -9,29 +9,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
+    .logo {height:50px;}
+    .blink {height:50px; margin-top:40px;}
+    .mail {text-decoration:none;font-weight:bold;}
+
     @media only screen and (max-width: 760px) {
+        .blank{display:none;}
         h1 {font-size:1.5em;}
+        .logo {height:40px;}
+        .blink{margin-top:20px;}
+        .contact{height:16px;}
  }
     </style>
 </head>
 
 <body>
-    <div class="w3-hide-small" style="height:100px;"></div>
+    <div class="blank" style="height:80px;"></div>
 
     <div class="w3-center w3-blue" style="">
         <h1 style="padding:40px 15px;">Thank you very much for your feedback !</h1>
     </div>
 
     <div class="w3-center" style="margin-top:50px;">
-        <img src="static/logo.png" style="height:50px;" class="w3-white"/>
-        <br>
-        <img src="static/blink.png" alt="B-Link" style="height:50px;margin-top:40px;">
-        <h6><i>A Data-driven Creativity Engine</i></h6>
+        <img src="static/logo.png" class="w3-white logo"/><br>
+        <img src="static/blink.png" alt="B-Link" class="blink">
+        <h6 style="font-size:13px;"><i>A Data-driven Creativity Engine</i></h6>
     </div>
 
-    <div class="w3-hide-small" style="height:50px;"></div>
-    <div class="w3-center" style="height:128px;">
-            <a href="/" value="#"><button class="w3-btn w3-large w3-blue" style="margin-top:50px;">Go back to B-Link</button></a>
+    <div class="w3-hide-small" style="height:30px;"></div>
+
+    <div class="w3-center" style="height:100px;">
+        <div style="padding:60px 0 20px 0;"><a href="mailto:l.chen15@imperial.ac.uk; f.shi14@imperial.ac.uk" class="w3-text-blue mail">Contact us</a></div>
+        <a href="/" value="#"><button class="w3-btn w3-large w3-blue" >Go back to B-Link</button></a>
     </div>
 
 </body>

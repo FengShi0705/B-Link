@@ -3,6 +3,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Feedback: B-Link </title>
+  <link rel="shortcut icon" href="static/favicon.png">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script type="text/javascript" src="static/feedback.js"></script>
   <link rel="stylesheet" type="text/css" href="static/w3.css">
@@ -19,10 +20,10 @@
 
         <h3>Part III : Functionality Evaluation</h3>
 
-        <div class="p-fb3">
+        <div id="fb3-q1" class="p-fb3">
           <label class="w3-label w3-text-black">1. According to your search results, please evaluate the following pairs of words in term of their relevance and interestingness.</label>
           <div class="rating-layout">
-              <div class="w3-text-blue q-title"><span class="tFront">(1). <span class=".checkNullTitle">{{ explore[0] }}</span></span></div>
+              <div class="w3-text-blue q-title"><span class="tFront">(1). <span id="explore0">{{ explore[0] }}</span></span></div>
               <div style="display:inline-block;">
                   <div style="display:table;">
                       <span class="rating-span" style="color:#8600b3;padding-right:10px;">Not relevant</span>
@@ -57,8 +58,8 @@
               </div>
           </div>
 
-          <div class="rating-layout">
-              <div class="w3-text-blue q-title"><span class="tFront">(2). {{ explore[1] }}</span></div>
+          <div class="rating-layout ">
+              <div class="w3-text-blue q-title"><span class="tFront">(2). <span id="explore1">{{ explore[1] }}</span></span></div>
               <div style="display:inline-block;">
                   <div style="display:table;">
                       <span class="rating-span" style="color:#8600b3;padding-right:10px;">Not relevant</span>
@@ -94,7 +95,7 @@
           </div>
 
           <div class="rating-layout">
-              <div class="w3-text-blue q-title"><span class="tFront">(3). {{ explore[2] }}</span></div>
+              <div class="w3-text-blue q-title"><span class="tFront">(3). <span id="explore2">{{ explore[2] }}</span></span></div>
               <div style="display:inline-block;">
                   <div style="display:table;">
                       <span class="rating-span" style="color:#8600b3;padding-right:10px;">Not relevant</span>
@@ -130,10 +131,10 @@
           </div>
         </div>
 
-        <div class="p-fb3">
+        <div id="fb3-q2" class="p-fb3">
           <label class="w3-label w3-text-black">2. Please evaluate the association degree of following paths. E.g “xxxx” is a good example</label><br>
           <div class="rating-layout">
-              <div class="w3-text-blue q-title"><span class="tFront">(1). {{ path[0] }}</span></div>
+              <div class="w3-text-blue q-title"><span class="tFront">(1). <span id="path0">{{ path[0] }}</span></span></div>
               <div style="display:inline-block;">
                   <div style="display:table;">
                       <span class="rating-span fixI5-fb22" style="color:#8600b3;padding-right:10px;">Distant Association</span>
@@ -153,7 +154,7 @@
           </div>
 
           <div class="rating-layout">
-              <div class="w3-text-blue q-title"><span class="tFront">(2). {{ path[1] }}</span></div>
+              <div class="w3-text-blue q-title"><span class="tFront">(2). <span id="path1">{{ path[1] }}</span></span></div>
               <div style="display:inline-block;">
                   <div style="display:table;">
                       <span class="rating-span fixI5-fb22" style="color:#8600b3;padding-right:10px;">Distant Association</span>
@@ -181,10 +182,10 @@
           <input class="w3-radio w3-margin-right" type="radio" name="FE3" value="no try"><label>I didn't try the function of cluster</label><br>
         </p>
 
-        <div class="p-fb3">
+        <div id="fb3-q4" class="p-fb3">
           <label class="w3-label  w3-text-black">4. Are you inspired by the following path between clusters?</label><br>
           <div class="rating-layout">
-                          <div class="w3-text-blue q-title"><span class="tFront">{{ cluster[0] }}</span></div>
+                          <div class="w3-text-blue q-title"><span id="cluster" class="tFront">{{ cluster[0] }}</span></div>
                           <div style="display:inline-block;">
                               <div style="display:table;">
                                   <span class="rating-span" style="color:#8600b3;padding-right:10px;">Little Inspiration</span>
@@ -226,6 +227,25 @@
         <p class="w3-center">
         <button type="submit" class="w3-btn w3-blue w3-large">Submit</button>
         </p>
+
+      <script>
+            $('button[type="submit"]').on('click',function(){
+                var required = $('[required]');
+                var error = false;
+                for(var i = 0; i <= (required.length - 1);i++)
+                {
+                    if(required[i].value == '') // tests that each required value does not equal blank, you could put in more stringent checks here if you wish.
+                    {
+                        error = true; // if any inputs fail validation then the error variable will be set to true;
+                    }
+                };
+                if(error) // if error is true;
+                {
+                    alert('Please answer all rating questions !')
+                    return false;  // stop the form from being submitted.
+                };
+            });
+      </script>
 
       </form>
 

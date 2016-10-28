@@ -1,15 +1,51 @@
 $(document).ready(function(){
 
     //////////// Check Null question title from FB3 ////////////
-    if ($('.checkNullTitle').is(':empty')){
-        console.log('find null span')
-        alert('find null span')
-        $(this).parentsUntil('.rating-layout')
-            .hide();
-        console.log('hide done')
-        alert('hide done')
+    if($.trim($("#explore0").text())==''){
+        console.log('explore0 is null')
+        $('input[name="FE1-11"]').attr('value','null');
+        $('input[name="FE1-12"]').attr('value','null');
+        $("#explore0").parents('div.rating-layout').hide();
+        $('#fb3-q1').hide();
+        console.log('question1 hide')
     };
 
+    if($.trim($("#explore1").text())==''){
+        console.log('explore1 is null')
+        $('input[name="FE1-21"]').attr('value','null');
+        $('input[name="FE1-22"]').attr('value','null');
+        $("#explore1").parents('div.rating-layout').hide();
+        console.log('explore[1] hide')
+    };
+
+    if($.trim($("#explore2").text())==''){
+        console.log('explore2 is null')
+        $('input[name="FE1-31"]').attr('value','null');
+        $('input[name="FE1-32"]').attr('value','null');
+        $("#explore2").parents('div.rating-layout').hide();
+        console.log('explore[2] hide')
+    };
+
+    if($.trim($("#path0").text())==''){
+        console.log('path0 is null')
+        $('input[name="FE2-1"]').attr('value','null');
+        $('#fb3-q2').hide();
+        console.log('question2 hide')
+    };
+
+    if($.trim($("#path1").text())==''){
+        console.log('path1 is null')
+        $('input[name="FE2-2"]').attr('value','null');
+        $("#path1").parents('div.rating-layout').hide();
+        console.log('path[1] hide')
+    };
+
+    if($.trim($("#cluster").text())==''){
+        console.log('cluster is null')
+        $('input[name="FE4"]').attr('value','null');
+        $('#fb3-q4').hide();
+        console.log('question4 hide')
+    };
 
     ///////////  Rating system design  ////////////
     $('circle[stroke="#8600b3"]').click(function(){
