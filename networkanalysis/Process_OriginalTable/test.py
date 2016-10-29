@@ -72,6 +72,8 @@ def filter_edgeandNode(alpha_thred,nodeDegree_thred):
     G = main.nodeDegree_filter(G,nodeDegree_thred)
     nx.write_gpickle(G,'../filteredG_{}_alpha{}_nodeD{}_{}.gpickle'.format(Graph_type,alpha_thred,nodeDegree_thred,schema))
     print '-----',alpha_thred,'----------'
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes())
 
     return
 
