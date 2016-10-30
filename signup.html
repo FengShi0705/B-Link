@@ -33,26 +33,22 @@
                    placeholder="    Please type in your EMAIL" id="email" autocomplete="on" required>
             <br>
             <input type="hidden" name="w" id="width" value="" class="w3-input">
-            <button type="submit" class="w3-btn w3-large w3-blue" style="margin-top:50px; width:150px;">Enter</button>
+            <button type="submit" id="submit" class="w3-btn w3-large w3-blue" style="margin-top:50px; width:150px;">Enter</button>
         </form>
     </div>
 
     <script>
 
-        d3.select('input[type="submit"]').on('click',function(){
-            alert('start checking')
+        d3.select('#submit').on('click',function(){
             if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1){
-                alert("safari browser")
                 var email = document.getElementById('email');
                 var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
                 if (!filter.test(email.value)) {
-                    alert('Email Address is Invalid !');
+                    alert('Please type in valid email address !');
                     email.focus;
-                    return false;
+                    d3.event.preventDefault();
                 }
-                else{alert.log('validation successful')}
             }
-            else { alert ('not safari')}
         });
 
     </script>
@@ -61,7 +57,6 @@
 
     var w=window.innerWidth || document.body.clientWidth;
     d3.select('input[name="w"]').attr('value',w);
-    console.log('well done')
 
     </script>
 

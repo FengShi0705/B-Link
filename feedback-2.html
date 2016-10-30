@@ -84,6 +84,7 @@
         </p>
 
         <p class="page-button">
+            <input type="hidden" id="submit_count" value='0' name="submit_count">
             <button type="submit" class="w3-btn w3-blue w3-large" >Save & Next</button>
         </p>
 
@@ -102,7 +103,14 @@
                 {
                     alert('Please answer all rating questions !')
                     return false;  // stop the form from being submitted.
-                };
+                }
+                else {
+                    submit_count = parseInt($("#submit_count").attr('value'), 10);
+                    console.log(submit_count)
+                    submit_count = submit_count + 1;
+                    console.log(submit_count)
+                    $('#submit_count').attr('value',submit_count);
+                }
             });
       </script>
 

@@ -12,7 +12,7 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG('undirected(fortest)','fortest','userdata')
+myRtr=Retrievor.UndirectedG('undirected(abcdeijm_test)MinE2_MinN1_Lp70_Sp30','abcdeijm_test','userdata')
 
 # sign up
 @app.route('/signup')
@@ -254,20 +254,32 @@ def HCI_data():
     HCI4 = request.form['HCI4']
     HCI5 = request.form['HCI5']
     HCI6 = request.form['HCI6']
+    submit_count = int(request.form['submit_count'])
+    print type(submit_count)
+    print 'submit_count: ', submit_count
 
-    if HCI3_t is None:
+    if HCI3 == 'yes':
         answer = [HCI1,HCI2,HCI3,HCI4,HCI5,HCI6]
-    else:
+    elif HCI3 == 'no':
         answer = [HCI1,HCI2,HCI3_t,HCI4,HCI5,HCI6]
-
-    print HCI1, HCI2,HCI3, HCI3_t,HCI4,HCI5,HCI6, answer
+    print 'answer', answer
 
     cnx, cursor = PF.creatCursor('feedback',"W")
     times_count = session['feedback_times']
 
-    for i in range(0,6):
-        Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'HCI{}\', \'{}\' )'.format(times_count, email, i+1, answer[i])
-        cursor.execute(Qy)
+    if (submit_count == 1):
+        print 'count is 1'
+        for i in range(0, 6):
+            Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'HCI{}\', \'{}\' )'.format(
+                times_count, email, i + 1, answer[i])
+            cursor.execute(Qy)
+    else:
+        print 'count is more than 1'
+        for i in range(0, 6):
+            Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`) VALUES (\'{}\', \'{}\', \'HCI{}\') ON DUPLICATE KEY UPDATE answer = \'{}\' '.format(
+                times_count, email, i + 1, answer[i])
+            cursor.execute(Qy)
+
     cnx.commit()
     cursor.close()
     cnx.close()
