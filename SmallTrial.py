@@ -6,6 +6,9 @@ from sklearn.utils.arpack import eigsh
 from sklearn.cluster.k_means_ import k_means
 import math
 from heapq import heappush, heappop
+import time
+import networkx as nx
+from networkanalysis.Process_OriginalTable import main
 
 from networkanalysis.Analysis import Retrievor
 
@@ -363,7 +366,84 @@ def testshortestpath():
         print p
 
 
+def fast_shortestpath(R):
+    ta1=time.time()
+    length, path=nx.bidirectional_dijkstra(R.G,1,1000,weight='Fw')
+    ta2=time.time()
+    print 'bidirectional: ',ta2-ta1
+    print path
 
+    ta1 = time.time()
+    path=nx.dijkstra_path(R.G, 1, 1000, weight='Fw')
+    ta2 = time.time()
+    print 'single dijkstra_path: ', ta2 - ta1
+    print path
+
+    ta1 = time.time()
+    gen=R.get_pathsBetween_twonodes(1,1000,'Fw',1)
+    (length, path)=gen.next()
+    ta2 = time.time()
+    print 'my dijkstra_path: ', ta2 - ta1
+    print path
+
+def testNodeEdgedegree():
+    G = nx.read_gpickle('data/undirected(fortest).gpickle')
+    main.nodeDegree_filter(G,1)
+    main.addNode_degree(G)
+    main.addEdge_distance(G)
+    n=3
+    print 'node:{}'.format(n)
+    node_results = [
+        ('key','machine','hand','error'),
+        ('label', G.node[n]['label'], 'C', 'None' ),
+        ('N', G.node[n]['N'], 14, G.node[n]['N']-14  ),
+        ('n', G.node[n]['n'], 3, G.node[n]['n']-3  ),
+        ('G_r', G.node[n]['G_r'], 0.633, G.node[n]['G_r']-0.633 ),
+        ('G_n', G.node[n]['G_n'], 0.988, G.node[n]['G_n']-0.987 ),
+        ('G_p', G.node[n]['G_p'], 0.917, G.node[n]['G_p']-0.917 ),
+        ('SP_r', G.node[n]['SP_r'], 0.367, G.node[n]['SP_r']-0.367 ),
+        ('SP_n', G.node[n]['SP_n'], 0.012, G.node[n]['SP_n']-0.013 ),
+        ('SP_p', G.node[n]['SP_p'], 0.083, G.node[n]['SP_p']-0.083 )
+    ]
+    for i in node_results:
+        print i
+    assert len(node_results)-1 == len(G.node[n].keys()), 'key number not mathing'
+
+    m=1
+    print 'node:{}'.format(m)
+    node_results = [
+        ('key', 'machine', 'hand', 'error'),
+        ('label', G.node[m]['label'], 'A', 'None'),
+        ('N', G.node[m]['N'], 6, G.node[m]['N'] -6 ),
+        ('n', G.node[m]['n'], 3, G.node[m]['n'] -3 ),
+        ('G_r', G.node[m]['G_r'], 0.199, G.node[m]['G_r'] - 0.199),
+        ('G_n', G.node[m]['G_n'], 0.012, G.node[m]['G_n'] - 0.012),
+        ('G_p', G.node[m]['G_p'], 0.333, G.node[m]['G_p'] - 0.333),
+        ('SP_r', G.node[m]['SP_r'], 0.801, G.node[m]['SP_r'] - 0.801),
+        ('SP_n', G.node[m]['SP_n'], 0.988, G.node[m]['SP_n'] - 0.988),
+        ('SP_p', G.node[m]['SP_p'], 0.667, G.node[m]['SP_p'] - 0.667)
+    ]
+    for i in node_results:
+        print i
+    assert len(node_results) - 1 == len(G.node[m].keys()), 'key number not mathing'
+
+    print 'edges:{}-{}'.format(n,m)
+    edge_results =[
+        ('key', 'machine', 'hand', 'error'),
+        ('G_r_AM', G[n][m]['G_r_AM'], 0.584 ),
+        ('G_n_GM', G[n][m]['G_n_GM'], 2.217),
+        ('G_p_HM', G[n][m]['G_p_HM'], 2.047),
+        ('R_p_AM', G[n][m]['R_p_AM'], 0.5),
+        ('R_r_GM', G[n][m]['R_r_GM'], 1.117),
+        ('R_n_HM', G[n][m]['R_n_HM'], 2.427),
+        ('C_np_AM', G[n][m]['C_np_AM'],0.7425),
+        ('C_rr_GM', G[n][m]['C_rr_GM'],2.155),
+        ('c_rn_HM', G[n][m]['c_rn_HM'],195.71)
+    ]
+    for i in edge_results:
+        print i
+
+    return G
 
 
 

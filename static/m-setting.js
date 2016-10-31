@@ -307,16 +307,16 @@ function show_panel(panelname){
 function show_info(panelname){
     if (panelname == "point"){
         console.log('point show');
-        document.getElementById("info_panel").style.top = "230px";
+        //document.getElementById("info_panel").style.height = "220px";
         Explore_showResult();
     }
     else if (panelname == "line"){
         console.log('line show');
-        document.getElementById("info_panel").style.top = "260px";
+        //document.getElementById("info_panel").style.top = "260px";
         FindPath_showResult();
     }
     else if (panelname == "cluster"){
-        document.getElementById("info_panel").style.top ="347px";
+        //document.getElementById("info_panel").style.top ="347px";
         BpathsClusters_showResult();
     };
     document.getElementById("info_panel").style.display = "block";
@@ -477,3 +477,20 @@ function ChangeSelectCluster(id){
     resumeClusterColor();
     FOCUSING_CLUSTER = d3.select('#'+id).attr('value');
 };
+
+
+//////////////// Mobile design only ///////////////
+
+$(document).ready(function(){
+
+    $('.hideInfo').click(function(){
+        $('.info_panel_height').toggleClass('info_panel_down');
+        $('.img-rotate').toggleClass('img-rotate-toggle');
+    });
+
+    $('.fullInfo').click(function(){
+        $('.info_panel_height').toggleClass('info_panel_full');
+        $('.fullInfo').toggleClass('fullInfo_toggle');
+    });
+
+});

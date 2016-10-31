@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Feedback: B-Link </title>
+  <link rel="shortcut icon" href="static/favicon.png">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script type="text/javascript" src="static/feedback.js"></script>
+  <link rel="stylesheet" type="text/css" href="static/w3.css">
+  <link rel="stylesheet" type="text/css" href="static/feedback.css">
+
+  <body>
+    <header class="w3-container w3-blue">
+      <h1> Feedback of B-Link</h1>
+    </header>
+
+    <div id="form-border" class="" style="">
+
+      <form id="form-padding" class="w3-container w3-card-4 form-max" action="/feedback-2" method="POST">
+
+        <h3>Part I : Basic Information</h3>
+
+        <p>
+          <label class="w3-label">1. Your email address*</label>
+          <input class="w3-input" type="text" name="BI1" value="{{ email }}" required>
+        </p>
+
+        <p>
+          <label class="w3-label">2. Your gender</label><br>
+          <input class="w3-radio w3-margin-right" type="radio" name="BI2" value="male" required /><label>Male</label>
+          <br>
+          <input class="w3-radio w3-margin-right" type="radio" name="BI2" value="female" /><label>Female</label>
+        </p>
+
+        <p>
+          <label class="w3-label">3. Your social role</label><br>
+          <select class="w3-select" name="BI3" id="job" style="" required />
+            <option value="" disabled selected>Choose your social role</option>
+            <option value="academic">Academic professional</option>
+            <option value="student">Student</option>
+            <option value="technician">Industrial technician</option>
+            <option value="service">Service industry worker</option>
+            <option value="other">Others</option>
+          </select>
+        </p>
+
+        <p>
+          <label class="w3-label">4. Your current education level</label><br>
+          <select class="w3-select" name="BI4" id="degree" style="" required>
+            <option value="" disabled selected>Choose your education level</option>
+            <option value="bachelor">Bachlor</option>
+            <option value="master">Master</option>
+            <option value="doctor">Doctor</option>
+          </select>
+        </p>
+
+        <p>
+          <label class="w3-label">5. Your academic background</label><br>
+          <select class="w3-select" name="BI5" id="subject" style="" required>
+            <option value="" disabled selected>Choose your subject</option>
+            <option value="art">Art</option>
+            <option value="business">Business</option>
+            <option value="engineering">Engineering-Design</option>
+            <option value="design">Engineering-others</option>
+            <option value="medicine">Medicine</option>
+            <option value="science">Natural science</option>
+            <option value="social">Social science</option>
+            <option value="other">Others</option>
+          </select>
+        </p>
+
+        <p>
+          <label class="w3-label">6. Tick the tools or web application service you have used:</label><br>
+          <input class="w3-check " type="checkbox" value="1" name="BI6"><label class="w3-validate">Google Map</label><br>
+          <input class="w3-check " type="checkbox" value="2" name="BI6"><label class="w3-validate">WikiLinks</label><br>
+          <input class="w3-check " type="checkbox" value="3" name="BI6"><label class="w3-validate">Others</label><br>
+          <input class="w3-check " type="checkbox" value="4" name="BI6"><label class="w3-validate">None of the above</label><br>
+        </p>
+
+        <p class="page-button" style="margin-top:25px;">
+        <button type="submit" class="w3-btn w3-blue w3-large" >Save & Next</button>
+        </p>
+
+      </form>
+
+    </div>
+  </body>
+</html>
+
