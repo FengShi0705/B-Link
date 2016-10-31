@@ -77,5 +77,28 @@ def filter_edgeandNode(alpha_thred,nodeDegree_thred):
 
     return
 
+def addNodeDe_EdgeDist():
+    """
+    Add node degree and edge distance on the filtered Graph
+    :return: Graph
+    """
+    schema = 'total_v3_csvneo4j'
+    Graph_type = 'undirected'
+    alpha_thred = 0.65
+    nodeDegree_thred = 1.0
+
+    G = nx.read_gpickle('../filteredG_{}_alpha{}_nodeD{}_{}.gpickle'.format(Graph_type,alpha_thred,nodeDegree_thred,schema))
+    print 'after read'
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes())
+    G = main.addNode_degree(G)
+    G = main.addEdge_distance(G)
+
+    nx.write_gpickle(G,'../addNodeEdgeDegree_{}_alpha{}_nodeD{}_{}.gpickle'.format(Graph_type,alpha_thred,nodeDegree_thred,schema))
+    print 'after adding node edge degree'
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes())
+
+    return
 
 

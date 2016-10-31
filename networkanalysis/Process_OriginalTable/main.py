@@ -367,7 +367,7 @@ def addEdge_distance(G):
         edgeE.add_edgedist()
         edgeE.otherdist()
 
-    return
+    return G
 
 
 def G2S_direction(G):
