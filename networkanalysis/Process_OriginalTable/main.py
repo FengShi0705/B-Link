@@ -267,10 +267,12 @@ def addNode_degree(G):
     return G
 
 
-def addEdge_distance(G):
+def addEdge_distance(G,DisTypes):
     """
     add the general, specific, relevance, combination and other distance of edges
+    The distance types in DisTypes are added.
     :param G: networkx directed or undirected graph
+    :param DisTypes: the types of distance to be added
     :return: G
     """
     def getMaxMinWeights():
@@ -330,22 +332,27 @@ def addEdge_distance(G):
             self.weight = w
             self.A = Anode
             self.B = Bnode
-        def add_edgedist(self):
+        def add_edgedist(self,dis_types):
             for nm in ['r','n','p']:
                 for meanmd in ['AM','GM','HM']:
                     # general distance
-                    G[self.A.n][self.B.n]['G_{}_{}'.format(nm,meanmd)] = deg_To_dist[meanmd](self.A.G[nm],self.B.G[nm])
+                    if 'G' in dis_types:
+                        G[self.A.n][self.B.n]['G_{}_{}'.format(nm,meanmd)] = deg_To_dist[meanmd](self.A.G[nm],self.B.G[nm])
                     # specific distance
-                    G[self.A.n][self.B.n]['SP_{}_{}'.format(nm, meanmd)] = deg_To_dist[meanmd](self.A.SP[nm], self.B.SP[nm])
+                    if 'SP' in dis_types:
+                        G[self.A.n][self.B.n]['SP_{}_{}'.format(nm, meanmd)] = deg_To_dist[meanmd](self.A.SP[nm], self.B.SP[nm])
                     # relevance distance
-                    G[self.A.n][self.B.n]['R_{}_{}'.format(nm,meanmd)] = deg_To_dist[meanmd](self.A.R[nm], self.B.R[nm])
+                    if 'R' in dis_types:
+                        G[self.A.n][self.B.n]['R_{}_{}'.format(nm,meanmd)] = deg_To_dist[meanmd](self.A.R[nm], self.B.R[nm])
             for nmR in ['r','n','p']:
                 for nmGSP in ['r','n','p']:
                     for meanmd in ['AM','GM','HM']:
                         #combine relevance and general
-                        G[self.A.n][self.B.n]['C_{}{}_{}'.format(nmR,nmGSP,meanmd)] = deg_To_dist[meanmd](self.A.C[nmR+nmGSP],self.B.C[nmR+nmGSP])
+                        if 'C' in dis_types:
+                            G[self.A.n][self.B.n]['C_{}{}_{}'.format(nmR,nmGSP,meanmd)] = deg_To_dist[meanmd](self.A.C[nmR+nmGSP],self.B.C[nmR+nmGSP])
                         #combine relevance and specific
-                        G[self.A.n][self.B.n]['c_{}{}_{}'.format(nmR,nmGSP,meanmd)] = deg_To_dist[meanmd](self.A.c[nmR+nmGSP],self.B.c[nmR+nmGSP])
+                        if 'c' in dis_types:
+                            G[self.A.n][self.B.n]['c_{}{}_{}'.format(nmR,nmGSP,meanmd)] = deg_To_dist[meanmd](self.A.c[nmR+nmGSP],self.B.c[nmR+nmGSP])
             return
 
         def otherdist(self):
@@ -364,8 +371,9 @@ def addEdge_distance(G):
         nodeA = nodeDe(a,w)
         nodeB = nodeDe(b,w)
         edgeE = edgeDe(nodeA,nodeB,w)
-        edgeE.add_edgedist()
-        edgeE.otherdist()
+        edgeE.add_edgedist(DisTypes)
+        if 'OTHER' in DisTypes:
+            edgeE.otherdist()
 
     return G
 
