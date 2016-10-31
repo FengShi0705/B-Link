@@ -12,7 +12,7 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG('undirected(abcdeijm_test)MinE2_MinN1_Lp70_Sp30','abcdeijm_test','userdata')
+myRtr=Retrievor.UndirectedG('undirected(fortest)','fortest','userdata')
 
 # sign up
 @app.route('/signup')

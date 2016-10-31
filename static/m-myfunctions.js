@@ -330,7 +330,7 @@ function ZoomToNodes(nodes){
             var y=obj_nodes[0].y
 
             var movew = w/2;
-
+            var moveh = 75+0.335*h;
         }else{
             var max_x=d3.max(obj_nodes,function(d){return d.x});
             var max_y=d3.max(obj_nodes,function(d){return d.y});
@@ -341,13 +341,14 @@ function ZoomToNodes(nodes){
 
             var kx = 0.7*w/(max_x-min_x+4*maxNodeRadius);
             var movew = w/2;
+            var moveh = 75+0.335*h;
 
             var ky = 0.7*h/(max_y-min_y+4*maxNodeRadius);
             var k = Math.min(kx,ky);
         };
         function transform(){
             return d3.zoomIdentity
-                     .translate(movew,h/2)
+                     .translate(movew,moveh)
                      .scale(k)
                      .translate(-x,-y);
         };
