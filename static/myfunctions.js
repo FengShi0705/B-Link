@@ -69,12 +69,12 @@ function SHOW_UPDATE_FORCE(dataset,born){
 
 
   //scale
-  scale_tp2Distance = d3.scalePow().exponent(-2)
-                   .domain([ d3.min(CLIENT_EDGES,function(d){return d[Type_distance]}), d3.max(CLIENT_EDGES,function(d){return d[Type_distance]})  ])
+  scale_tp2Distance = d3.scaleLinear()
+                   .domain([ d3.min(CLIENT_EDGES,function(d){return d['dist']}), d3.max(CLIENT_EDGES,function(d){return d['dist']})  ])
                    .range([minlinkdistance,maxlinkdistance]);
 
-  scale_tp2Stokewidth = d3.scalePow().exponent(-2)
-                    .domain([ d3.min(CLIENT_EDGES,function(d){return d[Type_distance]}), d3.max(CLIENT_EDGES,function(d){return d[Type_distance]})  ])
+  scale_tp2Stokewidth = d3.scaleLinear()
+                    .domain([ d3.min(CLIENT_EDGES,function(d){return d['dist']}), d3.max(CLIENT_EDGES,function(d){return d['dist']})  ])
                     .range([maxlinkwidth,minlinkwidth]);
 
   scale_NodeRadius = d3.scalePow().exponent(3)
@@ -82,7 +82,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                         .range([minNodeRadius,maxNodeRadius]);
 
   //update link distance
-  SIMULATION.force("link").distance(function(d){return scale_tp2Distance(d[Type_distance]);});
+  SIMULATION.force("link").distance(function(d){return scale_tp2Distance(d['dist']);});
 
   //change title color
   TITLECOLOR_CHANGE();
@@ -90,11 +90,11 @@ function SHOW_UPDATE_FORCE(dataset,born){
   var edges=GRAPH.selectAll(".edge")
                .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
-          edges.attr("stroke-width",function(d){return scale_tp2Stokewidth(d[Type_distance]);});
+          edges.attr("stroke-width",function(d){return scale_tp2Stokewidth(d['dist']);});
           edges.enter()
                .insert("line",":first-child")
                .attr("class","edge")
-               .attr("stroke-width",function(d){return scale_tp2Stokewidth(d[Type_distance]);});
+               .attr("stroke-width",function(d){return scale_tp2Stokewidth(d['dist']);});
           edges.exit().remove();
 
   /*var edgelabels=GRAPH.selectAll(".edgelabel")
@@ -103,7 +103,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
           edgelabels.enter()
                     .append("text")
                     .attr("class","edgelabel")
-                    .text(function(d){return d[Type_distance];});
+                    .text(function(d){return d['dist'];});
           edgelabels.exit().remove();*/
 
   var gnodes = GRAPH.selectAll(".gnode")
@@ -420,9 +420,9 @@ function get_minhops(minhop_id){
 function check_explore_LG(switcher){
     var selector = 'label.switchLG input#'+switcher
     if( d3.select(selector).node().checked==true ){
-        return 'local';
+        return 'specific';
     }else{
-        return 'global';
+        return 'general';
     };
 };
 
@@ -432,14 +432,17 @@ function check_explore_LG(switcher){
 // born is the wid of the node as the bornplace.
 function Explore_Nearby(LorG,start,minhops,N,query,born){
     var currentnodes = CLIENT_NODES_ids;
-    if ( LorG=="local" ){
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':minhops,'localnodes':currentnodes};
-        var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
-        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
-    }else{
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':minhops,'localnodes':null};
+    if ( LorG=="specific" ){
+        var subparameters = {'ipt':query,'tp':SP_distance,'minhops':minhops,'localnodes':null};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
+    }else if( LorG=="general" ){
+        var subparameters = {'ipt':query,'tp':G_Distance,'minhops':minhops,'localnodes':null};
+        var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
+        var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
+    }else{
+        alert('unknown specific or general');
+        throw 'unknown specific or general';
     };
     //calculate bornplace
     assert( _.contains(currentnodes,born), 'current nodes do not include born node');
@@ -455,14 +458,17 @@ function Explore_Nearby(LorG,start,minhops,N,query,born){
 
 //find paths between two nodes
 function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
-    if ( LorG=="local" ){
-        var subparameters = {"source":node1,"target":node2,"tp":Type_distance, "minhops":minhops, "localnodes":CLIENT_NODES_ids};
-        var parameters = {"N":N, "parameters":subparameters, "generator":'find_paths', "start":start};
-        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
-    }else{
-        var subparameters = {"source":node1,"target":node2,"tp":Type_distance,"minhops":minhops,"localnodes":null};
+    if ( LorG=="specific" ){
+        var subparameters = {"source":node1,"target":node2,"tp":SP_distance,"minhops":minhops,"localnodes":null};
         var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
         var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+    }else if( LorG=="general" ){
+        var subparameters = {"source":node1,"target":node2,"tp":G_Distance,"minhops":minhops,"localnodes":null};
+        var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
+        var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+    }else{
+        alert('unknown specific or general');
+        throw 'unknown specific or general';
     };
     // calculate bornplace
     assert( _.contains(CLIENT_NODES_ids,node1) && _.contains(CLIENT_NODES_ids,node2) , 'path ends do not exist!');
@@ -479,14 +485,17 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
     if( _.intersection(cluster1,cluster2).length > 0 ){
         throw 'two clusters are overlapping.'
     };
-    if ( LorG=='local' ){
-        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':Type_distance, 'localnodes': CLIENT_NODES_ids};
-        var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start };
-        var info = {'explorelocal':true, 'parameters': parameters, 'localnodes':null};
-    }else{
-        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':Type_distance, 'localnodes':null};
+    if ( LorG=='specific' ){
+        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':SP_distance, 'localnodes':null};
         var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start  };
         var info = {'explorelocal':false, 'parameters':parameters, 'localnodes':CLIENT_NODES_ids};
+    }else if( LorG=="general" ){
+        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':G_Distance, 'localnodes':null};
+        var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start  };
+        var info = {'explorelocal':false, 'parameters':parameters, 'localnodes':CLIENT_NODES_ids};
+    }else{
+        alert('unknown specific or general');
+        throw 'unknown specific or general';
     };
     var bornnode1=CLIENT_NODES.filter(function(obj){return obj["wid"]==cluster1[0];})[0];
     var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==cluster2[0];})[0];
@@ -524,7 +533,6 @@ function generator_update_graphAndPanel(info,bornplace,znodes,queries){
             };
             z_nodes = _.union(z_nodes,d.ids);
         });
-
         var highlights={'nodes':queries,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
         highlight_nodespaths(highlights);
         ZoomToNodes(z_nodes); // zoom to the node

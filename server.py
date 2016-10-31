@@ -12,7 +12,8 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG('undirected(fortest)','fortest','userdata')
+#myRtr=Retrievor.UndirectedG('addNodeEdgeDegree_G+SP+R_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j','total_v3_csvneo4j','userdata')
+myRtr=Retrievor.UndirectedG('undirected(fortest)_R+G+SP+C+c','fortest','userdata')
 
 # sign up
 @app.route('/signup')
@@ -51,7 +52,7 @@ def mobile():
 def texttowid(info):
     info = json.loads(info)
     searchtext = info['searchtext']
-    distance = info['tp']
+    distance = 'None'
     searchtext = searchtext.encode('utf-8')
     ipts = [word.strip() for word in searchtext.split(';')]
     try:
@@ -82,7 +83,7 @@ def search(info):
     allnodes = [
         {"wid": n, "label": localG.node[n]["label"], "N": localG.degree(n, weight="weight"), "n": localG.degree(n)} for
         n in localG.nodes()]
-    alledges = [{"source": source, "target": target, distance: dist} for (source, target, dist) in localG.edges(data=distance)]
+    alledges = [{"source": source, "target": target, 'dist': dist} for (source, target, dist) in localG.edges(data=distance)]
     sorted_paths = sorted(localG.edges(nbunch=[info['query']],data=distance), key=lambda x:x[2])
     add_paths = [path[:-1] for path in sorted_paths]
     try:
@@ -169,7 +170,7 @@ def generator(info):
     else:
         localG = myRtr.G.subgraph(set(info['localnodes']) | set(explorenodes))  # local
         allnodes = [{"wid":n, "label":localG.node[n]["label"],"N":localG.degree(n,weight="weight"), "n":localG.degree(n)} for n in localG.nodes()]
-        alledges=[{"source":source, "target":target, distance:dist} for (source,target,dist) in localG.edges(data=distance)]
+        alledges=[{"source":source, "target":target, 'dist':dist} for (source,target,dist) in localG.edges(data=distance)]
         dataset={'AddNew':True,"allnodes":allnodes, "alledges":alledges,"paths":explorepaths,"position":position}
         response=json.dumps(dataset)
 

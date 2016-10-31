@@ -30,7 +30,7 @@ function updateGraph_searchButton(query,zh_nodes){
 
 // Handle search button
 function Handle_Search_Button(searchbutton_id){
-    var info = {'searchtext':get_inputtext(searchbutton_id), 'tp':Type_distance};
+    var info = {'searchtext':get_inputtext(searchbutton_id)};
     d3.json('/texttowid/'+JSON.stringify(info),function(error,data){
         if (data){
             var zh_nodes=[data];
@@ -47,7 +47,7 @@ function Handle_Search_Button(searchbutton_id){
 
 // handle search button of path
 function Handle_pathSearchbutton(searchbutton_id){
-     var info = {'searchtext':get_inputtext(searchbutton_id), 'tp':Type_distance};
+     var info = {'searchtext':get_inputtext(searchbutton_id)};
      d3.json('/texttowid/'+JSON.stringify(info),function(error,data){
          if (data){
              var node1=data;
@@ -55,7 +55,7 @@ function Handle_pathSearchbutton(searchbutton_id){
              d3.select(selector1).data([node1]);
              var theother_id= _.difference( ['pathstart_textinput','pathend_textinput'] , [searchbutton_id])[0];
 
-             var info1 = {'searchtext':get_inputtext(theother_id), 'tp':Type_distance};
+             var info1 = {'searchtext':get_inputtext(theother_id)};
              d3.json('/texttowid/'+JSON.stringify(info1),function(error,data){
                  if(data){
                      var node2=data;

@@ -390,7 +390,7 @@ def testNodeEdgedegree():
     G = nx.read_gpickle('data/undirected(fortest).gpickle')
     main.nodeDegree_filter(G,1)
     main.addNode_degree(G)
-    main.addEdge_distance(G)
+    main.addEdge_distance(G,['G','SP','R','C','c'])
     n=3
     print 'node:{}'.format(n)
     node_results = [
@@ -445,6 +445,23 @@ def testNodeEdgedegree():
 
     return G
 
+def check_gpickle(path):
+    G= nx.read_gpickle(path)
+    node = G.nodes_iter().next()
+    (a,b) = G.edges_iter().next()
+    nkey = set(G.node[node].keys())
+    ekey = set(G[a][b].keys())
+    for n in G.nodes():
+        assert nkey == set(G.node[n].keys()), 'node not same: {}'.format(n)
+        if nkey!=set(G.node[n].keys()):
+            print 'node not same: {}'.format(n)
+    for (a,b) in G.edges():
+        assert ekey == set(G[a][b].keys()), 'edge not same: {}-{}'.format(a,b)
+        if ekey!=set(G[a][b].keys()):
+            print 'edge not same: {}-{}'.format(a,b)
+
+    print 'Finish'
+    return
 
 
 if __name__=='main':
