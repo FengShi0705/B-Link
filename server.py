@@ -1,16 +1,18 @@
-from flask import Flask, render_template, make_response, request,session,redirect
+from flask import Flask, render_template, make_response, request,session,redirect,url_for
 import json
 import networkx as nx
 from networkanalysis.Analysis import Retrievor
-from user_Feedback.recordUser import record_thread,error_thread
+from user_Feedback.recordUser import record_thread,error_thread,userQuestion
+from Private import PF
 from time import gmtime, strftime
+
 
 app = Flask(__name__)
 app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d\xb3+\xbe>\xd2'
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG('undirected(fortest)','abcdeijm_test','userdata')
+myRtr=Retrievor.UndirectedG('undirected(abcdeijm_test)MinE2_MinN1_Lp70_Sp30','abcdeijm_test','userdata')
 
 # sign up
 @app.route('/signup')
@@ -18,25 +20,31 @@ def signup():
     user = request.args.get('email','')
     w = request.args.get('w','')
     session['user'] = user
+    session['w'] = w
     fusers = open('allusers.txt', mode='a')
     fusers.write(user+'\n')
     fusers.close()
-    return redirect('/?w={}'.format(w))
+    return redirect('/')
 
 
 # Main Page
 @app.route('/')
 def index():
     if 'user' in session:
-        w = request.args.get('w','')
+        print session['w']
         print session['user']
+        w=session['w']
         if int(w)<=750:
             print 'moble'
+            return make_response(open('m-index.html').read())
         else:
             return make_response(open('index.html').read())
     else:
         return make_response(open('signup.html').read())
 
+@app.route('/mobile')
+def mobile():
+    return make_response(open('m-index.html').read())
 
 # get text return nodes number
 @app.route('/texttowid/<info>')
@@ -192,6 +200,157 @@ def wordrank(node):
     response=json.dumps(nodesandpaths)
     return make_response(response)
 
+
+
+
+############ FEEDBACK DATA COLLECTION #####################
+@app.route('/feedback')
+def feedback():
+    email = session['user']
+    return render_template('feedback.html', email=email)
+
+# the first page of feedback completes:
+@app.route('/feedback-2', methods = ['POST'])
+def BI_data():
+    email = request.form['BI1']
+    BI2 = request.form['BI2']
+    BI3 = request.form['BI3']
+    BI4 = request.form['BI4']
+    BI5 = request.form['BI5']
+    BI6_temp = request.form.getlist('BI6')
+    BI6 = json.dumps(BI6_temp)
+
+    answer = [BI2,BI3,BI4,BI5,BI6]
+    print email, BI2,BI3,BI4,BI5,BI6, answer
+
+    cnx, cursor = PF.creatCursor('feedback',"W")
+    Qy = 'SELECT MAX(`times_count`) FROM `ans_all` WHERE `email`="{}"'.format(email)
+    cursor.execute(Qy)
+    times_count_array = cursor.fetchone()
+    times_count_last = times_count_array[0]
+    if times_count_last is None:
+        times_count = 1
+    else:
+        times_count = times_count_last + 1;
+    session['feedback_times'] = times_count
+
+    for i in range(1,6):
+        Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'BI{}\', \'{}\' )'.format(times_count, email, i+1, answer[i-1])
+        cursor.execute(Qy)
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+    return make_response(open('feedback-2.html').read())
+
+#the second page of feedback comletes:
+@app.route('/feedback-3', methods = ['POST'])
+def HCI_data():
+    email = session['user']
+    HCI1 = request.form['HCI1']
+    HCI2 = request.form['HCI2']
+    HCI3 = request.form['HCI3']
+    HCI3_t = request.form['HCI3-t']
+    HCI4 = request.form['HCI4']
+    HCI5 = request.form['HCI5']
+    HCI6 = request.form['HCI6']
+    submit_count = int(request.form['submit_count'])
+    print type(submit_count)
+    print 'submit_count: ', submit_count
+
+    if HCI3 == 'yes':
+        answer = [HCI1,HCI2,HCI3,HCI4,HCI5,HCI6]
+    elif HCI3 == 'no':
+        answer = [HCI1,HCI2,HCI3_t,HCI4,HCI5,HCI6]
+    print 'answer', answer
+
+    cnx, cursor = PF.creatCursor('feedback',"W")
+    times_count = session['feedback_times']
+
+    if (submit_count == 1):
+        print 'count is 1'
+        for i in range(0, 6):
+            Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'HCI{}\', \'{}\' )'.format(
+                times_count, email, i + 1, answer[i])
+            cursor.execute(Qy)
+    else:
+        print 'count is more than 1'
+        for i in range(0, 6):
+            Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`) VALUES (\'{}\', \'{}\', \'HCI{}\') ON DUPLICATE KEY UPDATE answer = \'{}\' '.format(
+                times_count, email, i + 1, answer[i])
+            cursor.execute(Qy)
+
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+
+    ################## get question content
+
+    questions = userQuestion(myRtr.userSchema,email,3)
+    if questions.has_key('get_Rel_one'):
+        explore = questions['get_Rel_one']
+    else:
+        explore = None
+    if questions.has_key('find_paths'):
+        path = questions['find_paths']
+    else:
+        path = None
+    if questions.has_key('find_paths_clusters'):
+        cluster = questions['find_paths_clusters']
+    else:
+        cluster = None
+
+    return render_template('feedback-3.html', explore=explore, path = path, cluster=cluster)
+
+#prepared to submit the feedback:
+@app.route('/feedback-submit', methods = ['POST'])
+def FE_data():
+    email = session['user']
+    FE1_11 = request.form['FE1-11']
+    FE1_12 = request.form['FE1-12']
+    FE1_21 = request.form['FE1-21']
+    FE1_22 = request.form['FE1-22']
+    FE1_31 = request.form['FE1-31']
+    FE1_32 = request.form['FE1-32']
+    FE1_array = [FE1_11,FE1_12,FE1_21,FE1_22,FE1_31,FE1_32]
+    print FE1_array
+    FE1 = json.dumps(FE1_array)
+
+    FE2_1 = request.form['FE2-1']
+    FE2_2 = request.form['FE2-2']
+    FE2_array = [FE2_1,FE2_2]
+    FE2 = json.dumps(FE2_array)
+
+    FE3 = request.form['FE3']
+    FE4 = request.form['FE4']
+
+    FE5_temp = request.form.getlist('FE5')
+    FE5_r_temp = request.form.getlist('FE5-r')
+    if FE5_temp is None:
+        FE5 = json.dumps(FE5_temp)
+    else:
+        FE5_temp.append(FE5_r_temp)
+        FE5 = json.dumps(FE5_temp)
+
+    FE6 = request.form['FE6']
+
+    answer = [FE1, FE2, FE3, FE4, FE5, FE6];
+
+    print FE1, FE2, FE3, FE4, FE5, FE6, answer
+
+    cnx, cursor = PF.creatCursor('feedback', "W")
+    times_count = session['feedback_times']
+
+    for i in range(0, 6):
+        Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'FE{}\', \'{}\' )'.format(
+            times_count, email, i + 1, answer[i])
+        cursor.execute(Qy)
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+    return make_response(open('fb-completion.html').read())
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', threaded=True, port=5000)
