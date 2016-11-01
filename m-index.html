@@ -80,7 +80,7 @@
                           <image src="/static/question.png" ></image>
                           <div class="w3-text w3-card-2 w3-medium w3-white w3-left w3-text-red"
                                style="position:fixed;left:10px;right:10px;top:147.3px;white-space:normal;padding:5px 10px;z-index:5;">
-                              The minimum steps with which you would like to discover associated points
+                              Define the minimum steps of successive association
                           </div>
                       </div>
                   </div>
@@ -95,19 +95,19 @@
                 <div class="w3-col s6 w3-border-left w3-border-cyan" style="height:60px;" >
                     <div style="position:relative;width:130px;left:50%;margin-left:-65px;">
                         <div class="w3-display-container" style="width:70px; height:60px; margin-right:0px; display:inline-block;">
-                            <div class="w3-display-topright t-global" >Global</div>
-                            <div class="w3-display-bottomright t-local" >Local</div>
+                            <div class="w3-display-topright t-global" >General</div>
+                            <div class="w3-display-bottomright t-local" >Specific</div>
                         </div>
                         <div class="w3-display-container" style="display:inline-block;height:60px;width:15px;margin-right:10px;z-index:5;">
                             <span class="w3-tooltip w3-display-topmiddle" style="height:15px;top:-8px;">
                                 <image src="/static/question.png" style="cursor:pointer;width:100%;"></image>
                                 <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:147.3px;left:10px;right:10px;padding:5px 10px;z-index:99;">
-                                    "Global" means all the data from our database are involved</div>
+                                    Explore General knowledge</div>
                             </span>
                             <span class="w3-tooltip w3-display-bottommiddle" style="padding-bottom:10px;">
                                 <image src="/static/question.png" style="cursor:pointer;width:100%;"></image>
                                 <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:147.3px;left:10px;right:10px;padding:5px 10px;z-index:99;">
-                                    "Local" means only the data shown in current network map are involved</div>
+                                    Explore Specific knowledge</div>
                             </span>
                         </div>
                         <label class="switch switchLG">
@@ -148,7 +148,7 @@
                           <image src="/static/question.png" style=""></image>
                           <div class="w3-text w3-card-2 w3-medium w3-white w3-left w3-text-red"
                                style="position:fixed;top:187.3px;left:10px;right:10px;white-space:normal;padding:5px 10px;z-index:5;">
-                              The minimum steps with which you would like to discover associated points
+                              Define the minimum steps of successive association
                           </div>
                       </div>
                   </div>
@@ -163,19 +163,19 @@
               <div class=" w3-col s6 w3-border-left w3-border-cyan w3-center" >
                   <div style="position:relative;left:50%;margin-left:-65px;width:130px;">
                     <div class="w3-display-container" style="width:57px; height:60px; margin-right:0px; display:inline-block;">
-                        <div class="w3-display-topright t-global" >Global</div>
-                        <div class="w3-display-bottomright t-local" >Local</div>
+                        <div class="w3-display-topright t-global" >General</div>
+                        <div class="w3-display-bottomright t-local" >Specific</div>
                     </div>
                     <div class="w3-display-container" style="display:inline-block;height:60px;width:18px;margin-left:-1px; margin-right:5px;">
                         <span class="w3-tooltip w3-display-topmiddle" style="top:-8px;">
                             <image src="/static/question.png" ></image>
                             <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:187.3px;left:10px;right:10px;padding:5px 10px;z-index:99;">
-                                "Global" means all the data from our database are involved</div>
+                                Explore General knowledge</div>
                         </span>
                         <span class="w3-tooltip w3-display-bottommiddle" style="padding-bottom:10px;">
                             <image src="/static/question.png" style="cursor:pointer;"></image>
                             <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:187.3px;left:10px;right:10px;padding:5px 10px;z-index:99;">
-                                "Local" means only the data shown in current network map are involved</div>
+                                Explore Specific knowledge</div>
                         </span>
                     </div>
                     <label class="switch switchLG">
@@ -248,14 +248,14 @@
                   <h6 style="font-weight:bold; margin:0; letter-spacing:1px; padding-top:5.5px;">Find Path Between Clusters</h6></div>
               <div id="findPath" class="w3-white cluster-panel w3-center" style="">
                   <div class=" w3-row w3-container w3-center" style="padding:5px 20px;">
-                      <div class="w3-col s4 w3-center t-global"  style="">Global</div>
+                      <div class="w3-col s4 w3-center t-global"  style="">General</div>
                       <div class="w3-col s4 w3-center" style="padding:2.5px 0;">
                           <label class="switch-cluster switchLG">
                             <input type="checkbox" name="switch-3" id="switch-3">
                             <div class="slider round"></div>
                           </label>
                       </div>
-                      <div class="w3-col s4 w3-center t-local" style="">Local</div>
+                      <div class="w3-col s4 w3-center t-local" style="">Specific</div>
                   </div>
                   <div class="w3-border-top w3-border-black w3-row" style="padding-top:10px;" >
                       <div id="BpathStart" class="w3-dropdown-click w3-col s6 ">
@@ -321,9 +321,10 @@
           <span style="vertical-align:-20%;"> B-Link team (F.Shi & L.Chen)</span>
       </div>
 
+    <script type="text/javascript" src="static/GraphSetting.js"></script>
     <script type="text/javascript" src="static/m-setting.js"></script>
-    <script type="text/javascript" src="static/m-myfunctions.js"></script>
-    <script type="text/javascript" src="static/m-app.js"></script>
+    <script type="text/javascript" src="static/myfunctions.js"></script>
+    <script type="text/javascript" src="static/app.js"></script>
 
   </body>
 
