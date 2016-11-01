@@ -28,7 +28,7 @@ input[name="search"]{
   right:5px;
   top:5px;
   border:2px;
-  background-image:url('/static/search.svg');
+  background-image:url('/static/search.png');
   background-color:white;
   background-size:100%;
   opacity:0.1;

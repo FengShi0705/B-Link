@@ -52,32 +52,35 @@ $(document).ready(function(){
         var inputName = $(this).attr("class");
         var value = $(this).attr('value');
         $('input[name='+ inputName +']').attr('value',value);
-        var inputValue = $('input[name='+inputName+']').attr('value');
         $(this).siblings().attr('fill','white');
         $(this).attr('fill','#8600b3');
-        console.log(value)
-
     });
     $('circle[stroke="#cccccc"]').click(function(){
         var inputName = $(this).attr("class");
         var value = $(this).attr('value');
         $('input[name='+ inputName +']').attr('value',value);
-        var inputValue = $('input[name='+inputName+']').attr('value');
         $(this).siblings().attr('fill','white');
         $(this).attr('fill','#cccccc');
-
     });
     $('circle[stroke="#4CAF50"]').click(function(){
         var inputName = $(this).attr("class");
         var value = $(this).attr('value');
         $('input[name='+ inputName +']').attr('value',value);
-        var inputValue = $('input[name='+inputName+']').attr('value');
         $(this).siblings().attr('fill','white');
         $(this).attr('fill','#4CAF50');
-
     });
 
     ////////////  OPTION 'OTHER' DESIGN /////////////////
+    $('#BI6-OTHER').click(function(){
+        if($(this).is(':checked')){
+            $('#BI6-INPUT').css('display','block');
+        }
+        else{
+            $('#BI6-INPUT').css('display','none');
+        }
+    });
+
+
     $('input[name$="HCI3"]').click(function(){
         if($('#HCI3_other').is(':checked')){
             $('#HCI3_input').css('display','block');

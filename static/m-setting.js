@@ -319,6 +319,7 @@ function show_info(panelname){
         //document.getElementById("info_panel").style.top ="347px";
         BpathsClusters_showResult();
     };
+    //$("#info_panel").css({"height":"33vh","bottom":"0px"});
     document.getElementById("info_panel").style.display = "block";
 
 }
