@@ -70,11 +70,11 @@ function SHOW_UPDATE_FORCE(dataset,born){
 
   //scale
   scale_tp2Distance = d3.scalePow().exponent(-2)
-                   .domain([ d3.min(CLIENT_EDGES,function(d){return d[Type_distance]}), d3.max(CLIENT_EDGES,function(d){return d[Type_distance]})  ])
+                   .domain([ d3.min(CLIENT_EDGES,function(d){return d['dist']})+1.0, d3.max(CLIENT_EDGES,function(d){return d['dist']})+1.0  ])
                    .range([minlinkdistance,maxlinkdistance]);
 
   scale_tp2Stokewidth = d3.scalePow().exponent(-2)
-                    .domain([ d3.min(CLIENT_EDGES,function(d){return d[Type_distance]}), d3.max(CLIENT_EDGES,function(d){return d[Type_distance]})  ])
+                    .domain([ d3.min(CLIENT_EDGES,function(d){return d['dist']})+1.0, d3.max(CLIENT_EDGES,function(d){return d['dist']})+1.0  ])
                     .range([maxlinkwidth,minlinkwidth]);
 
   scale_NodeRadius = d3.scalePow().exponent(3)
@@ -82,7 +82,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                         .range([minNodeRadius,maxNodeRadius]);
 
   //update link distance
-  SIMULATION.force("link").distance(function(d){return scale_tp2Distance(d[Type_distance]);});
+  SIMULATION.force("link").distance(function(d){return scale_tp2Distance(d['dist']+1.0);});
 
   //change title color
   TITLECOLOR_CHANGE();
@@ -90,20 +90,21 @@ function SHOW_UPDATE_FORCE(dataset,born){
   var edges=GRAPH.selectAll(".edge")
                .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
-          edges.attr("stroke-width",function(d){return scale_tp2Stokewidth(d[Type_distance]);});
+          edges.attr("stroke-width",function(d){return scale_tp2Stokewidth(d['dist']+1.0);});
           edges.enter()
                .insert("line",":first-child")
                .attr("class","edge")
-               .attr("stroke-width",function(d){return scale_tp2Stokewidth(d[Type_distance]);});
+               .attr("stroke-width",function(d){return scale_tp2Stokewidth(d['dist']+1.0);});
           edges.exit().remove();
 
   /*var edgelabels=GRAPH.selectAll(".edgelabel")
-                    .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
+                    .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);})
+                    .text(function(d){return Number((d['dist']).toFixed(1));});
 
           edgelabels.enter()
                     .append("text")
                     .attr("class","edgelabel")
-                    .text(function(d){return d[Type_distance];});
+                    .text(function(d){return Number((d['dist']).toFixed(1));});
           edgelabels.exit().remove();*/
 
   var gnodes = GRAPH.selectAll(".gnode")
@@ -328,11 +329,19 @@ function ZoomToNodes(nodes){
             var k = 1;
             var x=obj_nodes[0].x
             var y=obj_nodes[0].y
-            if( d3.select('#info_panel').style('display')=="none" ){
+            if(w<=750){ // mobel
                 var movew = w/2;
-            }else{
-                var movew = (w+Width_infoPanel)/2;
+                var moveh = 75+0.335*h;
+            }else{  // PC
+                if( d3.select('#info_panel').style('display')=="none" ){
+                    var movew = w/2;
+                    var moveh = h/2;
+                }else{
+                    var movew = (w+Width_infoPanel)/2;
+                    var moveh = h/2;
+                };
             };
+
         }else{
             var max_x=d3.max(obj_nodes,function(d){return d.x});
             var max_y=d3.max(obj_nodes,function(d){return d.y});
@@ -340,19 +349,30 @@ function ZoomToNodes(nodes){
             var min_y=d3.min(obj_nodes,function(d){return d.y});
             var x = (max_x+min_x)/2;
             var y = (max_y+min_y)/2;
-            if ( d3.select('#info_panel').style('display')=="none" ){
-                var kx = 0.7*w/(max_x-min_x+4*maxNodeRadius);
+            if(w<=750){
                 var movew = w/2;
+                var moveh = 75+0.335*h;
+                var kx = 0.8*w/(max_x-min_x+4*maxNodeRadius);
+                var ky = 0.8*(0.67*h-150)/(max_y-min_y+4*maxNodeRadius);
+                var k = Math.min(kx,ky);
             }else{
-                var kx = 0.7*(w-Width_infoPanel)/(max_x-min_x+4*maxNodeRadius);
-                var movew = (w+Width_infoPanel)/2;
+                if ( d3.select('#info_panel').style('display')=="none" ){
+                    var kx = 0.7*w/(max_x-min_x+4*maxNodeRadius);
+                    var movew = w/2;
+                    var moveh = h/2;
+                }else{
+                    var kx = 0.7*(w-Width_infoPanel)/(max_x-min_x+4*maxNodeRadius);
+                    var movew = (w+Width_infoPanel)/2;
+                    var moveh = h/2;
+                };
+                var ky = 0.7*h/(max_y-min_y+4*maxNodeRadius);
+                var k = Math.min(kx,ky);
             };
-            var ky = 0.7*h/(max_y-min_y+4*maxNodeRadius);
-            var k = Math.min(kx,ky);
+
         };
         function transform(){
             return d3.zoomIdentity
-                     .translate(movew,h/2)
+                     .translate(movew, moveh )
                      .scale(k)
                      .translate(-x,-y);
         };
@@ -420,9 +440,9 @@ function get_minhops(minhop_id){
 function check_explore_LG(switcher){
     var selector = 'label.switchLG input#'+switcher
     if( d3.select(selector).node().checked==true ){
-        return 'local';
+        return 'specific';
     }else{
-        return 'global';
+        return 'general';
     };
 };
 
@@ -432,14 +452,17 @@ function check_explore_LG(switcher){
 // born is the wid of the node as the bornplace.
 function Explore_Nearby(LorG,start,minhops,N,query,born){
     var currentnodes = CLIENT_NODES_ids;
-    if ( LorG=="local" ){
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':minhops,'localnodes':currentnodes};
-        var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
-        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
-    }else{
-        var subparameters = {'ipt':query,'tp':Type_distance,'minhops':minhops,'localnodes':null};
+    if ( LorG=="specific" ){
+        var subparameters = {'ipt':query,'tp':SP_distance,'minhops':minhops,'localnodes':null};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
+    }else if( LorG=="general" ){
+        var subparameters = {'ipt':query,'tp':G_Distance,'minhops':minhops,'localnodes':null};
+        var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
+        var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
+    }else{
+        alert('unknown specific or general');
+        throw 'unknown specific or general';
     };
     //calculate bornplace
     assert( _.contains(currentnodes,born), 'current nodes do not include born node');
@@ -455,14 +478,17 @@ function Explore_Nearby(LorG,start,minhops,N,query,born){
 
 //find paths between two nodes
 function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
-    if ( LorG=="local" ){
-        var subparameters = {"source":node1,"target":node2,"tp":Type_distance, "minhops":minhops, "localnodes":CLIENT_NODES_ids};
-        var parameters = {"N":N, "parameters":subparameters, "generator":'find_paths', "start":start};
-        var info = {'explorelocal':true,'parameters':parameters,'localnodes':null};
-    }else{
-        var subparameters = {"source":node1,"target":node2,"tp":Type_distance,"minhops":minhops,"localnodes":null};
+    if ( LorG=="specific" ){
+        var subparameters = {"source":node1,"target":node2,"tp":SP_distance,"minhops":minhops,"localnodes":null};
         var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
         var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+    }else if( LorG=="general" ){
+        var subparameters = {"source":node1,"target":node2,"tp":G_Distance,"minhops":minhops,"localnodes":null};
+        var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
+        var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
+    }else{
+        alert('unknown specific or general');
+        throw 'unknown specific or general';
     };
     // calculate bornplace
     assert( _.contains(CLIENT_NODES_ids,node1) && _.contains(CLIENT_NODES_ids,node2) , 'path ends do not exist!');
@@ -479,14 +505,17 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
     if( _.intersection(cluster1,cluster2).length > 0 ){
         throw 'two clusters are overlapping.'
     };
-    if ( LorG=='local' ){
-        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':Type_distance, 'localnodes': CLIENT_NODES_ids};
-        var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start };
-        var info = {'explorelocal':true, 'parameters': parameters, 'localnodes':null};
-    }else{
-        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':Type_distance, 'localnodes':null};
+    if ( LorG=='specific' ){
+        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':SP_distance, 'localnodes':null};
         var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start  };
         var info = {'explorelocal':false, 'parameters':parameters, 'localnodes':CLIENT_NODES_ids};
+    }else if( LorG=="general" ){
+        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':G_Distance, 'localnodes':null};
+        var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start  };
+        var info = {'explorelocal':false, 'parameters':parameters, 'localnodes':CLIENT_NODES_ids};
+    }else{
+        alert('unknown specific or general');
+        throw 'unknown specific or general';
     };
     var bornnode1=CLIENT_NODES.filter(function(obj){return obj["wid"]==cluster1[0];})[0];
     var bornnode2=CLIENT_NODES.filter(function(obj){return obj["wid"]==cluster2[0];})[0];
@@ -524,7 +553,6 @@ function generator_update_graphAndPanel(info,bornplace,znodes,queries){
             };
             z_nodes = _.union(z_nodes,d.ids);
         });
-
         var highlights={'nodes':queries,'paths':hlpath,'paths1':hlpath1}; //highlight nodes and paths
         highlight_nodespaths(highlights);
         ZoomToNodes(z_nodes); // zoom to the node

@@ -8,6 +8,7 @@ import math
 from heapq import heappush, heappop
 import time
 import networkx as nx
+from networkanalysis.Process_OriginalTable import main
 
 from networkanalysis.Analysis import Retrievor
 
@@ -385,7 +386,82 @@ def fast_shortestpath(R):
     print 'my dijkstra_path: ', ta2 - ta1
     print path
 
+def testNodeEdgedegree():
+    G = nx.read_gpickle('data/undirected(fortest).gpickle')
+    main.nodeDegree_filter(G,1)
+    main.addNode_degree(G)
+    main.addEdge_distance(G,['G','SP','R','C','c','OTHER'])
+    n=3
+    print 'node:{}'.format(n)
+    node_results = [
+        ('key','machine','hand','error'),
+        ('label', G.node[n]['label'], 'C', 'None' ),
+        ('N', G.node[n]['N'], 14, G.node[n]['N']-14  ),
+        ('n', G.node[n]['n'], 3, G.node[n]['n']-3  ),
+        ('G_r', G.node[n]['G_r'], 0.633, G.node[n]['G_r']-0.633 ),
+        ('G_n', G.node[n]['G_n'], 0.988, G.node[n]['G_n']-0.987 ),
+        ('G_p', G.node[n]['G_p'], 0.917, G.node[n]['G_p']-0.917 ),
+        ('SP_r', G.node[n]['SP_r'], 0.367, G.node[n]['SP_r']-0.367 ),
+        ('SP_n', G.node[n]['SP_n'], 0.012, G.node[n]['SP_n']-0.013 ),
+        ('SP_p', G.node[n]['SP_p'], 0.083, G.node[n]['SP_p']-0.083 )
+    ]
+    for i in node_results:
+        print i
+    assert len(node_results)-1 == len(G.node[n].keys()), 'key number not mathing'
 
+    m=1
+    print 'node:{}'.format(m)
+    node_results = [
+        ('key', 'machine', 'hand', 'error'),
+        ('label', G.node[m]['label'], 'A', 'None'),
+        ('N', G.node[m]['N'], 6, G.node[m]['N'] -6 ),
+        ('n', G.node[m]['n'], 3, G.node[m]['n'] -3 ),
+        ('G_r', G.node[m]['G_r'], 0.199, G.node[m]['G_r'] - 0.199),
+        ('G_n', G.node[m]['G_n'], 0.012, G.node[m]['G_n'] - 0.012),
+        ('G_p', G.node[m]['G_p'], 0.333, G.node[m]['G_p'] - 0.333),
+        ('SP_r', G.node[m]['SP_r'], 0.801, G.node[m]['SP_r'] - 0.801),
+        ('SP_n', G.node[m]['SP_n'], 0.988, G.node[m]['SP_n'] - 0.988),
+        ('SP_p', G.node[m]['SP_p'], 0.667, G.node[m]['SP_p'] - 0.667)
+    ]
+    for i in node_results:
+        print i
+    assert len(node_results) - 1 == len(G.node[m].keys()), 'key number not mathing'
+
+    print 'edges:{}-{}'.format(n,m)
+    edge_results =[
+        ('key', 'machine', 'hand', 'error'),
+        ('G_r_AM', G[n][m]['G_r_AM'], 0.584 ),
+        ('G_n_GM', G[n][m]['G_n_GM'], 2.217),
+        ('G_p_HM', G[n][m]['G_p_HM'], 2.047),
+        ('R_p_AM', G[n][m]['R_p_AM'], 0.5),
+        ('R_r_GM', G[n][m]['R_r_GM'], 1.117),
+        ('R_n_HM', G[n][m]['R_n_HM'], 2.427),
+        ('C_np_AM', G[n][m]['C_np_AM'],0.7425),
+        ('C_rr_GM', G[n][m]['C_rr_GM'],2.155),
+        ('c_rn_HM', G[n][m]['c_rn_HM'],195.71)
+    ]
+    for i in edge_results:
+        print i
+
+    return G
+
+def check_gpickle(path):
+    G= nx.read_gpickle(path)
+    node = G.nodes_iter().next()
+    (a,b) = G.edges_iter().next()
+    nkey = set(G.node[node].keys())
+    ekey = set(G[a][b].keys())
+    for n in G.nodes():
+        assert nkey == set(G.node[n].keys()), 'node not same: {}'.format(n)
+        if nkey!=set(G.node[n].keys()):
+            print 'node not same: {}'.format(n)
+    for (a,b) in G.edges():
+        assert ekey == set(G[a][b].keys()), 'edge not same: {}-{}'.format(a,b)
+        if ekey!=set(G[a][b].keys()):
+            print 'edge not same: {}-{}'.format(a,b)
+
+    print 'Finish'
+    return
 
 
 if __name__=='main':

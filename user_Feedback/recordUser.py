@@ -244,6 +244,13 @@ def userQuestion(schema,user,N):
     """
 
     def divide_range(R,x):
+        """
+        Seperate [0,R-1] into x sections. then randomly select one elements from each section
+        :param R: range [0,R-1]
+        :param x: number of section
+        :return: the list of selected number
+        """
+        assert R>=x, 'Not Enought Range to be divided'
         rand_index = []
         for i in xrange(0,x):
             ns = int(round( float(R)/x*i ))
@@ -252,9 +259,36 @@ def userQuestion(schema,user,N):
             rand_index.append(n)
         return rand_index
 
+    def divide_list(array,x):
+        """
+        Cut array into x equal section, random select an element from each section
+        :param array: input array
+        :param x: x sections
+        :return: cleaned array
+        """
+        nay = len(array)
+        ind = divide_range(nay,x)
+        newarry = []
+        for i in ind:
+            newarry.append(array[i])
+        return newarry
+
+    def filterlist(array):
+        """
+        remove duplicated element from list, while preserve the order
+        :param array: input array
+        :return: filter array
+        """
+        filterar=[]
+        for el in array:
+            if el not in filterar:
+                filterar.append(el)
+        return filterar
+
 
     cnx,cursor = PF.creatCursor(schema,'R')
     questions = {}
+    N1 = N*2
 
     for query_type in ['get_Rel_one','find_paths','find_paths_clusters','generateClusters']:
         Qy = ("""
@@ -266,10 +300,10 @@ def userQuestion(schema,user,N):
         n_res = len(results)
         if n_res==0:
             continue
-        elif n_res<=N:
+        elif n_res<=N1:
             selected_index = [i for i in xrange(0,n_res)]
         else:
-            selected_index = divide_range( n_res, N )
+            selected_index = divide_range( n_res, N1 )
 
         questions[query_type] = []
 
@@ -284,13 +318,14 @@ def userQuestion(schema,user,N):
                 record = '[' + '] -- ['.join(record) + ']'
                 questions[query_type].append(record)
 
-    ## remove duplicate element from 'get_Rel_one'
-    if questions.has_key('get_Rel_one'):
-        explist = []
-        for en in questions['get_Rel_one']:
-            if en not in explist:
-                explist.append(en)
-        questions['get_Rel_one'] = explist
+    ## remove duplicate element and get final results
+    for key in questions.keys():
+        questions[key] = filterlist(questions[key])
+        n_rem = len( questions[key] )
+        if n_rem <= N:
+            continue
+        else:
+            questions[key] = divide_list(questions[key],N)
 
 
     return questions
