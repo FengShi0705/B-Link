@@ -11,7 +11,7 @@
 
   <body>
     <header class="w3-container w3-blue">
-      <h1> Feedback of B-Link</h1>
+      <h1> Feedback on B-Link</h1>
     </header>
 
     <div id="form-border" class="" style="">
@@ -39,7 +39,6 @@
             <option value="academic">Academic professional</option>
             <option value="student">Student</option>
             <option value="technician">Industrial technician</option>
-            <option value="service">Service industry worker</option>
             <option value="other">Others</option>
           </select>
         </p>
@@ -72,14 +71,31 @@
         <p>
           <label class="w3-label">6. Tick the tools or web application service you have used:</label><br>
           <input class="w3-check " type="checkbox" value="1" name="BI6"><label class="w3-validate">Google Map</label><br>
-          <input class="w3-check " type="checkbox" value="2" name="BI6"><label class="w3-validate">WikiLinks</label><br>
-          <input class="w3-check " type="checkbox" value="3" name="BI6"><label class="w3-validate">Others</label><br>
-          <input class="w3-check " type="checkbox" value="4" name="BI6"><label class="w3-validate">None of the above</label><br>
+          <input class="w3-check " type="checkbox" value="2" name="BI6"><label class="w3-validate">Gephi</label><br>
+          <input class="w3-check " type="checkbox" value="3" name="BI6"><label class="w3-validate">neo4j</label><br>
+          <input class="w3-check " type="checkbox" value="4" name="BI6"><label class="w3-validate">WikiLinks</label><br>
+          <input id="BI6-OTHER" class="w3-check " type="checkbox" value="5" name="BI6"><label class="w3-validate">Other web-app similar to B-Link</label><br>
+          <input id="BI6-INPUT" class="w3-input" type="text" value="" placeholder="Please specify its name here" style="display:none;">
         </p>
 
         <p class="page-button" style="margin-top:25px;">
-        <button type="submit" class="w3-btn w3-blue w3-large" >Save & Next</button>
+        <button id="submit" type="submit" class="w3-btn w3-blue w3-large">Save & Next</button>
         </p>
+
+        <script>
+          $('#submit').click(function(){
+            console.log('submit')
+            if ($('#BI6-INPUT').css('display') == 'block'){
+              console.log('input block !')
+              var input = $('#BI6-INPUT').val();
+              console.log('orginal input:'+input)
+              input = '5+'+input;
+              console.log('new input:'+input)
+              $('#BI6-OTHER').attr('value', input)
+              console.log('done!')
+            }
+          });
+        </script>
 
       </form>
 

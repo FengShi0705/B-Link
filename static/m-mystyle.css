@@ -28,7 +28,7 @@ input[name="search"]{
   right:5px;
   top:5px;
   border:2px;
-  background-image:url('/static/search.svg');
+  background-image:url('/static/search.png');
   background-color:white;
   background-size:100%;
   opacity:0.1;
@@ -234,14 +234,14 @@ input[name="endpoint"]{
     bottom:0px;
 }*/
 .fullInfo{
-    background-image:url('/static/zoom_in.svg');
+    background-image:url('/static/zoom_in.png');
     background-repeat: no-repeat;
     background-size: 25px 25px;
     background-position:center;
 }
 
 .fullInfo_toggle{
-    background-image:url('/static/zoom_out.svg');
+    background-image:url('/static/zoom_out.png');
 }
 
 .img-rotate{
@@ -347,7 +347,7 @@ div.info-display div.row:after {
 
 .feedback{
     position:absolute;
-    bottom:30px;
+    bottom:38px;
     left:10px;
     width:60px;
 

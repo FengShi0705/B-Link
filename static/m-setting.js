@@ -167,6 +167,13 @@ function show_info(panelname){
         //document.getElementById("info_panel").style.top ="347px";
         BpathsClusters_showResult();
     };
+
+    if(count_hideInfo % 2 == 1){
+        console.log('count_hideInfo is even')
+        count_hideInfo += 1;
+        $('.info_panel_height').toggleClass('info_panel_down');
+        $('.img-rotate').toggleClass('img-rotate-toggle');
+    };
     document.getElementById("info_panel").style.display = "block";
 
 }
@@ -328,10 +335,11 @@ function ChangeSelectCluster(id){
 
 
 //////////////// Mobile design only ///////////////
-
+var count_hideInfo = 0;
 $(document).ready(function(){
-
     $('.hideInfo').click(function(){
+        count_hideInfo += 1;
+        console.log(count_hideInfo)
         $('.info_panel_height').toggleClass('info_panel_down');
         $('.img-rotate').toggleClass('img-rotate-toggle');
     });
@@ -340,5 +348,4 @@ $(document).ready(function(){
         $('.info_panel_height').toggleClass('info_panel_full');
         $('.fullInfo').toggleClass('fullInfo_toggle');
     });
-
 });
