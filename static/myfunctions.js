@@ -69,12 +69,12 @@ function SHOW_UPDATE_FORCE(dataset,born){
 
 
   //scale
-  scale_tp2Distance = d3.scaleLinear()
-                   .domain([ d3.min(CLIENT_EDGES,function(d){return d['dist']}), d3.max(CLIENT_EDGES,function(d){return d['dist']})  ])
+  scale_tp2Distance = d3.scalePow().exponent(-2)
+                   .domain([ d3.min(CLIENT_EDGES,function(d){return d['dist']})+1.0, d3.max(CLIENT_EDGES,function(d){return d['dist']})+1.0  ])
                    .range([minlinkdistance,maxlinkdistance]);
 
-  scale_tp2Stokewidth = d3.scaleLinear()
-                    .domain([ d3.min(CLIENT_EDGES,function(d){return d['dist']}), d3.max(CLIENT_EDGES,function(d){return d['dist']})  ])
+  scale_tp2Stokewidth = d3.scalePow().exponent(-2)
+                    .domain([ d3.min(CLIENT_EDGES,function(d){return d['dist']})+1.0, d3.max(CLIENT_EDGES,function(d){return d['dist']})+1.0  ])
                     .range([maxlinkwidth,minlinkwidth]);
 
   scale_NodeRadius = d3.scalePow().exponent(3)
@@ -82,7 +82,7 @@ function SHOW_UPDATE_FORCE(dataset,born){
                         .range([minNodeRadius,maxNodeRadius]);
 
   //update link distance
-  SIMULATION.force("link").distance(function(d){return scale_tp2Distance(d['dist']);});
+  SIMULATION.force("link").distance(function(d){return scale_tp2Distance(d['dist']+1.0);});
 
   //change title color
   TITLECOLOR_CHANGE();
@@ -90,20 +90,21 @@ function SHOW_UPDATE_FORCE(dataset,born){
   var edges=GRAPH.selectAll(".edge")
                .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
 
-          edges.attr("stroke-width",function(d){return scale_tp2Stokewidth(d['dist']);});
+          edges.attr("stroke-width",function(d){return scale_tp2Stokewidth(d['dist']+1.0);});
           edges.enter()
                .insert("line",":first-child")
                .attr("class","edge")
-               .attr("stroke-width",function(d){return scale_tp2Stokewidth(d['dist']);});
+               .attr("stroke-width",function(d){return scale_tp2Stokewidth(d['dist']+1.0);});
           edges.exit().remove();
 
   /*var edgelabels=GRAPH.selectAll(".edgelabel")
-                    .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);});
+                    .data(SIMULATION.force("link").links(),function(d){return Math.min(d.source.wid,d.target.wid)+"-"+Math.max(d.source.wid,d.target.wid);})
+                    .text(function(d){return Number((d['dist']).toFixed(1));});
 
           edgelabels.enter()
                     .append("text")
                     .attr("class","edgelabel")
-                    .text(function(d){return d['dist'];});
+                    .text(function(d){return Number((d['dist']).toFixed(1));});
           edgelabels.exit().remove();*/
 
   var gnodes = GRAPH.selectAll(".gnode")

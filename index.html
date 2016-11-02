@@ -51,20 +51,20 @@
               <img class="w3-border w3-border-blue w3-round" src="static/point.png" style="width:50px;">
               <div class="w3-small w3-text-cyan" style="letter-spacing:0.8px;">Explore</div>
               <div class="tip-style w3-card-2">
-                  Explore: Help you generate more points associated with input words
+                  Explore around your query
               </div>
           </div>
           <div class="w3-white w3-btn w3-third tooltip " onclick="show_panel('line')">
               <img class="w3-border w3-border-blue w3-round" src="static/line.png" style="width:50px;">
-              <div class="w3-small w3-text-cyan">Find Path</div>
+              <div class="w3-small w3-text-cyan">Search Path</div>
               <div class="tip-style w3-card-2" >
-                  Find Path: Help you discover multiple pathways between two input words </div>
+                  Find association path between two concepts </div>
           </div>
           <div class="w3-white w3-btn w3-third tooltip" onclick="show_panel('cluster')">
               <img class="w3-border w3-border-blue w3-round" src="static/cluster.png" style="width:50px;">
               <div class="w3-small w3-text-cyan" style="letter-spacing:1px;">Cluster</div>
               <div class="tip-style w3-card-2">
-                  Cluster: Help you divide  points in network into different groups </div>
+                  Divide concepts into different groups  </div>
           </div>
       </div>
 
@@ -109,12 +109,12 @@
                     <span class="w3-tooltip w3-display-topmiddle">
                         <image src="/static/question.png" style="cursor:pointer;"></image>
                         <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:absolute;top:35px;left:-95px;width:170px;height:70px;z-index:10;">
-                            Explore General knowledge</div>
+                            Explore General knowledge with smooth association</div>
                     </span>
                     <span class="w3-tooltip w3-display-bottommiddle" style="padding-bottom:15px;">
                         <image src="/static/question.png" style="cursor:pointer;"></image>
                         <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:180px;left:175px;width:185px;height:70px;z-index:10;">
-                            Explore Specific knowledge</div>
+                            Explore Specific knowledge with steep association</div>
                     </span>
                 </div>
                 <label class="switch switchLG">
@@ -175,12 +175,12 @@
                     <span class="w3-tooltip w3-display-topmiddle">
                         <image src="/static/question.png" style="cursor:pointer;"></image>
                         <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:absolute;top:35px;left:-95px;width:170px;height:70px;z-index:5;">
-                            Explore General knowledge</div>
+                            Search smooth Path with General knowledge</div>
                     </span>
                     <span class="w3-tooltip w3-display-bottommiddle" style="padding-bottom:15px;">
                         <image src="/static/question.png" style="cursor:pointer;"></image>
                         <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:220px;left:175px;width:185px;height:70px;z-index:5;">
-                            Explore Specific knowledge</div>
+                            Search steep Path with Specific knowledge</div>
                     </span>
                 </div>
                 <label class="switch switchLG">
@@ -212,7 +212,7 @@
                       <input type="number" class="w3-large w3-center-align" name="clusterNum" min="1" step="1" value="1" style="width:50px;">
                   </div>
                   <div id="clusterMethod2Setting" class="w3-container" style="display:none;">
-                      <div class="w3-label" style="padding-bottom:10px;">Set the Level:</div>
+                      <div class="w3-label" style="padding-bottom:10px;">Set the Cluster Level:</div>
                       <ul class="w3-navbar w3-row w3-center">
                           <li>Low &nbsp</li>
                           <li><input type="range" class="" name="clusterLevel" min="1" max="5" step="0.001" value="1"  style="width:230px;"></li>
@@ -248,7 +248,7 @@
                   </li>
               </ul>
               -->
-              <div class="w3-container w3-center w3-blue" style="height:47px;"><h5 style="font-weight:bold;">Find Path Between Clusters</h5></div>
+              <div class="w3-container w3-center w3-blue" style="height:47px;"><h5 style="font-weight:bold;">Search Path Between Clusters</h5></div>
 
               <div id="findPath" class="w3-white cluster-panel w3-container w3-center w3-center" style="height:240px;">
                   <ul class="w3-navbar w3-row w3-section w3-center">

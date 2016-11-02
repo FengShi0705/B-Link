@@ -390,7 +390,7 @@ def testNodeEdgedegree():
     G = nx.read_gpickle('data/undirected(fortest).gpickle')
     main.nodeDegree_filter(G,1)
     main.addNode_degree(G)
-    main.addEdge_distance(G,['G','SP','R','C','c'])
+    main.addEdge_distance(G,['G','SP','R','C','c','OTHER'])
     n=3
     print 'node:{}'.format(n)
     node_results = [

@@ -12,8 +12,8 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-#myRtr=Retrievor.UndirectedG('addNodeEdgeDegree_G+SP+R_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j','total_v3_csvneo4j','userdata')
-myRtr=Retrievor.UndirectedG('undirected(fortest)_R+G+SP+C+c','fortest','userdata')
+myRtr=Retrievor.UndirectedG('addNodeEdgeDegree_G+SP+R_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j','total_v3_csvneo4j','userdata')
+#myRtr=Retrievor.UndirectedG('undirected(fortest)_R+G+SP+C+c','fortest','userdata')
 
 # sign up
 @app.route('/signup')
@@ -123,7 +123,7 @@ def generateClusters(info):
     # record clusters activities
     user = session['user']
     record_wid = sorted(nodes)
-    rthread = record_thread(myRtr.userSchema, myRtr.data_version, info['distance'], user, 'generateClusters', [record_wid], ["Omit"], 1)
+    rthread = record_thread(myRtr.userSchema, myRtr.data_version, weight, user, 'generateClusters', [record_wid], ["Omit"], 1)
     rthread.start()
 
     if method=='normalized':

@@ -70,9 +70,15 @@ var HltNodesNumber=20;
 var POSITIONFORCE_STRENGTH=0.8;
 var N_SearchButton=10;
 var N_forPath = 5;
-var Type_distance = 'R_r_GM';
-var G_Distance = 'R_n_GM';
-var SP_distance = 'R_r_GM';
+var Type_distance = 'R_n_AM';
+console.log('graphsetting');
+console.log(Type_distance);
+var G_Distance = 'R_n_AM';
+console.log('G')
+console.log(G_Distance)
+var SP_distance = 'R_n_GM';
+console.log('SP');
+console.log(SP_distance);
 var Kernal_Weight = 'weight';
 var N_ExploreFunctionpanel=20;
 var HltPathColor = '#FF6800';
