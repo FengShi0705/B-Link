@@ -18,20 +18,8 @@
   </head>
 
   <body onresize="SVG_change_size()">
-  <noscript>
-      <style type="text/css">
-            .js-check {display:none;}
-      </style>
-      <div class="w3-container w3-center">
-          <h1 class="w3-jumbo">JavaScript Is Not Enabled</h1>
-          <br>
-          <img src="static/warning.png" alt="Warning: " style="height:100px;">
-          <div class=" w3-large" style="display:inline-block;height:100px;vertical-align:middle;padding-left:30px;">
-              You need to have JavaSript enabled in your browser to utilise the full functionality of this website.</div>
-      </div>
-  </noscript>
 
-      <div id="mainSearchBox" class="js-check">
+      <div id="mainSearchBox">
           <input class="w3-hover-border-blue" type="text" id="keywords" name="keywords" placeholder="Search..."
                  onkeyup="checkTextField(this)" style="width:100%;">
           <input id="point_search" type="button" name="search" value="" onclick="Handle_Search_Button('keywords')">
