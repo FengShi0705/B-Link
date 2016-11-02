@@ -3,7 +3,8 @@
   stroke: #aaa;
 }
 .edge.hltE {
-  stroke: #ff7f0e;
+  stroke: #ff0000;
+  stroke-width: 5px;
 }
 .edge.hltE1 {
   stroke: #ff7f0e;
@@ -17,7 +18,7 @@
 }
 
 .gnode circle.hltP{
-   stroke: #ff7f0e;
+   stroke: #ff0000;
    stroke-width: 3px;
 }
 .gnode circle.hltP1{
@@ -27,12 +28,12 @@
 }
 .gnode circle.hltA{
    fill: #fff;
-   stroke: #ff7f0e;
+   stroke: #ff0000;
    stroke-width: 5px;
 }
 .gnode circle.hltQ{
    fill: #fff;
-   stroke: #ff7f0e;
+   stroke: #ff0000;
    stroke-width: 5px;
 }
 .gnode circle.hltA1{
