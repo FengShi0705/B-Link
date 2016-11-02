@@ -73,7 +73,7 @@ var N_forPath = 5;
 var Type_distance = 'R_n_AM';
 console.log('graphsetting');
 console.log(Type_distance);
-var G_Distance = 'R_n_AM';
+var G_Distance = 'R_r_GM';
 console.log('G')
 console.log(G_Distance)
 var SP_distance = 'R_n_GM';
