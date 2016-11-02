@@ -8,7 +8,7 @@
 }
 .edge.hltE1 {
   stroke: #ff7f0e;
-  stroke-opacity: 0.3;
+  stroke-opacity: 0.5;
 }
 
 .gnode circle {
@@ -24,7 +24,7 @@
 .gnode circle.hltP1{
    stroke: #ff7f0e;
    stroke-width: 3px;
-   stroke-opacity: 0.3;
+   stroke-opacity: 0.5;
 }
 .gnode circle.hltA{
    fill: #fff;
@@ -39,7 +39,7 @@
 .gnode circle.hltA1{
    fill: #fff;
    stroke: #ff7f0e;
-   stroke-opacity: 0.3;
+   stroke-opacity: 0.5;
    stroke-width: 5px;
 }
 
@@ -47,6 +47,12 @@
     font-family: 'Archivo Narrow',sans-serif;
 }
 
+.gnode text.hlttx{
+    font-weight:bold;
+}
+.gnode text.txQ{
+    font-weight:bold;
+}
 .neighbor_track{
   stroke: blue;
   stroke-dasharray:5, 10;
