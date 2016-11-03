@@ -141,7 +141,9 @@ def disparity_alpha(G):
         if Ki>1:
             alpha_i = 1.0 - math.pow( (1.0 - Pij) , (Ki-1) )
         else:
-            alpha_i = 1.0
+            # if let alpha be 0, remove edge of nodes whose degree<=1
+            # if let alpha be 1, keep edge of nodes whose degree<=1
+            alpha_i = 0.0
 
         Sj = G.degree(j,weight='weight')
         Pji = w/Sj
@@ -149,7 +151,9 @@ def disparity_alpha(G):
         if Kj>1:
             alpha_j = 1.0 - math.pow( (1.0 - Pji) ,( Kj-1 ) )
         else:
-            alpha_j = 1.0
+            # if let alpha be 0, remove edge of nodes whose degree<=1
+            # if let alpha be 1, keep edge of nodes whose degree<=1
+            alpha_j = 0.0
 
         return  max(alpha_i,alpha_j), min(alpha_i,alpha_j)
 
