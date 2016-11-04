@@ -464,11 +464,11 @@ function check_explore_LG(switcher){
 function Explore_Nearby(LorG,start,minhops,N,query,born){
     var currentnodes = CLIENT_NODES_ids;
     if ( LorG=="specific" ){
-        var subparameters = {'ipt':query,'tp':SP_distance,'minhops':minhops,'localnodes':null};
+        var subparameters = {'ipt':query,'tp':ExploreSP_distance,'minhops':minhops,'localnodes':null};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
     }else if( LorG=="general" ){
-        var subparameters = {'ipt':query,'tp':G_Distance,'minhops':minhops,'localnodes':null};
+        var subparameters = {'ipt':query,'tp':ExploreG_Distance,'minhops':minhops,'localnodes':null};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
     }else{
@@ -490,11 +490,11 @@ function Explore_Nearby(LorG,start,minhops,N,query,born){
 //find paths between two nodes
 function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
     if ( LorG=="specific" ){
-        var subparameters = {"source":node1,"target":node2,"tp":SP_distance,"minhops":minhops,"localnodes":null};
+        var subparameters = {"source":node1,"target":node2,"tp":PathSP_distance,"minhops":minhops,"localnodes":null};
         var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
         var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
     }else if( LorG=="general" ){
-        var subparameters = {"source":node1,"target":node2,"tp":G_Distance,"minhops":minhops,"localnodes":null};
+        var subparameters = {"source":node1,"target":node2,"tp":PathG_Distance,"minhops":minhops,"localnodes":null};
         var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
         var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
     }else{
@@ -517,11 +517,11 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
         throw 'two clusters are overlapping.'
     };
     if ( LorG=='specific' ){
-        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':SP_distance, 'localnodes':null};
+        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':PathSP_distance, 'localnodes':null};
         var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start  };
         var info = {'explorelocal':false, 'parameters':parameters, 'localnodes':CLIENT_NODES_ids};
     }else if( LorG=="general" ){
-        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':G_Distance, 'localnodes':null};
+        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':PathG_Distance, 'localnodes':null};
         var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start  };
         var info = {'explorelocal':false, 'parameters':parameters, 'localnodes':CLIENT_NODES_ids};
     }else{

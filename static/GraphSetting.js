@@ -70,17 +70,22 @@ var HltNodesNumber=20;
 var POSITIONFORCE_STRENGTH=0.8;
 var N_SearchButton=10;
 var N_forPath = 5;
-var Type_distance = 'R_n_AM';
-console.log('graphsetting');
+var Type_distance = 'R_n_HM';
+console.log('Type_distance');
 console.log(Type_distance);
-var G_Distance = 'R_r_GM';
-console.log('G')
-console.log(G_Distance)
-var SP_distance = 'R_n_GM';
-console.log('SP');
-console.log(SP_distance);
+var ExploreG_Distance = 'R_n_HM';
+console.log('ExploreG_Distance')
+console.log(ExploreG_Distance)
+var ExploreSP_distance = 'R_r_GM';
+console.log('ExploreSP_distance');
+console.log(ExploreSP_distance);
+var PathG_Distance = 'R_n_HM';
+console.log('PathG_Distance')
+console.log(PathG_Distance)
+var PathSP_distance = 'R_n_GM';
+console.log('PathSP_distance');
+console.log(PathSP_distance);
 var Kernal_Weight = 'weight';
-var N_ExploreFunctionpanel=20;
 var HltPathColor = '#FF6800';
 var NodeColor = '#3498DB';
 var EdgeColor = '#aaa';

@@ -100,6 +100,14 @@ process: add alpha value-->filter edges on alpha0.7 -->filter nodes mindegree1.0
 edges:  3585173
 nodes:  535590
 }
+(3). add R;r,n;GM,HM
+addNodeEdgeDegree_R+rn+GMHM_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j.gpickle
+{
+type: undirected
+process: add alpha value-->filter edges on alpha0.65 -->filter nodes mindegree1.0 --> add node degree/edge distance 'R';'r','n';'GM','HM'
+edges:  3726904
+nodes:  536507
+}
 
 
 
