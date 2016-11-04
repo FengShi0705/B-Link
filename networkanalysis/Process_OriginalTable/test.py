@@ -52,6 +52,10 @@ def rawGraph_withAlpha():
 
     G = main.load_rawGraph(schema,reltable,labtable,Graph_type=Graph_type)
     G = main.disparity_alpha(G)
+    print 'finish add alpha'
+    print 'edges: ', len(G.edges())
+    print 'nodes: ', len(G.nodes()), '\n'
+
     nx.write_gpickle(G, '../RawGraphWithDisparityAlpha_{}_{}.gpickle'.format(Graph_type,schema))
     return
 
@@ -86,7 +90,9 @@ def addNodeDe_EdgeDist():
     Graph_type = 'undirected'
     alpha_thred = 0.65
     nodeDegree_thred = 1.0
-    DisTypes = ['G','SP','R']
+    DisTypes = ['R']
+    NormalizaMethod = ['r','n']
+    mean_methods = ['GM','HM']
 
     G = nx.read_gpickle('../filteredG_{}_alpha{}_nodeD{}_{}.gpickle'.format(Graph_type,alpha_thred,nodeDegree_thred,schema))
     print 'after read'
@@ -94,10 +100,10 @@ def addNodeDe_EdgeDist():
     print 'nodes: ', len(G.nodes())
     G = main.addNode_degree(G)
     print 'finish adding node degree'
-    G = main.addEdge_distance(G,DisTypes)
+    G = main.addEdge_distance(G,DisTypes,NormalizaMethod,mean_methods)
     print 'finish adding edge degree'
 
-    nx.write_gpickle(G,'../addNodeEdgeDegree_{}_{}_alpha{}_nodeD{}_{}.gpickle'.format('+'.join(DisTypes),Graph_type,alpha_thred,nodeDegree_thred,schema))
+    nx.write_gpickle(G,'../addNodeEdgeDegree_{}_{}_alpha{}_nodeD{}_{}.gpickle'.format('+'.join([''.join(DisTypes),''.join(NormalizaMethod),''.join(mean_methods)]),Graph_type,alpha_thred,nodeDegree_thred,schema))
     print 'finishing write gpickle'
     print 'edges: ', len(G.edges())
     print 'nodes: ', len(G.nodes())
