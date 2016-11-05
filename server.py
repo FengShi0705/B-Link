@@ -12,8 +12,8 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG('addNodeEdgeDegree_G+SP+R_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j','total_v3_csvneo4j','userdata')
-#myRtr=Retrievor.UndirectedG('undirected(fortest)_R+G+SP+C+c','fortest','userdata')
+#myRtr=Retrievor.UndirectedG('addNodeEdgeDegree_G+SP+R_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j','total_v3_csvneo4j','userdata')
+myRtr=Retrievor.UndirectedG('undirected(fortest)_R+G+SP+C+c','fortest','userdata')
 
 # sign up
 @app.route('/signup')
@@ -218,11 +218,11 @@ def BI_data():
     BI3 = request.form['BI3']
     BI4 = request.form['BI4']
     BI5 = request.form['BI5']
-    BI6_temp = request.form.getlist('BI6')
-    BI6 = json.dumps(BI6_temp)
+    BI5_temp = request.form.getlist('BI5')
+    BI5 = json.dumps(BI5_temp)
 
-    answer = [BI2,BI3,BI4,BI5,BI6]
-    print email, BI2,BI3,BI4,BI5,BI6, answer
+    answer = [BI2,BI3,BI4,BI5]
+    print email, BI2,BI3,BI4,BI5, answer
 
     cnx, cursor = PF.creatCursor('feedback',"W")
     Qy = 'SELECT MAX(`times_count`) FROM `ans_all` WHERE `email`="{}"'.format(email)
@@ -235,7 +235,7 @@ def BI_data():
         times_count = times_count_last + 1;
     session['feedback_times'] = times_count
 
-    for i in range(1,6):
+    for i in range(1,5):
         Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'BI{}\', \'{}\' )'.format(times_count, email, i+1, answer[i-1])
         cursor.execute(Qy)
     cnx.commit()
@@ -254,15 +254,14 @@ def HCI_data():
     HCI3_t = request.form['HCI3-t']
     HCI4 = request.form['HCI4']
     HCI5 = request.form['HCI5']
-    HCI6 = request.form['HCI6']
     submit_count = int(request.form['submit_count'])
     print type(submit_count)
     print 'submit_count: ', submit_count
 
     if HCI3 == 'yes':
-        answer = [HCI1,HCI2,HCI3,HCI4,HCI5,HCI6]
+        answer = [HCI1,HCI2,HCI3,HCI4,HCI5]
     elif HCI3 == 'no':
-        answer = [HCI1,HCI2,HCI3_t,HCI4,HCI5,HCI6]
+        answer = [HCI1,HCI2,HCI3_t,HCI4,HCI5]
     print 'answer', answer
 
     cnx, cursor = PF.creatCursor('feedback',"W")
@@ -270,13 +269,13 @@ def HCI_data():
 
     if (submit_count == 1):
         print 'count is 1'
-        for i in range(0, 6):
+        for i in range(0, 5):
             Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'HCI{}\', \'{}\' )'.format(
                 times_count, email, i + 1, answer[i])
             cursor.execute(Qy)
     else:
         print 'count is more than 1'
-        for i in range(0, 6):
+        for i in range(0, 5):
             Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`) VALUES (\'{}\', \'{}\', \'HCI{}\') ON DUPLICATE KEY UPDATE answer = \'{}\' '.format(
                 times_count, email, i + 1, answer[i])
             cursor.execute(Qy)
@@ -325,25 +324,27 @@ def FE_data():
 
     FE3 = request.form['FE3']
     FE4 = request.form['FE4']
-
-    FE5_temp = request.form.getlist('FE5')
-    FE5_r_temp = request.form.getlist('FE5-r')
-    if FE5_temp is None:
-        FE5 = json.dumps(FE5_temp)
-    else:
-        FE5_temp.append(FE5_r_temp)
-        FE5 = json.dumps(FE5_temp)
-
+    FE5 = request.form['FE5']
     FE6 = request.form['FE6']
 
-    answer = [FE1, FE2, FE3, FE4, FE5, FE6];
+    FE7_temp = request.form.getlist('FE7')
+    FE7_r_temp = request.form.getlist('FE7-r')
+    if FE7_temp is None:
+        FE7 = json.dumps(FE7_temp)
+    else:
+        FE7_temp.append(FE7_r_temp)
+        FE7 = json.dumps(FE7_temp)
 
-    print FE1, FE2, FE3, FE4, FE5, FE6, answer
+    FE8 = request.form['FE8']
+
+    answer = [FE1, FE2, FE3, FE4, FE5, FE6, FE7, FE8];
+
+    print FE1, FE2, FE3, FE4, FE5, FE6, FE7, FE8,  answer
 
     cnx, cursor = PF.creatCursor('feedback', "W")
     times_count = session['feedback_times']
 
-    for i in range(0, 6):
+    for i in range(0, 8):
         Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'FE{}\', \'{}\' )'.format(
             times_count, email, i + 1, answer[i])
         cursor.execute(Qy)
