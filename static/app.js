@@ -1,12 +1,12 @@
 //update graph for search button
 //query is the node to be searched or added
 // zh_nodes is the list of nodes to be zoomed and highlighted as end nodes
-function updateGraph_searchButton(query,zh_nodes){
+function updateGraph_searchButton(query){
     var currentnodes = CURRENT_NODESSET(CLIENT_NODES,"wid");
-    if(_.contains(currentnodes,query)){
-        var highlights = {'nodes':zh_nodes,'paths':[],'paths1':[]};
+    if( _.difference(query,currentnodes).length==0 ){
+        var highlights = {'nodes':query,'paths':[],'paths1':[]};
         highlight_nodespaths(highlights);
-        ZoomToNodes(zh_nodes);
+        ZoomToNodes(query);
     }else{
         var info={'currentnodes':currentnodes,'query':query, 'tp':Type_distance};
         d3.json('/searchbutton/'+JSON.stringify(info),function(error,data){
@@ -16,14 +16,14 @@ function updateGraph_searchButton(query,zh_nodes){
             }else{var bornplace = {x:w/2, y:h/2, vx:NaN, vy: NaN};};
             SHOW_UPDATE_FORCE(data,bornplace);
             node_left_click_on();
-            var highlights = {'nodes':zh_nodes,'paths':[],'paths1':[]};
+            var highlights = {'nodes':query,'paths':[],'paths1':[]};
             highlight_nodespaths(highlights);
-            ZoomToNodes(zh_nodes);
+            ZoomToNodes(query);
         });
     };
 
     //update previous focus
-    FOCUSING_NODE = query;
+    FOCUSING_NODE = query[0];
 
 };
 
@@ -33,9 +33,8 @@ function Handle_Search_Button(searchbutton_id){
     var info = {'searchtext':get_inputtext(searchbutton_id)};
     d3.json('/texttowid/'+JSON.stringify(info),function(error,data){
         if (data){
-            var zh_nodes=[data];
             d3.select('input#' + searchbutton_id ).data([data]);
-            updateGraph_searchButton(data,zh_nodes);
+            updateGraph_searchButton([data]);
 
             Show_FuncPanel(searchbutton_id);
         }else{
@@ -61,18 +60,17 @@ function Handle_pathSearchbutton(searchbutton_id){
                      var node2=data;
                      var selector2='input#'+theother_id;
                      d3.select(selector2).data([node2]);
-                     var zh_nodes=[node1,node2];
-
-                     if( _.contains(CLIENT_NODES_ids,node2) && node1!=node2 ){
+                     var queries=[node1,node2];
+                     if( node1!=node2 ){
                          Show_FuncPanel(searchbutton_id);
                      };
                  }else{
-                     var zh_nodes=[node1];
+                     var queries=[node1];
                  };
-                 updateGraph_searchButton(node1,zh_nodes);
+                 updateGraph_searchButton(queries);
              });
          }else{
-             alert('Can not match your input concepts');
+             alert('Can not match this input');
          };
      });
 };

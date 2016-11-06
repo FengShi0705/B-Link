@@ -141,7 +141,9 @@ def disparity_alpha(G):
         if Ki>1:
             alpha_i = 1.0 - math.pow( (1.0 - Pij) , (Ki-1) )
         else:
-            alpha_i = 1.0
+            # if let alpha be 0, remove edge of nodes whose degree<=1
+            # if let alpha be 1, keep edge of nodes whose degree<=1
+            alpha_i = 0.0
 
         Sj = G.degree(j,weight='weight')
         Pji = w/Sj
@@ -149,7 +151,9 @@ def disparity_alpha(G):
         if Kj>1:
             alpha_j = 1.0 - math.pow( (1.0 - Pji) ,( Kj-1 ) )
         else:
-            alpha_j = 1.0
+            # if let alpha be 0, remove edge of nodes whose degree<=1
+            # if let alpha be 1, keep edge of nodes whose degree<=1
+            alpha_j = 0.0
 
         return  max(alpha_i,alpha_j), min(alpha_i,alpha_j)
 
@@ -267,12 +271,14 @@ def addNode_degree(G):
     return G
 
 
-def addEdge_distance(G,DisTypes):
+def addEdge_distance(G,DisTypes,normalization_methods,meanmethods):
     """
     add the general, specific, relevance, combination and other distance of edges
     The distance types in DisTypes are added.
     :param G: networkx directed or undirected graph
-    :param DisTypes: the types of distance to be added
+    :param DisTypes: the types of distance to be added in edges. ['G','SP','R','C','c','OTHER']
+    :param normalization_methods: normalization methods to be tried for node degree and edge distance. ['r','n','p']
+    :param meanmethods: avaerage methods to be tried for edge distance. ['AM','GM','HM']
     :return: G
     """
     def getMaxMinWeights():
@@ -300,7 +306,7 @@ def addEdge_distance(G,DisTypes):
     deg_To_dist = {'AM':deg_AM_dist,'GM':deg_GM_dist,'HM':deg_HM_dist}
 
     class nodeDe(object):
-        def __init__(self,n,w):
+        def __init__(self,n,w,normalization_methods):
             self.strength = G.node[n]['N']
             self.degree = G.node[n]['n']
             self.n = n
@@ -321,8 +327,8 @@ def addEdge_distance(G,DisTypes):
             }
             self.C = {}
             self.c = {}
-            for rnm in ['r','n','p']:
-                for gsp_nm in ['r','n','p']:
+            for rnm in normalization_methods:
+                for gsp_nm in normalization_methods:
                     self.C[rnm+gsp_nm] = self.R[rnm] * self.G[gsp_nm]
                     self.c[rnm+gsp_nm] = self.R[rnm] * self.SP[gsp_nm]
             return
@@ -332,9 +338,9 @@ def addEdge_distance(G,DisTypes):
             self.weight = w
             self.A = Anode
             self.B = Bnode
-        def add_edgedist(self,dis_types):
-            for nm in ['r','n','p']:
-                for meanmd in ['AM','GM','HM']:
+        def add_edgedist(self,dis_types,normalization_methods,meanmethods):
+            for nm in normalization_methods:
+                for meanmd in meanmethods:
                     # general distance
                     if 'G' in dis_types:
                         G[self.A.n][self.B.n]['G_{}_{}'.format(nm,meanmd)] = deg_To_dist[meanmd](self.A.G[nm],self.B.G[nm])
@@ -344,9 +350,9 @@ def addEdge_distance(G,DisTypes):
                     # relevance distance
                     if 'R' in dis_types:
                         G[self.A.n][self.B.n]['R_{}_{}'.format(nm,meanmd)] = deg_To_dist[meanmd](self.A.R[nm], self.B.R[nm])
-            for nmR in ['r','n','p']:
-                for nmGSP in ['r','n','p']:
-                    for meanmd in ['AM','GM','HM']:
+            for nmR in normalization_methods:
+                for nmGSP in normalization_methods:
+                    for meanmd in meanmethods:
                         #combine relevance and general
                         if 'C' in dis_types:
                             G[self.A.n][self.B.n]['C_{}{}_{}'.format(nmR,nmGSP,meanmd)] = deg_To_dist[meanmd](self.A.C[nmR+nmGSP],self.B.C[nmR+nmGSP])
@@ -368,10 +374,10 @@ def addEdge_distance(G,DisTypes):
             return
 
     for (a, b, w) in G.edges_iter(data='weight'):
-        nodeA = nodeDe(a,w)
-        nodeB = nodeDe(b,w)
+        nodeA = nodeDe(a,w,normalization_methods)
+        nodeB = nodeDe(b,w,normalization_methods)
         edgeE = edgeDe(nodeA,nodeB,w)
-        edgeE.add_edgedist(DisTypes)
+        edgeE.add_edgedist(DisTypes,normalization_methods,meanmethods)
         if 'OTHER' in DisTypes:
             edgeE.otherdist()
 

@@ -160,7 +160,7 @@ function show_info(panelname){
     }
     else if (panelname == "line"){
         console.log('line show');
-        document.getElementById("info_panel").style.top = "260px";
+        document.getElementById("info_panel").style.top = "206px";
         FindPath_showResult();
     }
     else if (panelname == "cluster"){
