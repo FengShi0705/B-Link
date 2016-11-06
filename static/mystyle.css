@@ -108,7 +108,7 @@ div.header{
 
 .t-global {
     font-family:arial;
-    font-size:18px;
+    font-size:20px;
     color:#2196F3;
     font-weight: bold;
     display:inline-block;
@@ -121,7 +121,7 @@ div.header{
 
 .t-local {
     font-family:arial;
-    font-size:18px;
+    font-size:20px;
     font-weight:normal;
     display:inline-block;
 }
@@ -186,7 +186,7 @@ input[name="switch-1"]:checked + .slider:before {
 }
 
 input[name="switch-2"]:checked + .slider:before {
-  transform: translateY(66px);
+  transform: translateX(66px);
 }
 
 input[name="switch-3"]:checked + .slider:before {

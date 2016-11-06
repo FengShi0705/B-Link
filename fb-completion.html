@@ -9,8 +9,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
+    h1 {padding:40px 15px;margin:0;}
+    .banner {margin-top:50px;}
     .logo {height:60px;}
     .blink {height:60px; margin-left:80px;}
+    .contact {margin:40px 0 20px 0;}
     .mail {text-decoration:none;font-weight:bold;}
     span{font-size:18px;}
 
@@ -21,7 +24,15 @@
         .blink {height:50px;margin:65px 0 0px 0;}
         .contact{height:16px;}
         span{display:block;}
- }
+    }
+    @media only screen and (max-width: 350px) {
+        h1 {padding:20px 15px;}
+        .banner {margin-top:40px;}
+        .logo {height:50px;}
+        .contact{margin:30px 0 20px 0;}
+        span {font-size:16px;}
+    }
+
     </style>
 </head>
 
@@ -29,10 +40,10 @@
     <div class="blank" style="height:80px;"></div>
 
     <div class="w3-center w3-blue" style="">
-        <h1 style="padding:40px 15px;">Thank you very much for your feedback !</h1>
+        <h1>Thank you very much for your feedback !</h1>
     </div>
 
-    <div class="w3-center" style="margin-top:50px;">
+    <div class="w3-center banner" >
         <img src="static/logo.png" class="w3-white logo"/>
         <img src="static/blink.png" alt="B-Link" class="blink"><br><br>
         <span>Linking your brain </span><span>knowledge within just a blink !</span>
@@ -41,7 +52,7 @@
     <div class="w3-hide-small" style="height:50px;"></div>
 
     <div class="w3-center" style="height:100px;">
-        <div style="padding:40px 0 20px 0;"><a href="mailto:l.chen15@imperial.ac.uk; f.shi14@imperial.ac.uk" class="w3-text-blue mail">Contact us</a></div>
+        <div class="contact"><a href="mailto:l.chen15@imperial.ac.uk; f.shi14@imperial.ac.uk" class="w3-text-blue mail">Contact us</a></div>
         <a href="/" value="#"><button class="w3-btn w3-large w3-blue" >Go back to B-Link</button></a>
     </div>
 

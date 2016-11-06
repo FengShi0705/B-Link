@@ -71,12 +71,12 @@ $(document).ready(function(){
     });
 
     ////////////  OPTION 'OTHER' DESIGN /////////////////
-    $('#BI6-OTHER').click(function(){
+    $('#BI5-OTHER').click(function(){
         if($(this).is(':checked')){
-            $('#BI6-INPUT').css('display','block');
+            $('#BI5-INPUT').css('display','block');
         }
         else{
-            $('#BI6-INPUT').css('display','none');
+            $('#BI5-INPUT').css('display','none');
         }
     });
 
@@ -91,11 +91,29 @@ $(document).ready(function(){
     });
 
     $('input[name$="FE5"]').click(function(){
-        if($('input[name$="FE5"]').is(':checked')){
-            $('#FE5reason').show();
+        if($('#FE5_yes').is(':checked')){
+            $('#FE5_rate').css('display','block');
         }
         else{
-            $('#FE5reason').hide();
+            $('#FE5_rate').css('display','none');
+        }
+    });
+
+    $('input[name$="FE6"]').click(function(){
+        if($('#FE6_yes').is(':checked')){
+            $('#FE6_rate').css('display','block');
+        }
+        else{
+            $('#FE6_rate').css('display','none');
+        }
+    });
+
+    $('input[name$="FE7"]').click(function(){
+        if($('input[name$="FE7"]').is(':checked')){
+            $('#FE7reason').show();
+        }
+        else{
+            $('#FE7reason').hide();
         }
     });
 

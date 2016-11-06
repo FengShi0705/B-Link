@@ -26,15 +26,8 @@
         </p>
 
         <p>
-          <label class="w3-label">2. Your gender</label><br>
-          <input class="w3-radio w3-margin-right" type="radio" name="BI2" value="male" required /><label>Male</label>
-          <br>
-          <input class="w3-radio w3-margin-right" type="radio" name="BI2" value="female" /><label>Female</label>
-        </p>
-
-        <p>
-          <label class="w3-label">3. Your social role</label><br>
-          <select class="w3-select" name="BI3" id="job" style="" required />
+          <label class="w3-label">2. Your social role</label><br>
+          <select class="w3-select" name="BI2" id="job" style="" required />
             <option value="" disabled selected>Choose your social role</option>
             <option value="academic">Academic professional</option>
             <option value="student">Student</option>
@@ -44,8 +37,8 @@
         </p>
 
         <p>
-          <label class="w3-label">4. Your current education level</label><br>
-          <select class="w3-select" name="BI4" id="degree" style="" required>
+          <label class="w3-label">3. Your current education level</label><br>
+          <select class="w3-select" name="BI3" id="degree" style="" required>
             <option value="" disabled selected>Choose your education level</option>
             <option value="bachelor">Bachlor</option>
             <option value="master">Master</option>
@@ -54,8 +47,8 @@
         </p>
 
         <p>
-          <label class="w3-label">5. Your academic background</label><br>
-          <select class="w3-select" name="BI5" id="subject" style="" required>
+          <label class="w3-label">4. Your academic background</label><br>
+          <select class="w3-select" name="BI4" id="subject" style="" required>
             <option value="" disabled selected>Choose your subject</option>
             <option value="art">Art</option>
             <option value="business">Business</option>
@@ -69,13 +62,13 @@
         </p>
 
         <p>
-          <label class="w3-label">6. Tick the tools or web application service you have used:</label><br>
-          <input class="w3-check " type="checkbox" value="1" name="BI6"><label class="w3-validate">Google Map</label><br>
-          <input class="w3-check " type="checkbox" value="2" name="BI6"><label class="w3-validate">Gephi</label><br>
-          <input class="w3-check " type="checkbox" value="3" name="BI6"><label class="w3-validate">neo4j</label><br>
-          <input class="w3-check " type="checkbox" value="4" name="BI6"><label class="w3-validate">WikiLinks</label><br>
-          <input id="BI6-OTHER" class="w3-check " type="checkbox" value="5" name="BI6"><label class="w3-validate">Other web-app similar to B-Link</label><br>
-          <input id="BI6-INPUT" class="w3-input" type="text" value="" placeholder="Please specify its name here" style="display:none;">
+          <label class="w3-label">5. Tick the tools or web application service you have used:</label><br>
+          <input class="w3-check " type="checkbox" value="1" name="BI5"><label class="w3-validate">Google Map</label><br>
+          <input class="w3-check " type="checkbox" value="2" name="BI5"><label class="w3-validate">Gephi</label><br>
+          <input class="w3-check " type="checkbox" value="3" name="BI5"><label class="w3-validate">neo4j</label><br>
+          <input class="w3-check " type="checkbox" value="4" name="BI5"><label class="w3-validate">WikiLinks</label><br>
+          <input id="BI5-OTHER" class="w3-check " type="checkbox" value="5" name="BI5"><label class="w3-validate">Other web-app similar to B-Link</label><br>
+          <input id="BI5-INPUT" class="w3-input" type="text" value="" placeholder="Please specify its name here" style="display:none;">
         </p>
 
         <p class="page-button" style="margin-top:25px;">
@@ -85,14 +78,10 @@
         <script>
           $('#submit').click(function(){
             console.log('submit')
-            if ($('#BI6-INPUT').css('display') == 'block'){
-              console.log('input block !')
-              var input = $('#BI6-INPUT').val();
-              console.log('orginal input:'+input)
+            if ($('#BI5-INPUT').css('display') == 'block'){
+              var input = $('#BI5-INPUT').val();
               input = '5+'+input;
-              console.log('new input:'+input)
-              $('#BI6-OTHER').attr('value', input)
-              console.log('done!')
+              $('#BI5-OTHER').attr('value', input)
             }
           });
         </script>

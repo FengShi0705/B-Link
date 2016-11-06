@@ -129,7 +129,7 @@
           </div>
       </div>
       <div id="line_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="top:85px;background-color:#e6ffe6;">
-          <div class="w3-row" style="margin:5px 0;">
+          <div class="w3-row" style="margin:5px 0; display:none;">
               <div class=" w3-col s6 w3-center" style="">
                   <div class="" style="position:relative;left:50%;margin-left:-64px;width:128px;padding-bottom:10px;">
                       <span style="font-size:14px;width:130px;margin-right:2px;">Min. Hop Steps </span>
@@ -149,7 +149,7 @@
                       <option value="5">5</option>
                   </select>
               </div>
-              <div class=" w3-col s6 w3-border-left w3-border-cyan w3-center" >
+              <!--div class=" w3-col s6 w3-border-left w3-border-cyan w3-center" >
                   <div style="position:relative;left:50%;margin-left:-65px;width:130px;">
                     <div class="w3-display-container" style="width:57px; height:60px; margin-right:0px; display:inline-block;">
                         <div class="w3-display-topright t-global" >Long</div>
@@ -172,9 +172,32 @@
                         <div class="slider round"></div>
                     </label>
                   </div>
+              </div-->
+          </div>
+          <div class=" w3-row w3-center" style="padding-top:10px;">
+              <div class="w3-col s4 w3-center t-global"  style="font-size:16px;">Divergent</div>
+              <div class="w3-col s4 w3-center" style="padding-top:2px;" >
+                  <label class="switch-cluster switchLG">
+                    <input type="checkbox" name="switch-2" id="switch-2">
+                    <div class="slider round"></div>
+                  </label>
+              </div>
+              <div class="w3-col s4 w3-center t-local" style="font-size:16px;">Convergent</div>
+          </div>
+          <div class="w3-row w3-center" style="position:relative;top:-3px;">
+              <div class="w3-col s4 w3-center w3-tooltip" >
+                  <image src="/static/question.png" ></image>
+                  <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:177px;left:10px;right:10px;padding:5px 10px;z-index:99;">
+                    Divergent: search association paths with divergent thinking</div>
+              </div>
+              <div class="w3-col s4">&nbsp &nbsp </div>
+              <div class="w3-col s4 w3-center w3-tooltip" >
+                  <image src="/static/question.png" ></image>
+                  <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:177px;left:10px;right:10px;padding:5px 10px;z-index:99;">
+                    Convergent: search association paths with convergent thinking</div>
               </div>
           </div>
-          <div class="w3-container w3-center" style="">
+          <div class="w3-container w3-center">
               <button class="w3-btn w3-blue w3-small" onclick="show_info('line')">Show Results</button>
           </div>
       </div>
