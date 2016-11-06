@@ -108,7 +108,7 @@ div.header{
 
 .t-global {
     font-family:arial;
-    font-size:20px;
+    font-size:18px;
     color:#2196F3;
     font-weight: bold;
     display:inline-block;
@@ -121,7 +121,7 @@ div.header{
 
 .t-local {
     font-family:arial;
-    font-size:20px;
+    font-size:18px;
     font-weight:normal;
     display:inline-block;
 }
@@ -351,65 +351,4 @@ div.info-display div.row:after {
 
 
 
-/* svg */
-.edge {
-  stroke: #aaa;
-}
-.edge.hltE {
-  stroke: #ff7f0e;
-}
-.edge.hltE1 {
-  stroke: #ff7f0e;
-  stroke-opacity: 0.3;
-}
-
-.gnode circle {
-  fill: #aaa;
-  stroke: #fff;
-  stroke-width: 2px;
-}
-
-.gnode circle.hltP{
-   stroke: #ff7f0e;
-   stroke-width: 3px;
-}
-.gnode circle.hltP1{
-   stroke: #ff7f0e;
-   stroke-width: 3px;
-   stroke-opacity: 0.3;
-}
-.gnode circle.hltA{
-   fill: #fff;
-   stroke: #ff7f0e;
-   stroke-width: 5px;
-}
-.gnode circle.hltQ{
-   fill: #fff;
-   stroke: #ff7f0e;
-   stroke-width: 5px;
-}
-.gnode circle.hltA1{
-   fill: #fff;
-   stroke: #ff7f0e;
-   stroke-opacity: 0.3;
-   stroke-width: 5px;
-}
-
-.gnode text{
-    font-family: 'Archivo Narrow',sans-serif;
-}
-
-.neighbor_track{
-  stroke: blue;
-  stroke-dasharray:5, 10;
-  fill: none;
-}
-
-svg rect#Backlayer{
-   fill:lime;
-   /*stroke:red;
-   stroke-width:5;*/
-   fill-opacity:0.1;
-   stroke-opacity:0.9;
-}
 

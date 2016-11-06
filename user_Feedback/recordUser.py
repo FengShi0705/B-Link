@@ -166,7 +166,7 @@ class record_thread(threading.Thread):
         Qy = ("""
                 SELECT `position` from `user_record` where `data_version`=\'{}\' and `distance_type`=\'{}\' and `eid`=\'{}\' and `query_type`=\'{}\' and `record_wid`=\'{}\'
         """.format(self.data_version,self.distance_type,self.eid,self.query_type,json.dumps(record_wid)))
-        print Qy
+        #print Qy
         self.cursor.execute(Qy)
         position = self.cursor.fetchall()
         assert len(position) <= 1, 'more than one position found, duplicated primary key'

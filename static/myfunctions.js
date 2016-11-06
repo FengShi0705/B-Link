@@ -313,6 +313,17 @@ function highlight_nodespaths(dataset){
         });
     };
 
+    //handle text
+    d3.selectAll(".gnode").selectAll("text").each(function(d){
+        if ( _.contains(hltQ, d.wid)  ){
+            d3.select(this).attr('class','txQ');
+        }else if( _.contains(hltA, d.wid) || hltG.hasNode(d.wid) ){
+            d3.select(this).attr('class','hlttx');
+        }else{
+            d3.select(this).attr('class','');
+        };
+    });
+
 
     //change title color
     TITLECOLOR_CHANGE();
@@ -453,11 +464,11 @@ function check_explore_LG(switcher){
 function Explore_Nearby(LorG,start,minhops,N,query,born){
     var currentnodes = CLIENT_NODES_ids;
     if ( LorG=="specific" ){
-        var subparameters = {'ipt':query,'tp':SP_distance,'minhops':minhops,'localnodes':null};
+        var subparameters = {'ipt':query,'tp':ExploreSP_distance,'minhops':minhops,'localnodes':null};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
     }else if( LorG=="general" ){
-        var subparameters = {'ipt':query,'tp':G_Distance,'minhops':minhops,'localnodes':null};
+        var subparameters = {'ipt':query,'tp':ExploreG_Distance,'minhops':minhops,'localnodes':null};
         var parameters = {'N':N,'parameters':subparameters,'generator':'get_Rel_one','start':start};
         var info = {'explorelocal': false, 'parameters':parameters,'localnodes':currentnodes};
     }else{
@@ -479,11 +490,11 @@ function Explore_Nearby(LorG,start,minhops,N,query,born){
 //find paths between two nodes
 function findPaths_betweenNodes(LorG, start, minhops, N, node1, node2){
     if ( LorG=="specific" ){
-        var subparameters = {"source":node1,"target":node2,"tp":SP_distance,"minhops":minhops,"localnodes":null};
+        var subparameters = {"source":node1,"target":node2,"tp":PathSP_distance,"minhops":minhops,"localnodes":null};
         var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
         var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
     }else if( LorG=="general" ){
-        var subparameters = {"source":node1,"target":node2,"tp":G_Distance,"minhops":minhops,"localnodes":null};
+        var subparameters = {"source":node1,"target":node2,"tp":PathG_Distance,"minhops":minhops,"localnodes":null};
         var parameters={"N":N,"parameters":subparameters,"generator":"find_paths","start":start};
         var info = {"explorelocal":false,"parameters":parameters,"localnodes":CLIENT_NODES_ids};
     }else{
@@ -506,11 +517,11 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
         throw 'two clusters are overlapping.'
     };
     if ( LorG=='specific' ){
-        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':SP_distance, 'localnodes':null};
+        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':PathSP_distance, 'localnodes':null};
         var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start  };
         var info = {'explorelocal':false, 'parameters':parameters, 'localnodes':CLIENT_NODES_ids};
     }else if( LorG=="general" ){
-        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':G_Distance, 'localnodes':null};
+        var subparameters = {'cluster1':cluster1, 'cluster2':cluster2, 'tp':PathG_Distance, 'localnodes':null};
         var parameters = { 'N':N, 'parameters':subparameters, 'generator': 'find_paths_clusters','start':start  };
         var info = {'explorelocal':false, 'parameters':parameters, 'localnodes':CLIENT_NODES_ids};
     }else{
@@ -533,7 +544,7 @@ function findBpaths_betweenClusters(LorG, start, N, cluster1, cluster2){
 function generator_update_graphAndPanel(info,bornplace,znodes,queries){
     d3.select('div#info_panel div.info-display').selectAll('div.row').remove();
     Loading_Spinner.spin(d3.select('.info-display').node());
-    d3.selectAll('#mainSearchBox,#func-nav,#point,#point_show_results,#line,#line_show_results,#cluster,#info_panel').style("pointer-events", "none");
+    d3.selectAll('.gnode,#mainSearchBox,#func-nav,#point,#point_show_results,#line,#line_show_results,#cluster,#info_panel').style("pointer-events", "none");
     d3.select('#pleasewait').style('display','block');
 
     d3.json('/generator/'+JSON.stringify(info),function(error,data){
@@ -566,7 +577,7 @@ function generator_update_graphAndPanel(info,bornplace,znodes,queries){
 function update_informationPanel(paths,position){
 
     Loading_Spinner.stop();
-    d3.selectAll('#mainSearchBox,#func-nav,#point,#point_show_results,#line,#line_show_results,#cluster,#info_panel').style("pointer-events", null);
+    d3.selectAll('.gnode,#mainSearchBox,#func-nav,#point,#point_show_results,#line,#line_show_results,#cluster,#info_panel').style("pointer-events", null);
     d3.select('#pleasewait').style('display','none');
 
     var inforow = d3.select('div#info_panel div.info-display')
@@ -617,12 +628,19 @@ function update_informationPanel(paths,position){
         d3.selectAll('div.row').classed('clicked',false);
         d3.select(this).classed('clicked',true);
         var hltP1=[];
+        var hltQ = [];
+        if ( d3.select('#point').style('display')=='block' ){
+            hltQ.push(d.ids[0]);
+        }else if( d3.select('#line').style('display')=='block' ){
+            hltQ.push(d.ids[0]);
+            hltQ.push(d.ids.slice(-1)[0]);
+        };
         paths.forEach(function(p,pi){
             if(pi!=i){
                 hltP1.push(p.ids);
             };
         });
-        var highlights={'nodes':[],'paths':[d.ids],'paths1':hltP1};
+        var highlights={'nodes':hltQ,'paths':[d.ids],'paths1':hltP1};
         highlight_nodespaths(highlights);
         ZoomToNodes(d.ids);
     });
@@ -774,10 +792,12 @@ function cancelClusterColor(){
 //cancel query highlight
 function cancelQyHighlight(){
     d3.selectAll(".gnode circle").classed('hltQ',null);
+    d3.selectAll(".gnode text").classed('txQ',null);
 };
 //cancel information highlight
 function cancelInfoHighlight(){
     d3.selectAll(".gnode circle").classed('hltA hltA1 hltP hltP1',null);
+    d3.selectAll(".gnode text").classed('hlttx',null);
     d3.selectAll(".edge").attr('class','edge');
 };
 //resume cluster color

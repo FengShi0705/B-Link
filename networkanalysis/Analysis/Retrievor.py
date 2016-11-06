@@ -41,6 +41,7 @@ class UndirectedG(object):
         ipwids = PF.find_id(ipts, cursor)
         ipwids=list(set(ipwids))
         for n in ipwids:
+            assert self.G.has_node(n),'graph can not find the node'
             print n, self.G.node[n]['label']
 
         cursor.close()
