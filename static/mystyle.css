@@ -186,7 +186,7 @@ input[name="switch-1"]:checked + .slider:before {
 }
 
 input[name="switch-2"]:checked + .slider:before {
-  transform: translateY(66px);
+  transform: translateX(66px);
 }
 
 input[name="switch-3"]:checked + .slider:before {
