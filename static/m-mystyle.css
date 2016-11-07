@@ -150,7 +150,7 @@ input[name="switch-1"]:checked + .slider:before {
 }
 
 input[name="switch-2"]:checked + .slider:before {
-  transform: translateX(40px);
+  transform: translateX(50px);
 }
 
 input[name="switch-3"]:checked + .slider:before {
