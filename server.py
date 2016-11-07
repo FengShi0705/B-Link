@@ -4,6 +4,7 @@ import networkx as nx
 from networkanalysis.Analysis import Retrievor
 from user_Feedback.recordUser import record_thread,error_thread,userQuestion
 from Private import PF
+import time
 from time import gmtime, strftime
 
 
@@ -12,8 +13,8 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-#myRtr=Retrievor.UndirectedG('addNodeEdgeDegree_R+rn+GMHM_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j','total_v3_csvneo4j','userdata')
-myRtr=Retrievor.UndirectedG('undirected(fortest)_R+G+SP+C+c','fortest','userdata')
+myRtr=Retrievor.UndirectedG('addNodeEdgeDegree_R+rn+GMHM_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j','total_v3_csvneo4j','userdata')
+#myRtr=Retrievor.UndirectedG('undirected(fortest)_R+G+SP+C+c','fortest','userdata')
 print 'edges: ', len(myRtr.G.edges())
 print 'nodes: ', len(myRtr.G.nodes())
 
@@ -238,11 +239,11 @@ def BI_data():
     if times_count_last is None:
         times_count = 1
     else:
-        times_count = times_count_last + 1;
+        times_count = times_count_last + 1
     session['feedback_times'] = times_count
 
     for i in range(1,5):
-        Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'BI{}\', \'{}\' )'.format(times_count, email, i+1, answer[i-1])
+        Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`, `time`) VALUES (\'{}\', \'{}\', \'BI{}\', \'{}\', \'{}\' )'.format(times_count, email, i+1, answer[i-1], time.strftime('%Y-%m-%d %H:%M:%S'))
         cursor.execute(Qy)
     cnx.commit()
     cursor.close()
@@ -276,14 +277,14 @@ def HCI_data():
     if (submit_count == 1):
         print 'count is 1'
         for i in range(0, 5):
-            Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'HCI{}\', \'{}\' )'.format(
-                times_count, email, i + 1, answer[i])
+            Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`, `time`) VALUES (\'{}\', \'{}\', \'HCI{}\', \'{}\', \'{}\' )'.format(
+                times_count, email, i + 1, answer[i], time.strftime('%Y-%m-%d %H:%M:%S'))
             cursor.execute(Qy)
     else:
         print 'count is more than 1'
         for i in range(0, 5):
-            Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`) VALUES (\'{}\', \'{}\', \'HCI{}\') ON DUPLICATE KEY UPDATE answer = \'{}\' '.format(
-                times_count, email, i + 1, answer[i])
+            Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`) VALUES (\'{}\', \'{}\', \'HCI{}\') ON DUPLICATE KEY UPDATE answer = \'{}\', `time`=\'{}\' '.format(
+                times_count, email, i + 1, answer[i], time.strftime('%Y-%m-%d %H:%M:%S'))
             cursor.execute(Qy)
 
     cnx.commit()
@@ -343,7 +344,7 @@ def FE_data():
 
     FE8 = request.form['FE8']
 
-    answer = [FE1, FE2, FE3, FE4, FE5, FE6, FE7, FE8];
+    answer = [FE1, FE2, FE3, FE4, FE5, FE6, FE7, FE8]
 
     print FE1, FE2, FE3, FE4, FE5, FE6, FE7, FE8,  answer
 
@@ -351,8 +352,8 @@ def FE_data():
     times_count = session['feedback_times']
 
     for i in range(0, 8):
-        Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`) VALUES (\'{}\', \'{}\', \'FE{}\', \'{}\' )'.format(
-            times_count, email, i + 1, answer[i])
+        Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`, `time`) VALUES (\'{}\', \'{}\', \'FE{}\', \'{}\', \'{}\' )'.format(
+            times_count, email, i + 1, answer[i], time.strftime('%Y-%m-%d %H:%M:%S'))
         cursor.execute(Qy)
     cnx.commit()
     cursor.close()

@@ -3,12 +3,7 @@
 
 /////////////////////////////////////////-----  HTML DESIGN ONLY below -----///////////////////////////////////////////
 
-// hide information panel
-function Hide_InfoPanel(){
-    document.getElementById("info_panel").style.display = "none";
 
-    cancelInfoHighlight();
-};
 
 function Hide_FuncPanel(){
     // document.getElementById("func-nav").style.display = "none";
@@ -88,6 +83,10 @@ d3.selectAll('#switch-1,#switch-2,#switch-3').on('click',function(d){
         console.log('switch-3');
         resumeClusterColor();
     };
+    if(this.id=='switch-1'){
+        resetMinihop_Explore();
+    };
+
     d3.select(this.parentNode.parentNode.parentNode).select('.t-global').classed('t-global-toggle',function(d){return !d3.select(this).classed('t-global-toggle');});
     d3.select(this.parentNode.parentNode.parentNode).select('.t-local').classed('t-local-toggle',function(d){return !d3.select(this).classed('t-local-toggle');});
 });

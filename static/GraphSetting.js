@@ -79,7 +79,7 @@ console.log(ExploreG_Distance)
 var ExploreSP_distance = 'R_r_GM';
 console.log('ExploreSP_distance');
 console.log(ExploreSP_distance);
-var PathG_Distance = 'R_n_HM';
+var PathG_Distance = 'R_r_HM';
 console.log('PathG_Distance')
 console.log(PathG_Distance)
 var PathSP_distance = 'R_n_GM';
@@ -121,7 +121,7 @@ CLIENT_EDGES=[];
 SIMULATION = d3.forceSimulation()
                .force("link",d3.forceLink().id(function id(d){return d.wid;}).links(CLIENT_EDGES)) //add spring
                .force("charge", d3.forceManyBody().strength(-100)) //repel each other
-               //.force("center", d3.forceCenter(w / 2, h / 2)) // force to center
+               .force("center", d3.forceCenter(w / 2, h / 2)) // force to center
                .nodes(CLIENT_NODES);
 // tick on
   TICK = function(){
@@ -163,4 +163,16 @@ SIMULATION = d3.forceSimulation()
   function zoomed() {
 
   GRAPH.attr("transform", d3.event.transform);
+};
+
+
+///////////////////////////////////////////// common - action setting//////////////////////////////////////////////////////
+// hide information panel
+function Hide_InfoPanel(){
+    document.getElementById("info_panel").style.display = "none";
+    cancelInfoHighlight();
+};
+
+function resetMinihop_Explore(){
+    d3.select('#minhop_point').each(function(d){this.value=1;});
 };

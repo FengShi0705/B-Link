@@ -250,6 +250,8 @@ function node_left_click_on(){
               // highlight the clicked node
               var highlights = {'nodes':[d.wid],'paths':[],'paths1':[]};
               highlight_nodespaths(highlights);
+              // reset explore minihop
+              resetMinihop_Explore();
 
               if(d3.select('#point').style('display')=='block'){ var searchid='point_textinput';}
               if(d3.select('#mainSearchBox').style('display')=='block'){ var searchid='keywords';};
