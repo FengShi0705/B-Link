@@ -311,7 +311,7 @@ def userQuestion(schema,user,N):
             record = json.loads(results[ind][0])
             if query_type == 'get_Rel_one' and len(record)>2:
                 records = zip(record[0:-1],record[1:])
-                for rd in records:
+                for rd in records[0:2]:
                     Rd='[' + '] -- ['.join(rd) + ']'
                     questions[query_type].append(Rd)
             else:
