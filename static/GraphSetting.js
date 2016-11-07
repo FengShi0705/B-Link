@@ -79,7 +79,7 @@ console.log(ExploreG_Distance)
 var ExploreSP_distance = 'R_r_GM';
 console.log('ExploreSP_distance');
 console.log(ExploreSP_distance);
-var PathG_Distance = 'R_n_HM';
+var PathG_Distance = 'R_r_HM';
 console.log('PathG_Distance')
 console.log(PathG_Distance)
 var PathSP_distance = 'R_n_GM';
