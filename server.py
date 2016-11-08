@@ -13,8 +13,8 @@ app.secret_key='\x8b\x19\xa1\xb0D\x87?\xc1M\x04\xff\xc8\xbdE\xb1\xca\xe6\x9e\x8d
 
 # Initial Data
 # whole retrievor, use whole database as its own graph
-myRtr=Retrievor.UndirectedG('addNodeEdgeDegree_R+rn+GMHM_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j','total_v3_csvneo4j','userdata')
-#myRtr=Retrievor.UndirectedG('undirected(fortest)_R+G+SP+C+c','fortest','userdata')
+#myRtr=Retrievor.UndirectedG('addNodeEdgeDegree_R+rn+GMHM_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j','total_v3_csvneo4j','userdata')
+myRtr=Retrievor.UndirectedG('undirected(fortest)_R+G+SP+C+c','fortest','userdata')
 print 'edges: ', len(myRtr.G.edges())
 print 'nodes: ', len(myRtr.G.nodes())
 
@@ -240,7 +240,6 @@ def BI_data():
     BI2 = request.form['BI2']
     BI3 = request.form['BI3']
     BI4 = request.form['BI4']
-    BI5 = request.form['BI5']
     BI5_temp = request.form.getlist('BI5')
     BI5 = json.dumps(BI5_temp)
 
@@ -350,13 +349,12 @@ def FE_data():
     FE5 = request.form['FE5']
     FE6 = request.form['FE6']
 
-    FE7_temp = request.form.getlist('FE7')
+    FE7_temp = request.form['FE7']
     FE7_r_temp = request.form.getlist('FE7-r')
-    if FE7_temp is None:
+    if (FE7_temp == 'yes'):
         FE7 = json.dumps(FE7_temp)
     else:
-        FE7_temp.append(FE7_r_temp)
-        FE7 = json.dumps(FE7_temp)
+        FE7 = json.dumps(FE7_r_temp)
 
     FE8 = request.form['FE8']
 
@@ -368,8 +366,8 @@ def FE_data():
     times_count = session['feedback_times']
 
     for i in range(0, 8):
-        Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`, `time`) VALUES (\'{}\', \'{}\', \'FE{}\', \'{}\', \'{}\' )'.format(
-            times_count, email, i + 1, answer[i], time.strftime('%Y-%m-%d %H:%M:%S'))
+        Qy = 'INSERT INTO `ans_all` (`times_count`, `email`, `question`, `answer`, `time`) VALUES (\'{}\', \'{}\', \'FE{}\', \'{}\', \'{}\' ) ON DUPLICATE KEY UPDATE answer = \'{}\', `time`=\'{}\' '.format(
+            times_count, email, i + 1, answer[i], time.strftime('%Y-%m-%d %H:%M:%S'), answer[i], time.strftime('%Y-%m-%d %H:%M:%S'))
         cursor.execute(Qy)
     cnx.commit()
     cursor.close()

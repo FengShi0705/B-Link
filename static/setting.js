@@ -1,9 +1,5 @@
 
-
-
 /////////////////////////////////////////-----  HTML DESIGN ONLY below -----///////////////////////////////////////////
-
-
 
 function Hide_FuncPanel(){
     // document.getElementById("func-nav").style.display = "none";
@@ -226,6 +222,7 @@ function showClusterLevel2(){
 
 // cluster input box control
 $(document).ready(function(){
+
     var count = 1;
     $('#remBtn').hide();
     $("#addBtn").click(function(){
