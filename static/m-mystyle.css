@@ -365,7 +365,9 @@ div.info-display div.row:after {
     pointer-events:none;
 }
 
-
+@media only screen and (max-width: 350px) {
+    .iphone5_none {display:none;}
+}
 
 
 

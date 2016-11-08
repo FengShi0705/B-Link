@@ -109,7 +109,7 @@ $(document).ready(function(){
     });
 
     $('input[name$="FE7"]').click(function(){
-        if($('input[name$="FE7"]').is(':checked')){
+        if($('#FE7_no').is(':checked')){
             $('#FE7reason').show();
         }
         else{
