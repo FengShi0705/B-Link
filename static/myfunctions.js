@@ -722,6 +722,10 @@ function generate_Clusters(){
 
         //option click on
         d3.selectAll('#clusterStartList a').on('click',function(d,i){
+            //zoom to cluster
+            var cl_nodes = d3.select(this).data()[0];
+            ZoomToNodes(cl_nodes);
+
             var color = d3.select(this).style('background-color');
             var value = d3.select(this).attr('value');
             d3.select('#clusterStartSelect')
@@ -730,7 +734,10 @@ function generate_Clusters(){
             ChangeSelectCluster('clusterStartSelect');
          });
         d3.selectAll('#clusterEndList a').on('click',function(d,i){
-            console.log('haha');
+            //zoom to cluster
+            var cl_nodes = d3.select(this).data()[0];
+            ZoomToNodes(cl_nodes);
+
             var value = d3.select(this).attr('value');
             var color = d3.select(this).style('background-color')
             d3.select('#clusterEndSelect')

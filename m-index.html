@@ -32,20 +32,20 @@
               <img class="w3-border w3-border-blue w3-round" src="static/point.png" style="width:70%;">
               <div class="w3-small w3-text-cyan" style="letter-spacing:0.8px;">Explore</div>
               <div class="tip-style w3-card-2">
-                  Explore around your query
+                  Discover associated concepts around your input
               </div>
           </div>
           <div class="w3-white w3-btn w3-col s4 tooltip " onclick="show_panel('line')">
               <img class="w3-border w3-border-blue w3-round" src="static/line.png" style="width:70%;">
               <div class="w3-small w3-text-cyan">Search Path</div>
               <div class="tip-style w3-card-2" >
-                  Find association path between two concepts </div>
+                  Discover associated paths between two inputs </div>
           </div>
           <div class="w3-white w3-btn w3-col s4 tooltip" onclick="show_panel('cluster')">
               <img class="w3-border w3-border-blue w3-round" src="static/cluster.png" style="width:70%;">
               <div class="w3-small w3-text-cyan" style="letter-spacing:1px;">Cluster</div>
               <div class="tip-style w3-card-2">
-                  Divide concepts into different groups </div>
+                  Divide current network into different groups </div>
           </div>
       </div>
 
@@ -62,14 +62,38 @@
       </div>
       <div id="point_show_results"  class="panel w3-border w3-border-cyan w3-round-large" style="box-sizing:border-box;top:45px;background-color:#e6ffe6;">
           <div class="w3-row " style="margin:5px 0; ">
-                <div class="w3-col s6 w3-center" style="">
+              <div class="w3-col s6 w3-border-right w3-border-cyan" style="height:60px;" >
+                    <div style="position:relative;width:130px;left:50%;margin-left:-65px;">
+                        <div class="w3-display-container" style="width:70px; height:60px; margin-right:0px; display:inline-block;">
+                            <div class="w3-display-topright t-global" >General</div>
+                            <div class="w3-display-bottomright t-local" >Specific</div>
+                        </div>
+                        <div class="w3-display-container" style="display:inline-block;height:60px;width:15px;margin-right:10px;z-index:5;">
+                            <span class="w3-tooltip w3-display-topmiddle" style="height:15px;top:-8px;">
+                                <image src="/static/question.png" style="cursor:pointer;width:100%;"></image>
+                                <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:147.3px;left:10px;right:10px;padding:5px 10px;z-index:99;">
+                                    Explore general knowledge and common sense around your input</div>
+                            </span>
+                            <span class="w3-tooltip w3-display-bottommiddle" style="padding-bottom:10px;">
+                                <image src="/static/question.png" style="cursor:pointer;width:100%;"></image>
+                                <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:147.3px;left:10px;right:10px;padding:5px 10px;z-index:99;">
+                                    Explore professional and specific knowledge around your input</div>
+                            </span>
+                        </div>
+                        <label class="switch switchLG">
+                            <input type="checkbox" name="switch-1" id="switch-1">
+                            <div class="slider round"></div>
+                        </label>
+                    </div>
+                </div>
+              <div class="w3-col s6 w3-center">
                   <div class="" style="position:relative;width:124px;left:50%;margin-left:-62px;padding-bottom:10px; ">
-                      <span style="font-size:14px;width:130px;margin-right:2px;">Min. Hop Steps</span>
-                      <div class="w3-tooltip" style="display:inline-block;width:15px;cursor:pointer; position:absolute;top:-2px;">
+                      <span style="font-size:14px;width:130px;margin-right:2px;">Minimum Steps</span>
+                      <div class="w3-tooltip" style="display:inline-block;width:15px;cursor:pointer; position:absolute;top:-8px;">
                           <image src="/static/question.png" ></image>
                           <div class="w3-text w3-card-2 w3-medium w3-white w3-left w3-text-red"
                                style="position:fixed;left:10px;right:10px;top:147.3px;white-space:normal;padding:5px 10px;z-index:5;">
-                              Define the minimum steps of successive association
+                              Define the minimum length of linked outputs
                           </div>
                       </div>
                   </div>
@@ -80,30 +104,6 @@
                       <option value="4">4</option>
                       <option value="5">5</option>
                   </select>
-                </div>
-                <div class="w3-col s6 w3-border-left w3-border-cyan" style="height:60px;" >
-                    <div style="position:relative;width:130px;left:50%;margin-left:-65px;">
-                        <div class="w3-display-container" style="width:70px; height:60px; margin-right:0px; display:inline-block;">
-                            <div class="w3-display-topright t-global" >General</div>
-                            <div class="w3-display-bottomright t-local" >Specific</div>
-                        </div>
-                        <div class="w3-display-container" style="display:inline-block;height:60px;width:15px;margin-right:10px;z-index:5;">
-                            <span class="w3-tooltip w3-display-topmiddle" style="height:15px;top:-8px;">
-                                <image src="/static/question.png" style="cursor:pointer;width:100%;"></image>
-                                <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:147.3px;left:10px;right:10px;padding:5px 10px;z-index:99;">
-                                    Explore general knowledge and common sense around your query</div>
-                            </span>
-                            <span class="w3-tooltip w3-display-bottommiddle" style="padding-bottom:10px;">
-                                <image src="/static/question.png" style="cursor:pointer;width:100%;"></image>
-                                <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:147.3px;left:10px;right:10px;padding:5px 10px;z-index:99;">
-                                    Explore professional and specific knowledge around your query</div>
-                            </span>
-                        </div>
-                        <label class="switch switchLG">
-                            <input type="checkbox" name="switch-1" id="switch-1">
-                            <div class="slider round"></div>
-                        </label>
-                    </div>
                 </div>
           </div>
           <div class="w3-container w3-center">
@@ -175,12 +175,12 @@
               </div-->
           </div>
           <div class=" w3-row w3-center" style="padding:10px 0;">
-              <div class="w3-col s4 w3-center t-global w3-display-container"  style="font-size:16px;">Divergent
-                  <div class="w3-display-topright w3-tooltip" style="right:-2px;top:-16px;">
+              <div class="w3-col s4 w3-center t-global w3-display-container"  style="font-size:16px;">Professional
+                  <!--div class="w3-display-topright w3-tooltip" style="right:-2px;top:-16px;">
                       <image src="/static/question.png" ></image>
                       <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:165px;left:10px;right:10px;padding:5px 10px;z-index:99;">
                         Divergent: search association paths with divergent thinking</div>
-                  </div>
+                  </div-->
               </div>
               <div class="w3-col s4 w3-center" style="padding-top:2px;" >
                   <label class="switch-cluster switchLG">
@@ -188,12 +188,12 @@
                     <div class="slider round"></div>
                   </label>
               </div>
-              <div class="w3-col s4 w3-center t-local" style="font-size:16px;">Convergent
-                  <div class="w3-display-topright w3-tooltip" style="top:-6px;">
+              <div class="w3-col s4 w3-center t-local" style="font-size:16px;">Basic
+                  <!--div class="w3-display-topright w3-tooltip" style="top:-6px;">
                       <image src="/static/question.png" ></image>
                       <div class="w3-text w3-card-2 w3-medium w3-white w3-text-red" style="position:fixed;top:165px;left:10px;right:10px;padding:5px 10px;z-index:99;">
                         Convergent: search association paths with convergent thinking</div>
-                  </div>
+                  </div-->
               </div>
           </div>
           <div class="w3-container w3-center">
@@ -205,26 +205,31 @@
           <div id="cluster_level_1" class="" >
               <div class="w3-white" style="min-height:190px;padding-bottom:10px;">
                   <div class="w3-container w3-blue">
-                      <h2>Setting</h2>
+                      <h2>Instruction</h2>
                   </div>
                   <div class="w3-panel">
+                      <span style="padding:0 5px;">First, the current network map, which was formed by your explorations, will be divided into several groups.</span>
+                      <p>To define how many groups you would like to create, please:</p>
                       <select id="clusterMethod" class="w3-select" onchange="clusterSettingOption()" style="">
-                          <option value="" disabled selected> Choose A Method to Cluster</option>
-                          <option value="normalized" >Specify quantity of groups</option>
-                          <option value="mcl" >Specify degree of clustering</option>
+                          <option value="" disabled selected> Choose A Method to Proceed</option>
+                          <option value="normalized" >Define quantity of groups</option>
+                          <option value="mcl" >Define degree of clustering</option>
                       </select>
                   </div>
                   <div id="clusterMethod1Setting" class="w3-container" style="display:none;">
-                      <span class="w3-label">Number of Clusters:   </span>
-                      <input type="number" class="w3-large w3-center-align" name="clusterNum" min="1" step="1" value="1" style="width:50px;">
+                      <span class="w3-label">Number of Groups:   </span>
+                      <input type="number" class="w3-large w3-center-align" name="clusterNum" min="1" step="1" value="2" style="width:50px;">
                   </div>
                   <div id="clusterMethod2Setting" class="w3-container" style="display:none;">
                       <div class="w3-label" style="padding-bottom:10px;">Set the Cluster Level:</div>
                       <div class="w3-row w3-center">
-                          <div class="w3-col s2">Low</div>
-                          <div class="w3-col s8"><input type="range" class="" name="clusterLevel" min="1" max="5" step="0.001" value="1" style="width:100%;"></div>
-                          <div class="w3-col s2">High</div>
+                          <div class="w3-col s2">Few</div>
+                          <div class="w3-col s8"><input type="range" class="" name="clusterLevel" min="1" max="5" step="0.001" value="2" style="width:100%;"></div>
+                          <div class="w3-col s2">Many</div>
                       </div>
+                  </div>
+                  <div style="padding:0 16px;">
+                      <p>Second, the divided groups will be presented in different colors, then you will be able to find path between two groups.</p>
                   </div>
               </div>
 
@@ -245,33 +250,32 @@
               </div>
               <div class="w3-container w3-white" style="height:2px;"></div>
 
-              <!--
-              <ul class="w3-navbar  w3-row">
+              <!--ul class="w3-navbar  w3-row">
                   <li id="clusterBtnPath" class="w3-half w3-center " style="cursor:pointer; ">
                       <div class="w3-align-center" style="cursor:pointer;" onclick="clusterPan('findPath')"><h5 id="textPath">Find Path</h5></div>
                   </li>
                   <li id="clusterBtnNode" class="w3-half w3-center " style="cursor:pointer; ">
                       <div class="w3-align-center" style="cursor:pointer;" onclick="clusterPan('generateMore')"><h5 id="textNode">More Nodes</h5></div>
                   </li>
-              </ul>
-              -->
+              </ul-->
+
               <div class="w3-container w3-center w3-blue" style="height:35px;">
-                  <h6 style="font-weight:bold; margin:0; letter-spacing:1px; padding-top:5.5px;">Search Path Between Clusters</h6></div>
+                  <h6 style="font-weight:bold; margin:0; letter-spacing:1px; padding-top:5.5px;">Search Path Between Groups</h6></div>
               <div id="findPath" class="w3-white cluster-panel w3-center" style="">
                   <div class=" w3-row w3-container w3-center" style="padding:5px 20px;">
-                      <div class="w3-col s4 w3-center t-global"  style="">Divergent</div>
+                      <div class="w3-col s4 w3-center t-global"  style="">Professional</div>
                       <div class="w3-col s4 w3-center" style="padding:2.5px 0;">
                           <label class="switch-cluster switchLG">
                             <input type="checkbox" name="switch-3" id="switch-3">
                             <div class="slider round"></div>
                           </label>
                       </div>
-                      <div class="w3-col s4 w3-center t-local" style="">Convergent</div>
+                      <div class="w3-col s4 w3-center t-local" style="">Basic</div>
                   </div>
                   <div class="w3-border-top w3-border-black w3-row" style="padding-top:10px;" >
                       <div id="BpathStart" class="w3-dropdown-click w3-col s6 ">
                             <button id="clusterStartSelect" class="w3-btn w3-row w3-border w3-border-blue" style="background-color:white;width:90%;padding:3px 0;">
-                                <span id="start_select_text" class="w3-col w3-bold w3-text-black" style="width:85%;">START cluster</span>
+                                <span id="start_select_text" class="w3-col w3-bold w3-text-black" style="width:85%;">START group</span>
                                 <i class="material-icons w3-rest w3-text-black" style="vertical-align:-30%;">arrow_drop_down</i>
                             </button>
                             <div id="clusterStartList" class="w3-dropdown-content w3-card-4" style="width:90%;z-index:5;min-width:0;left:2.5vw;">
@@ -280,7 +284,7 @@
                       </div>
                       <div id="BpathEnd" class="w3-dropdown-click w3-col s6 ">
                             <button id="clusterEndSelect" class="w3-btn w3-row w3-border w3-border-blue" style="background-color:white;width:90%;padding:3px 0;">
-                                <span id="end_select_text" class="w3-col w3-bold w3-text-black" style="width:85%;">END cluster</span>
+                                <span id="end_select_text" class="w3-col w3-bold w3-text-black" style="width:85%;">END group</span>
                                 <i class="material-icons w3-rest w3-text-black" style="vertical-align:-30%;">arrow_drop_down</i>
                             </button>
                             <div id="clusterEndList" class="w3-dropdown-content w3-card-4" style="width:90%;z-index:6;min-width:0;left:2.5vw;">
