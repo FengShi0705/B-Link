@@ -167,6 +167,18 @@ SIMULATION = d3.forceSimulation()
 
 
 ///////////////////////////////////////////// common - action setting//////////////////////////////////////////////////////
+//alert fisttime visit
+d3.json('/checkFirstTimevisit',function(error,data){
+    if(data==true){
+        alert('Tips: 1. Play it just like Google map;\n        2. You can also select node by clicking it instead of typing in the searchbox'+
+       '\n \n                      Play it hard and Have fun, Thanks!')
+    };
+});
+
+
+
+
+
 // hide information panel
 function Hide_InfoPanel(){
     document.getElementById("info_panel").style.display = "none";
