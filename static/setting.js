@@ -222,8 +222,6 @@ function showClusterLevel2(){
 
 // cluster input box control
 $(document).ready(function(){
-    alert('Tips: 1. manipulate the network like Google map;\n        2. click the node instead of typing it in search-box;'+
-           '\n \n                      Well done, have fun and enjoy !')
 
     var count = 1;
     $('#remBtn').hide();

@@ -28,22 +28,22 @@
       </div>
 
       <div id="func-nav" class="panel w3-row w3-border w3-border-cyan w3-round-large w3-white" style="top:45px;padding:0 10px;">
-          <div class="w3-white w3-btn w3-col s4 tooltip " onclick="show_panel('point')">
+          <div class="w3-white w3-btn w3-col s4 tooltip " onclick="show_panel('point')" style="padding:6px 0;">
               <img class="w3-border w3-border-blue w3-round" src="static/point.png" style="width:70%;">
-              <div class="w3-small w3-text-cyan" style="letter-spacing:0.8px;">Explore</div>
+              <div class="w3-small w3-text-cyan" style="letter-spacing:0.8px;padding-top:2px;">Explore</div>
               <div class="tip-style w3-card-2">
                   Discover associated concepts around your input
               </div>
           </div>
-          <div class="w3-white w3-btn w3-col s4 tooltip " onclick="show_panel('line')">
+          <div class="w3-white w3-btn w3-col s4 tooltip " onclick="show_panel('line')" style="padding:6px 0;">
               <img class="w3-border w3-border-blue w3-round" src="static/line.png" style="width:70%;">
-              <div class="w3-small w3-text-cyan">Search Path</div>
+              <div class="w3-small w3-text-cyan" style="padding-top:2px;">Search Path</div>
               <div class="tip-style w3-card-2" >
                   Discover associated paths between two inputs </div>
           </div>
-          <div class="w3-white w3-btn w3-col s4 tooltip" onclick="show_panel('cluster')">
+          <div class="w3-white w3-btn w3-col s4 tooltip" onclick="show_panel('cluster')" style="padding:6px 0;">
               <img class="w3-border w3-border-blue w3-round" src="static/cluster.png" style="width:70%;">
-              <div class="w3-small w3-text-cyan" style="letter-spacing:1px;">Cluster</div>
+              <div class="w3-small w3-text-cyan" style="letter-spacing:1px;padding-top:2px;">Cluster</div>
               <div class="tip-style w3-card-2">
                   Divide current network into different groups </div>
           </div>
@@ -93,7 +93,7 @@
                           <image src="/static/question.png" ></image>
                           <div class="w3-text w3-card-2 w3-medium w3-white w3-left w3-text-red"
                                style="position:fixed;left:10px;right:10px;top:147.3px;white-space:normal;padding:5px 10px;z-index:5;">
-                              Define the minimum length of linked outputs
+                              <img src="static/min_step.png" style="width:60%;">
                           </div>
                       </div>
                   </div>
@@ -208,7 +208,7 @@
                       <h2>Instruction</h2>
                   </div>
                   <div class="w3-panel">
-                      <span style="padding:0 5px;">First, the current network map, which was formed by your explorations, will be divided into several groups.</span>
+                      <span>Your current network map will be divided into several groups.</span>
                       <p>To define how many groups you would like to create, please:</p>
                       <select id="clusterMethod" class="w3-select" onchange="clusterSettingOption()" style="">
                           <option value="" disabled selected> Choose A Method to Proceed</option>
@@ -228,8 +228,8 @@
                           <div class="w3-col s2">Many</div>
                       </div>
                   </div>
-                  <div style="padding:0 16px;">
-                      <p>Second, the divided groups will be presented in different colors, then you will be able to find path between two groups.</p>
+                  <div class="iphone5_none" style="padding:0 16px;">
+                      <p>The divided groups will be presented in different colors, then you could find path between two groups.</p>
                   </div>
               </div>
 
