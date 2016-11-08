@@ -21,6 +21,7 @@ print 'nodes: ', len(myRtr.G.nodes())
 # sign up
 @app.route('/signup')
 def signup():
+    session['firstTimeVisit'] = True
     user = request.args.get('email','')
     w = request.args.get('w','')
     session['user'] = user
@@ -182,6 +183,21 @@ def generator(info):
         response=json.dumps(dataset)
 
     return make_response(response)
+
+# check first time visit
+@app.route('/checkFirstTimevisit')
+def checkFirstTimevisit():
+    if session['firstTimeVisit'] == True:
+        session['firstTimeVisit'] =False
+        info = True
+    else:
+        info = False
+    response = json.dumps(info)
+    return make_response(response)
+
+
+
+
 
 # get NeighborLevel for a node
 @app.route('/neighbor_level/<int:node>')
