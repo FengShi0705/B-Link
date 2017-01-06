@@ -41,8 +41,9 @@
     </div>
 
     <div class="w3-hide-small" style="height:50px;"></div>
+    <p class="w3-center w3-small" ><ins style="cursor:pointer;" onclick="privacy()">Terms & Conditions</ins></p>
     <div class="w3-center" style="height:128px;;">
-        <form action="/signup" class="" style="margin-top:50px;">
+        <form action="/signup" class="" style="">
             <input type="email" name="email" value="" class="w3-input" style="width:260px;;display:inline-block;"
                    placeholder="    Please type in your EMAIL" id="email" autocomplete="on" required>
             <br>
@@ -52,7 +53,13 @@
     </div>
 
     <script>
-        console.log('haha');
+        function privacy() {
+            alert ("Privacy Policy and Terms:\n\n "+
+            "1. Your email address will be used for counting access times only;\n"+
+            " 2. All the information you give in B-Link will be used for its research only and kept securely;\n"+
+            " 3. Your consent to participant in the feedback survey will be implied by submitting the online questionnaire;\n\n"+
+			"Thanks for using B-Link !");
+        }
 
         d3.select('#submit').on('click',function(){
             if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1){
