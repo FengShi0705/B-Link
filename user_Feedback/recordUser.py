@@ -127,7 +127,7 @@ class record_thread(threading.Thread):
                 if current_position == -1:
                     self.insert_newline(record_wid, record_label, newposition)
                 else:
-                    assert current_position == newposition, 'position does not remain same in the explore or search function'
+                    assert current_position == newposition, 'position does not remain same in the explore or search function' # Minimum Steps (minhops) may cause this error
                     self.addCount_updateTime(record_wid)
 
             elif self.query_type == 'find_paths':
