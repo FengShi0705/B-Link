@@ -9,7 +9,7 @@ Pandas version: 0.24.2
 
 Networkx version: 1.11
 
-The b-link souce data mainly contains two parts, i.e. a networkx gpickle file representing the graph structure, and a csv file representing the mapping between 
+The b-link souce data mainly contains two parts, i.e. (1) a networkx gpickle file representing the graph structure, and (2) a csv file representing the mapping between 
 node id and the node text.
 
 ## networkx gpickle
