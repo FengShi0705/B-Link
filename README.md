@@ -12,7 +12,7 @@ Networkx version: 1.11
 The b-link souce data mainly contains two parts, i.e. (1) a networkx gpickle file representing the graph structure, and (2) a csv file representing the mapping between 
 node id and the node text.
 
-## networkx gpickle
+## 1. networkx gpickle
 The networkx gpickle file can be downloaded [here](https://b-link.s3.eu-west-2.amazonaws.com/addNodeEdgeDegree_R%2Brn%2BGMHM_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j.gpickle). It represents the main graph structure of [B-Link](http://www.b-link.uk/).
 
 To use the networkx graph:
@@ -32,7 +32,7 @@ The code above check the edge between node(1048581) and node(343561). It shows t
 
 Regarding how to compute the disance between nodes, please refer to paper [1]
 
-## csv node id map
+## 2. csv node id map
 The csv file represents the mapping between node id and node phrase/text. It can be downloaded [here](https://b-link.s3.eu-west-2.amazonaws.com/node_words.gz).
 
 To check the mapping:
