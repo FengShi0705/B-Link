@@ -18,7 +18,7 @@ The networkx gpickle file can be downloaded [here](https://b-link.s3.eu-west-2.a
 To use the networkx graph:
 ```
 >>> import networkx as nx
->>> G= nx.read_gpickle('../addNodeEdgeDegree_R+rn+GMHM_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j.gpickle')
+>>> G= nx.read_gpickle('addNodeEdgeDegree_R+rn+GMHM_undirected_alpha0.65_nodeD1.0_total_v3_csvneo4j.gpickle')
 >>> G[1048581][343561]
 {'weight': 2.0, 'R_r_HM': 85.00000000000001, 'maxAlpha': 0.8335867548824862, 'R_n_HM': 29120.999999999975, 'minAlpha': 0.7497914234110472, 'R_r_GM': 3.3576916931673404, 'R_n_GM': 10.279214842380336}
 ```
